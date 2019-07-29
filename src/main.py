@@ -68,7 +68,7 @@ class testKid(QWidget):
 				btnApp.setIconSize(QSize(48,48))
 				btnApp.setToolTip(appName)
 				btnApp.clicked.connect(lambda: self._launch(appName))
-				vbox.addWidget(btnApp,0,Qt.Alignment(0))
+				vbox.addWidget(btnApp,0,Qt.Alignment(1))
 			tabContent.setLayout(vbox)
 			tabBar.addTab(tabContent,icn,(""))
 		return (tabBar)
@@ -88,14 +88,19 @@ class testKid(QWidget):
 
 	def _launch(self,app):
 		proc=QProcess(self.zone)
+		os.environ["HOME"]="/home/lliurex"
+		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
+		print("Launching")
 #		args=["-parent %s"%self.winID]
 		args=[]
 		app="Xephyr"
 		port=13001
-		xpra_cmd="xpra start :"+str(port)
-		xpra_cmd=xpra_cmd+" --systemd-run=no --exit-with-children --start-via-proxy=no  --start-child='xterm'"
+		xpra_cmd="xpra"
+		xpra_args=["start :%s"%str(port),"--exit-with-children","--start-via-proxy=no","--start-child='firefox'"]
+#		xpra_cmd=xpra_cmd+" --systemd-run=no --exit-with-children --start-via-proxy=no  --start-child='firefox'"
 #		proc.setProgram(app)
 		proc.start(xpra_cmd,args)
+		proc.waitForFinished(-1)
 
 
 
