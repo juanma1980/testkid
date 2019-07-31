@@ -13,6 +13,7 @@ import subprocess
 from edupals.ui import QAnimatedStatusBar
 from app2menu import App2Menu
 import time
+from libAppRun import appRun
 QString=type("")
 
 
@@ -45,11 +46,13 @@ class testKid(QWidget):
 		super().__init__()
 		self.dbg=True
 		self.pid=0
+		self.app_icons={}
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.showFullScreen()
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self._render_gui()
+		self.runner=appRun()
 	#def init
 	
 	def _debug(self,msg):
@@ -57,6 +60,7 @@ class testKid(QWidget):
 			print("%s"%msg)
 
 	def _render_gui(self):
+		self.show()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
 		self.statusBar.setStateCss("success","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(0,0,255,1), stop:1 rgba(0,0,255,0.6));color:white;")
@@ -64,19 +68,25 @@ class testKid(QWidget):
 		self.tabBar=self._tabBar()
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
-		self.show()
+	#def _render_gui
 
 	def _tabBar(self):
 		tabBar=QTabWidget()
+		tabScroll=QWidget()
+		scrollArea=QScrollArea(tabScroll)
+		tabContent=QWidget()
+#		icn=QtGui.QIcon.fromTheme("go-previous")
+		icn=QtGui.QIcon.fromTheme("go-home")
+		vbox=QGridLayout()
+		row=0
+		col=0
+		scr=app.primaryScreen()
+		w=scr.size().width()-128
+		h=scr.size().height()-256
+		maxCol=int(w/128)-3
+		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
 		for category,icon in self.categories.items():
-			tabContent=QWidget()
-			icn=QtGui.QIcon.fromTheme(icon)
-			vbox=QGridLayout()
 			apps=self._get_category_apps(category)
-			row=0
-			col=0
-			maxCol=int(self.width()/128)
-			self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
 			sigmap_run=QSignalMapper(self)
 			sigmap_run.mapped[QString].connect(self._launch)
 			for appName,appIcon in apps.items():
@@ -84,12 +94,12 @@ class testKid(QWidget):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
 				else:
 					continue
+				self.app_icons[appName]=appIcon
 				self._debug("Adding %s"%appName)
 				btnApp=QPushButton()
 				btnApp.setIcon(icnApp)
 				btnApp.setIconSize(QSize(128,128))
 				btnApp.setToolTip(appName)
-#				btnApp.clicked.connect(lambda: self._launch(appName))
 				sigmap_run.setMapping(btnApp,appName)
 				btnApp.clicked.connect(sigmap_run.map)
 				vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
@@ -98,9 +108,14 @@ class testKid(QWidget):
 					col=0
 					row+=1
 
-			tabContent.setLayout(vbox)
-			tabBar.addTab(tabContent,icn,(""))
+		tabContent.setLayout(vbox)
+		scrollArea.setWidget(tabContent)
+		scrollArea.alignment()
+		tabBar.addTab(tabScroll,icn,(""))
+		scrollArea.setGeometry(QRect(0,0,w,h))
+		tabBar.setIconSize(QSize(96,96))
 		return (tabBar)
+	#def _tabBar
 
 	def _get_category_apps(self,category):
 		apps={}
@@ -108,57 +123,31 @@ class testKid(QWidget):
 		for key,app in applist.items():
 			apps[app['exe']]=app['icon']
 		return (apps)
+	#def _get_category_apps
 
-	def _launchZone(self):
-#		self.winID=int(Qzone.winId())
-#		subZone=QtGui.QWindow.fromWinId(self.winID)
+	def _launchZone(self,app):
 		tabContent=QWidget()
 		box=QVBoxLayout()
-		wid=0
-		count=0
-		while not wid and count<=50:
-			p_wid=subprocess.run(["xdotool","search","--any","--pid","%s"%self.pid],stdout=subprocess.PIPE)
-			wid=p_wid.stdout.decode()
-			time.sleep(0.1)
-			count+=1
-		if not wid:
-			p_wid=subprocess.run(["xdotool","getactivewindow"],stdout=subprocess.PIPE)
-			wid=p_wid.stdout.decode()
+		wid=self.runner.get_wid(self.display)
 		self._debug("W: %s"%wid)
 		subZone=QtGui.QWindow.fromWinId(int(wid))
 		zone=QWidget.createWindowContainer(subZone)
 		zone.setParent(self)
 		box.addWidget(zone)
 		tabContent.setLayout(box)
-		self.tabBar.addTab(tabContent,"R")
-		os.environ['DISPLAY']=":13"
-		subprocess.Popen(["ratpoison"],stdin=None,stdout=None,stderr=None,shell=False)
-#		self.box.show()
-
-	def _launch2(self,app):
-		th_run=th_runApp(app)
-		th_run.start()
-
+		icn=QtGui.QIcon.fromTheme(self.app_icons[app])
+		self.tabBar.addTab(tabContent,icn,"")
+	#def _launchZone
 
 	def _launch(self,app):
 		self.tabBar.setCurrentIndex(3)
 		os.environ["HOME"]="/home/lliurex"
 		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
-		if self.pid==0:
-			args=[]
-			self._debug("Width: %s Height: %s"%(self.tabBar.width(),self.tabBar.height()))
-			xephyr_cmd=["Xephyr",
-			"-br",
-			"-ac",
-			"-screen",
-			"%sx%s"%(self.tabBar.width(),self.tabBar.height()),
-			":13"]
-
-			p_pid=subprocess.Popen(xephyr_cmd)
-			self.pid=p_pid.pid
-			self._launchZone()
-		self._launch2(app)
-
+#		if self.pid==0:
+		self.display,self.pid=self.runner.new_Xephyr(self.tabBar)
+		self._launchZone(app)
+		self.runner.launch(app,self.display)
+	#def _launch
 
 
 #_debug("Init %s"%sys.argv)
