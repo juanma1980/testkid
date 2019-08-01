@@ -27,6 +27,8 @@ class testKid(QWidget):
 		self.pid=0
 		self.app_icons={}
 		self.tab_icons={}
+		self.tab_id={0:{'index':0}}
+		self.id=0
 		self.currentTab=0
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
 		self.sigmap_tabSelect=QSignalMapper(self)
@@ -64,7 +66,7 @@ class testKid(QWidget):
 		self.statusBar.setStateCss("success","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(0,0,255,1), stop:1 rgba(0,0,255,0.6));color:white;")
 		self.box.addWidget(self.statusBar,0,0,1,1)
 		self.tabBar=self._tabBar()
-		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged())
+		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged(False))
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
 	#def _render_gui
@@ -114,31 +116,41 @@ class testKid(QWidget):
 		return (tabBar)
 	#def _tabBar
 
-	def _on_tabChanged(self):
-		self._debug("Current: %s"%self.currentTab)
-		index=self.currentTab
-		key='show'
-		if self.currentTab==0:
-			index='home'
-			key='close'
-		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
-
-		self.currentTab=self.tabBar.currentIndex()
-		index=self.currentTab
-		key='close'
-		if self.currentTab==0:
-			index='home'
+	def _on_tabChanged(self,remove=True):
+		if remove==False:
+			self._debug("Current: %s"%self.currentTab)
+			index=self._get_tabId_from_index(self.currentTab)
+			index=self.currentTab
 			key='show'
-		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
-		self._debug("New: %s"%self.currentTab)
+			if self.currentTab==0:
+				index='home'
+				key='close'
+			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
+			self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
+			index=self.currentTab
+			key='close'
+			if self.currentTab==0:
+				index='home'
+				key='show'
+			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
+			self._debug("New: %s"%self.currentTab)
 
 	def _on_tabSelect(self,index):
 		self._debug("Select tab: %s"%index)
-		self.tabBar.setCurrentIndex(index)
+		self.tabBar.setCurrentIndex(self.tab_id[index]['index'])
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
-		self.tabBar.removeTab(index)
+		self.tabBar.blockSignals(True)
+		self.tabBar.removeTab(self.tab_id[index]['index'])
+		for idx in range(index+1,len(self.tab_id)):
+			self._debug("Reasign %s"%(self.tab_id[idx]['index']))
+			self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
+			self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
+		self.tabId[index]={}
+		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
+		self.tabBar.blockSignals(False)
+		self._debug("Removed tab: %s"%index)
 
 	def _get_category_apps(self,category):
 		apps={}
@@ -162,12 +174,14 @@ class testKid(QWidget):
 		btn=QPushButton()
 		btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		btn.setIcon(icn)
-		self.sigmap_tabSelect.setMapping(btn,self.tabBar.count())
+		self.id+=1
+		self.tab_id[self.id]={'index':self.tabBar.count(),'pid':0}
+		self.sigmap_tabSelect.setMapping(btn,self.id)
 		btn.clicked.connect(self.sigmap_tabSelect.map)
 		btn_close=QPushButton()
 		btn_close.setIcon(self.closeIcon)
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.sigmap_tabRemove.setMapping(btn_close,self.tabBar.count())
+		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
 		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
 		self.tabBar.addTab(tabContent,"")
@@ -186,8 +200,62 @@ class testKid(QWidget):
 		self.runner.launch(app,self.display)
 	#def _launch
 
+	def _get_tabId_from_index(self,index):
+		idx=0
+		self._debug("Search id for display: %s"%(index))
+		for key,data in self.tab_id.items():
+			if index==data['index']:
+				print(key)
+				idx=key
+				break
+		self._debug("Find idx: %s For index: %s"%(idx,index))
+		return idx
+
+def _define_css():
+	css="""
+	QPushButton{
+		padding: 0px;
+		margin:0px;
+		border:0px;
+	}
+	QPushButton:active{
+		padding: 6px;
+		margin:6px;
+		font: 14px Roboto;
+		color:black;
+		background:none;
+	}
+	QStatusBar{
+		background:red;
+		color:white;
+		font: 14px Roboto bold;
+	}
+	QLabel{
+		padding:6px;
+		margin:6px;
+	}
+
+	#dlgLabel{
+		font:12px Roboto;
+		margin:0px;
+		border:0px;
+		padding:3px;
+	}
+	
+	QLineEdit{
+		border:0px;
+		border-bottom:1px solid grey;
+		padding:1px;
+		font:14px Roboto;
+		margin-right:6px;
+	}
+	"""
+	return(css)
+	#def _define_css
+
 
 #_debug("Init %s"%sys.argv)
 app=QApplication(["Test Kid Launcher"])
 testKidLauncher=testKid()
+app.instance().setStyleSheet(_define_css())
 app.exec_()
