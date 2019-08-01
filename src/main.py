@@ -45,7 +45,8 @@ class testKid(QWidget):
 		btnHome=QPushButton()
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
+#		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
+		self.tab_id['home']={'index':0,'pid':0,'show':btnHome,'close':btnPrevious}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.showFullScreen()
@@ -111,7 +112,7 @@ class testKid(QWidget):
 		scrollArea.setWidget(tabContent)
 		scrollArea.alignment()
 		tabBar.addTab(tabScroll,"")
-		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_icons['home']['show'])
+		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id['home']['show'])
 		scrollArea.setGeometry(QRect(0,0,w,h))
 		return (tabBar)
 	#def _tabBar
@@ -125,15 +126,16 @@ class testKid(QWidget):
 			if self.currentTab==0:
 				index='home'
 				key='close'
-			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
-			self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
-			index=self.currentTab
+			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+			index=self._get_tabId_from_index(self.tabBar.currentIndex())
+			self.currentTab=self.tabBar.currentIndex()
+#			index=self.currentTab
 			key='close'
 			if self.currentTab==0:
 				index='home'
 				key='show'
-			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
-			self._debug("New: %s"%self.currentTab)
+			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+			self._debug("New: %s key:%s"%(self.currentTab,key))
 
 	def _on_tabSelect(self,index):
 		self._debug("Select tab: %s"%index)
@@ -144,10 +146,11 @@ class testKid(QWidget):
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 		for idx in range(index+1,len(self.tab_id)):
-			self._debug("Reasign %s"%(self.tab_id[idx]['index']))
-			self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
-			self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
-		self.tabId[index]={}
+			if idx in self.tab_id.keys():
+				self._debug("Reasign %s"%(self.tab_id[idx]['index']))
+				self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
+				self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
+		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.tabBar.blockSignals(False)
 		self._debug("Removed tab: %s"%index)
@@ -176,14 +179,15 @@ class testKid(QWidget):
 		btn.setIcon(icn)
 		self.id+=1
 		self.tab_id[self.id]={'index':self.tabBar.count(),'pid':0}
-		self.sigmap_tabSelect.setMapping(btn,self.id)
+		self.sigmap_tabSelect.setMapping(btn,self.tabBar.count())
 		btn.clicked.connect(self.sigmap_tabSelect.map)
 		btn_close=QPushButton()
 		btn_close.setIcon(self.closeIcon)
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
+		self.tab_id[self.id]={'index':self.tabBar.count(),'pid':0,'show':btn,'close':btn_close}
+#		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
 		self.tabBar.addTab(tabContent,"")
 		return(tabContent)
 	#def _launchZone
@@ -204,10 +208,13 @@ class testKid(QWidget):
 		idx=0
 		self._debug("Search id for display: %s"%(index))
 		for key,data in self.tab_id.items():
-			if index==data['index']:
-				print(key)
-				idx=key
-				break
+			if 'index' in data.keys():
+				if index==data['index']:
+					print(key)
+					idx=key
+					break
+		if index==0:
+			idx=0
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
 
