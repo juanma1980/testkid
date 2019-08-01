@@ -213,13 +213,14 @@ class testKid(QWidget):
 	def _get_tabId_from_index(self,index):
 		idx=index
 		self._debug("Search id for display: %s"%(index))
+		self._debug("%s"%(self.tab_id))
 		for key,data in self.tab_id.items():
 			if 'index' in data.keys():
 				if index==data['index']:
 					idx=key
 					break
 		if index==0:
-			idx=0
+			idx='home'
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
 
