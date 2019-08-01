@@ -5,8 +5,8 @@ import os
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
 import gettext
 import subprocess
-from edupals.ui import QAnimatedStatusBar
 from app2menu import App2Menu
+import signal
 import time
 QString=type("")
 
@@ -33,15 +33,16 @@ class th_runApp(QThread):
 		try:
 			dsp=os.environ['DISPLAY']
 			os.environ['DISPLAY']=self.display
-			subprocess.Popen([self.app],stdin=None,stdout=None,stderr=None,shell=False)
+			p_pid=subprocess.Popen([self.app],stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
-			retval=True
+			retval=p_pid.pid
 		except Exception as e:
 			print("Error running: %s"%e)
 		self.signal.emit(retval)
 
 
 class appRun():
+	signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
@@ -50,6 +51,7 @@ class appRun():
 		self.main_display=os.environ['DISPLAY']
 		self.topBarHeight=116
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
+		self.threads_pid={}
 	#def __init__
 
 	def _debug(self,msg):
@@ -120,13 +122,27 @@ class appRun():
 		return(prc)
 	#def _run_cmd_on_display
 
+	def kill_thread(self,thread):
+		if thread in self.threads_pid.keys():			
+			os.kill(self.threads_pid[thread],signal.SIGKILL)
+	def stop_thread(self,thread):
+		if thread in self.threads_pid.keys():			
+			os.kill(self.threads_pid[thread],signal.SIGSTOP)
+	def resume_thread(self,thread):
+		if thread in self.threads_pid.keys():			
+			os.kill(self.threads_pid[thread],signal.SIGCONT)
+
 	def launch(self,app,display=":13"):
+		def _get_th_pid(pid):
+			self.threads_pid[th_run]=pid
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
 		th_run=th_runApp("ratpoison",display)
 		th_run.start()
 		th_run=th_runApp(app,display)
 		th_run.start()
+		th_run.signal.connect(_get_th_pid)
+		return(th_run)
 	
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))

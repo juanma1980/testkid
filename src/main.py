@@ -46,7 +46,7 @@ class testKid(QWidget):
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 #		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
-		self.tab_id['home']={'index':0,'pid':0,'show':btnHome,'close':btnPrevious}
+		self.tab_id['home']={'index':0,'thread':0,'show':btnHome,'close':btnPrevious}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.showFullScreen()
@@ -118,41 +118,47 @@ class testKid(QWidget):
 	#def _tabBar
 
 	def _on_tabChanged(self,remove=True):
-		if remove==False:
-			self._debug("Current: %s"%self.currentTab)
-			index=self._get_tabId_from_index(self.currentTab)
-			index=self.currentTab
-			key='show'
-			if self.currentTab==0:
-				index='home'
-				key='close'
-			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-			index=self._get_tabId_from_index(self.tabBar.currentIndex())
-			self.currentTab=self.tabBar.currentIndex()
-#			index=self.currentTab
+		self._debug("Current: %s"%self.currentTab)
+		index=self._get_tabId_from_index(self.currentTab)
+		self._debug("Index: %s"%index)
+#		index=self.currentTab
+		key='show'
+		if self.currentTab==0:
+			index='home'
 			key='close'
-			if self.currentTab==0:
-				index='home'
-				key='show'
-			self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-			self._debug("New: %s key:%s"%(self.currentTab,key))
+		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+		self.runner.stop_thread(self.tab_id[index]['thread'])
+		index=self._get_tabId_from_index(self.tabBar.currentIndex())
+		self.currentTab=self.tabBar.currentIndex()
+#		index=self.currentTab
+		key='close'
+		if self.currentTab==0:
+			index='home'
+			key='show'
+		self._debug("TabID: %s"%self.tab_id[index])
+		self._debug("INDEX: %s"%index)
+		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+		self.runner.resume_thread(self.tab_id[index]['thread'])
+		self._debug("New: %s key:%s"%(self.currentTab,key))
 
 	def _on_tabSelect(self,index):
 		self._debug("Select tab: %s"%index)
+		index=self._get_tabId_from_index(index)
 		self.tabBar.setCurrentIndex(self.tab_id[index]['index'])
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
+		self.runner.kill_thread(self.tab_id[index]['thread'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
 				self._debug("Reasign %s"%(self.tab_id[idx]['index']))
 				self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
 				self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
 		self.tab_id[index]={}
-		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.tabBar.blockSignals(False)
+		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self._debug("Removed tab: %s"%index)
 
 	def _get_category_apps(self,category):
@@ -178,7 +184,7 @@ class testKid(QWidget):
 		btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		btn.setIcon(icn)
 		self.id+=1
-		self.tab_id[self.id]={'index':self.tabBar.count(),'pid':0}
+		self._debug("New Tab id %s"%self.id)
 		self.sigmap_tabSelect.setMapping(btn,self.tabBar.count())
 		btn.clicked.connect(self.sigmap_tabSelect.map)
 		btn_close=QPushButton()
@@ -186,7 +192,7 @@ class testKid(QWidget):
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-		self.tab_id[self.id]={'index':self.tabBar.count(),'pid':0,'show':btn,'close':btn_close}
+		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close}
 #		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
 		self.tabBar.addTab(tabContent,"")
 		return(tabContent)
@@ -201,16 +207,15 @@ class testKid(QWidget):
 		self.display,self.pid=self.runner.new_Xephyr(self.tabBar)
 		tabRun=self._launchZone(app)
 		self.tabBar.setCurrentIndex(tabCount)
-		self.runner.launch(app,self.display)
+		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 	#def _launch
 
 	def _get_tabId_from_index(self,index):
-		idx=0
+		idx=index
 		self._debug("Search id for display: %s"%(index))
 		for key,data in self.tab_id.items():
 			if 'index' in data.keys():
 				if index==data['index']:
-					print(key)
 					idx=key
 					break
 		if index==0:
