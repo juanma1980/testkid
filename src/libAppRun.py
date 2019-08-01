@@ -48,6 +48,7 @@ class appRun():
 		self.xephyr_servers={}
 		self.username=getpass.getuser()
 		self.main_display=os.environ['DISPLAY']
+		self.topBarHeight=116
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
 	#def __init__
 
@@ -55,6 +56,9 @@ class appRun():
 		if self.dbg:
 			print("appRun: %s"%msg)
 	#def _debug
+
+	def set_topBarHeight(self,h):
+		self.topBarHeight=h+20
 
 	def get_wid(self,display=":13"):
 		wid=0
@@ -96,7 +100,7 @@ class appRun():
 				"-br",
 				"-ac",
 				"-screen",
-				"%sx%s"%(qwidget.width(),qwidget.height()),
+				"%sx%s"%(qwidget.width(),qwidget.height()-(self.topBarHeight)),
 				"%s"%display]
 				p_pid=subprocess.Popen(xephyr_cmd)
 				self.xephyr_servers[display]=p_pid.pid
@@ -119,8 +123,8 @@ class appRun():
 	def launch(self,app,display=":13"):
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
-#		th_run=th_runApp("ratpoison",display)
-#		th_run.start()
+		th_run=th_runApp("ratpoison",display)
+		th_run.start()
 		th_run=th_runApp(app,display)
 		th_run.start()
 	

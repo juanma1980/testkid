@@ -3,11 +3,11 @@ import getpass
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
-				QDialog,QStackedWidget,QGridLayout,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
+				QDialog,QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
+from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
 import subprocess
 from edupals.ui import QAnimatedStatusBar
@@ -15,30 +15,9 @@ from app2menu import App2Menu
 import time
 from libAppRun import appRun
 QString=type("")
-
-
-class th_runApp(QThread):
-	signal=pyqtSignal("PyQt_PyObject")
-	def __init__(self,app,parent=None):
-		QThread.__init__(self,parent)
-		self.app=app
-
-	def __del__(self):
-		self.wait()
-		pass
-
-	def run(self):
-		retval=False
-		print("Launching thread...")
-		try:
-			os.environ['DISPLAY']=":13"
-#			subprocess.Popen(["ratposion"],stdin=None,stdout=None,stderr=None,shell=False)
-			subprocess.Popen([self.app],stdin=None,stdout=None,stderr=None,shell=False)
-			retval=True
-		except Exception as e:
-			print("Error running: %s"%e)
-		self.signal.emit(retval)
-
+QInt=type(0)
+TAB_BTN_SIZE=96
+BTN_SIZE=128
 
 class testKid(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
@@ -47,10 +26,29 @@ class testKid(QWidget):
 		self.dbg=True
 		self.pid=0
 		self.app_icons={}
+		self.tab_icons={}
+		self.currentTab=0
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
+		self.sigmap_tabSelect=QSignalMapper(self)
+		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
+		self.sigmap_tabRemove=QSignalMapper(self)
+		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
+		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
+		btnPrevious=QPushButton()
+		btnPrevious.setIcon(self.previousIcon)
+		btnPrevious.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		self.sigmap_tabSelect.setMapping(btnPrevious,0)
+		btnPrevious.clicked.connect(self.sigmap_tabSelect.map)
+		self.homeIcon=QtGui.QIcon.fromTheme("go-home")
+		btnHome=QPushButton()
+		btnHome.setIcon(self.homeIcon)
+		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
+		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.showFullScreen()
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.display=os.environ['DISPLAY']
 		self._render_gui()
 		self.runner=appRun()
 	#def init
@@ -66,6 +64,7 @@ class testKid(QWidget):
 		self.statusBar.setStateCss("success","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(0,0,255,1), stop:1 rgba(0,0,255,0.6));color:white;")
 		self.box.addWidget(self.statusBar,0,0,1,1)
 		self.tabBar=self._tabBar()
+		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged())
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
 	#def _render_gui
@@ -75,15 +74,13 @@ class testKid(QWidget):
 		tabScroll=QWidget()
 		scrollArea=QScrollArea(tabScroll)
 		tabContent=QWidget()
-#		icn=QtGui.QIcon.fromTheme("go-previous")
-		icn=QtGui.QIcon.fromTheme("go-home")
 		vbox=QGridLayout()
 		row=0
 		col=0
 		scr=app.primaryScreen()
-		w=scr.size().width()-128
-		h=scr.size().height()-256
-		maxCol=int(w/128)-3
+		w=scr.size().width()-BTN_SIZE
+		h=scr.size().height()-(2*BTN_SIZE)
+		maxCol=int(w/BTN_SIZE)-3
 		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
 		for category,icon in self.categories.items():
 			apps=self._get_category_apps(category)
@@ -98,7 +95,7 @@ class testKid(QWidget):
 				self._debug("Adding %s"%appName)
 				btnApp=QPushButton()
 				btnApp.setIcon(icnApp)
-				btnApp.setIconSize(QSize(128,128))
+				btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 				btnApp.setToolTip(appName)
 				sigmap_run.setMapping(btnApp,appName)
 				btnApp.clicked.connect(sigmap_run.map)
@@ -111,11 +108,37 @@ class testKid(QWidget):
 		tabContent.setLayout(vbox)
 		scrollArea.setWidget(tabContent)
 		scrollArea.alignment()
-		tabBar.addTab(tabScroll,icn,(""))
+		tabBar.addTab(tabScroll,"")
+		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_icons['home']['show'])
 		scrollArea.setGeometry(QRect(0,0,w,h))
-		tabBar.setIconSize(QSize(96,96))
 		return (tabBar)
 	#def _tabBar
+
+	def _on_tabChanged(self):
+		self._debug("Current: %s"%self.currentTab)
+		index=self.currentTab
+		key='show'
+		if self.currentTab==0:
+			index='home'
+			key='close'
+		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
+
+		self.currentTab=self.tabBar.currentIndex()
+		index=self.currentTab
+		key='close'
+		if self.currentTab==0:
+			index='home'
+			key='show'
+		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_icons[index][key])
+		self._debug("New: %s"%self.currentTab)
+
+	def _on_tabSelect(self,index):
+		self._debug("Select tab: %s"%index)
+		self.tabBar.setCurrentIndex(index)
+
+	def _on_tabRemove(self,index):
+		self._debug("Remove tab: %s"%index)
+		self.tabBar.removeTab(index)
 
 	def _get_category_apps(self,category):
 		apps={}
@@ -136,16 +159,30 @@ class testKid(QWidget):
 		box.addWidget(zone)
 		tabContent.setLayout(box)
 		icn=QtGui.QIcon.fromTheme(self.app_icons[app])
-		self.tabBar.addTab(tabContent,icn,"")
+		btn=QPushButton()
+		btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		btn.setIcon(icn)
+		self.sigmap_tabSelect.setMapping(btn,self.tabBar.count())
+		btn.clicked.connect(self.sigmap_tabSelect.map)
+		btn_close=QPushButton()
+		btn_close.setIcon(self.closeIcon)
+		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		self.sigmap_tabRemove.setMapping(btn_close,self.tabBar.count())
+		btn_close.clicked.connect(self.sigmap_tabRemove.map)
+		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
+		self.tabBar.addTab(tabContent,"")
+		return(tabContent)
 	#def _launchZone
 
 	def _launch(self,app):
-		self.tabBar.setCurrentIndex(3)
+		self.tabBar.setTabIcon(0,self.previousIcon)
+		self._debug("Tabs: %s"%self.tabBar.count())
+		tabCount=self.tabBar.count()
 		os.environ["HOME"]="/home/lliurex"
 		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
-#		if self.pid==0:
 		self.display,self.pid=self.runner.new_Xephyr(self.tabBar)
-		self._launchZone(app)
+		tabRun=self._launchZone(app)
+		self.tabBar.setCurrentIndex(tabCount)
 		self.runner.launch(app,self.display)
 	#def _launch
 
