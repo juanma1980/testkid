@@ -27,7 +27,7 @@ class testKid(QWidget):
 		self.pid=0
 		self.app_icons={}
 		self.tab_icons={}
-		self.tab_id={0:{'index':0}}
+		self.tab_id={}
 		self.id=0
 		self.currentTab=0
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
@@ -46,11 +46,13 @@ class testKid(QWidget):
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 #		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
-		self.tab_id['home']={'index':0,'thread':0,'show':btnHome,'close':btnPrevious}
+		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
-		self.showFullScreen()
+#		self.showFullScreen()
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
 		self.display=os.environ['DISPLAY']
 		self._render_gui()
 		self.runner=appRun()
@@ -112,7 +114,7 @@ class testKid(QWidget):
 		scrollArea.setWidget(tabContent)
 		scrollArea.alignment()
 		tabBar.addTab(tabScroll,"")
-		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id['home']['show'])
+		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['show'])
 		scrollArea.setGeometry(QRect(0,0,w,h))
 		return (tabBar)
 	#def _tabBar
@@ -124,7 +126,7 @@ class testKid(QWidget):
 #		index=self.currentTab
 		key='show'
 		if self.currentTab==0:
-			index='home'
+			index=0
 			key='close'
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.runner.stop_thread(self.tab_id[index]['thread'])
@@ -133,7 +135,7 @@ class testKid(QWidget):
 #		index=self.currentTab
 		key='close'
 		if self.currentTab==0:
-			index='home'
+			index=0
 			key='show'
 		self._debug("TabID: %s"%self.tab_id[index])
 		self._debug("INDEX: %s"%index)
@@ -143,22 +145,26 @@ class testKid(QWidget):
 
 	def _on_tabSelect(self,index):
 		self._debug("Select tab: %s"%index)
-		index=self._get_tabId_from_index(index)
+#		index=self._get_tabId_from_index(index)
 		self.tabBar.setCurrentIndex(self.tab_id[index]['index'])
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
+#		index=self._get_tabId_from_index(index)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
-		self.runner.kill_thread(self.tab_id[index]['thread'])
+		self.runner.kill_thread(self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
-				self._debug("Reasign %s"%(self.tab_id[idx]['index']))
-				self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
-				self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
+				self._debug("%s"%self.tab_id)
+				if 'index' in self.tab_id[idx].keys():
+					self._debug("Reasign %s"%(self.tab_id[idx]['index']))
+					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
+					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
 		self.tab_id[index]={}
 		self.tabBar.blockSignals(False)
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
+		self._on_tabChanged()
 		self._debug("Removed tab: %s"%index)
 
 	def _get_category_apps(self,category):
@@ -185,15 +191,15 @@ class testKid(QWidget):
 		btn.setIcon(icn)
 		self.id+=1
 		self._debug("New Tab id %s"%self.id)
-		self.sigmap_tabSelect.setMapping(btn,self.tabBar.count())
+		self.sigmap_tabSelect.setMapping(btn,self.id)
 		btn.clicked.connect(self.sigmap_tabSelect.map)
 		btn_close=QPushButton()
 		btn_close.setIcon(self.closeIcon)
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close}
 #		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
+		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close}
 		self.tabBar.addTab(tabContent,"")
 		return(tabContent)
 	#def _launchZone
@@ -204,10 +210,11 @@ class testKid(QWidget):
 		tabCount=self.tabBar.count()
 		os.environ["HOME"]="/home/lliurex"
 		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
-		self.display,self.pid=self.runner.new_Xephyr(self.tabBar)
+		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
 		tabRun=self._launchZone(app)
 		self.tabBar.setCurrentIndex(tabCount)
 		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
+		self.tab_id[self.id]['xephyr']=x_pid
 	#def _launch
 
 	def _get_tabId_from_index(self,index):
@@ -219,8 +226,6 @@ class testKid(QWidget):
 				if index==data['index']:
 					idx=key
 					break
-		if index==0:
-			idx='home'
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
 

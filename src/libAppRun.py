@@ -107,7 +107,7 @@ class appRun():
 				p_pid=subprocess.Popen(xephyr_cmd)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Xephyr PID: %s"%p_pid.pid)
-		return (display,self.xephyr_servers[display])
+		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
 
 	def _run_cmd_on_display(self,cmd=[],display=":13"):
@@ -125,12 +125,18 @@ class appRun():
 	def kill_thread(self,thread):
 		if thread in self.threads_pid.keys():			
 			os.kill(self.threads_pid[thread],signal.SIGKILL)
+		elif type(thread)==type(0):
+			os.kill(thread,signal.SIGKILL)
 	def stop_thread(self,thread):
 		if thread in self.threads_pid.keys():			
 			os.kill(self.threads_pid[thread],signal.SIGSTOP)
+#		elif type(thread)==type(0):
+#			os.kill(thread,signal.SIGSTOP)
 	def resume_thread(self,thread):
 		if thread in self.threads_pid.keys():			
 			os.kill(self.threads_pid[thread],signal.SIGCONT)
+#		elif type(thread)==type(0):
+#			os.kill(thread,signal.SIGCONT)
 
 	def launch(self,app,display=":13"):
 		def _get_th_pid(pid):
