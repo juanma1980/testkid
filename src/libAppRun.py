@@ -125,19 +125,31 @@ class appRun():
 
 	def kill_thread(self,thread):
 		if thread in self.threads_pid.keys():			
-			os.kill(self.threads_pid[thread],signal.SIGKILL)
+			try:
+				os.kill(self.threads_pid[thread],signal.SIGKILL)
+			except:
+				self._debug("Kill failed on thread %s"%thread)
 		elif type(thread)==type(0):
-			os.kill(thread,signal.SIGKILL)
+			try:
+				os.kill(thread,signal.SIGKILL)
+			except:
+				self._debug("Kill failed on pid %s"%thread)
 	#def kill_thread
 
 	def stop_thread(self,thread):
-		if thread in self.threads_pid.keys():			
-			os.kill(self.threads_pid[thread],signal.SIGSTOP)
+		if thread in self.threads_pid.keys():
+			try:
+				os.kill(self.threads_pid[thread],signal.SIGSTOP)
+			except:
+				self._debug("Stop failed on thread %s"%thread)
 	#def stop_thread
 
 	def resume_thread(self,thread):
 		if thread in self.threads_pid.keys():			
-			os.kill(self.threads_pid[thread],signal.SIGCONT)
+			try:
+				os.kill(self.threads_pid[thread],signal.SIGCONT)
+			except:
+				self._debug("Cont failed on thread %s"%thread)
 	#def resume_thread
 
 	def launch(self,app,display=":13"):

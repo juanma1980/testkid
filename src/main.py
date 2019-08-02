@@ -118,9 +118,9 @@ class testKid(QWidget):
 	#def _tabBar
 
 	def _on_tabChanged(self,remove=True):
-		self._debug("Current: %s"%self.currentTab)
+		self._debug("From Tab: %s"%self.currentTab)
 		index=self._get_tabId_from_index(self.currentTab)
-		self._debug("Index: %s"%index)
+		self._debug("Tab Index: %s"%index)
 		key='show'
 		if self.currentTab==0:
 			index=0
@@ -133,11 +133,11 @@ class testKid(QWidget):
 		if self.currentTab==0:
 			index=0
 			key='show'
-		self._debug("TabID: %s"%self.tab_id[index])
-		self._debug("INDEX: %s"%index)
+		self._debug("New Tab Index: %s"%self.tab_id[index])
+		self._debug("New index: %s"%index)
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.runner.resume_thread(self.tab_id[index]['thread'])
-		self._debug("New: %s key:%s"%(self.currentTab,key))
+		self._debug("New Current Tab: %s Icon:%s"%(self.currentTab,key))
 	#def _on_tabChanged
 
 	def _on_tabSelect(self,index):
@@ -149,6 +149,7 @@ class testKid(QWidget):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
+		self.runner.kill_thread(self.tab_id[index]['thread'])
 		self.runner.kill_thread(self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
@@ -208,9 +209,9 @@ class testKid(QWidget):
 		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
 		tabRun=self._launchZone(app)
-		self.tabBar.setCurrentIndex(tabCount)
 		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 		self.tab_id[self.id]['xephyr']=x_pid
+		self.tabBar.setCurrentIndex(tabCount)
 	#def _launch
 
 	def _get_tabId_from_index(self,index):
