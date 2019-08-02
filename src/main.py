@@ -171,6 +171,8 @@ class testKid(QWidget):
 		for key,app in applist.items():
 			if 'xdg-open' in app['exe']:
 				app['exe']=app['exe'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['exe'].split(" ")[-1]))
+			if 'firefox' in app['exe']:
+				app['exe']=app['exe'].replace('firefox','firefox --new-window')
 			apps[app['exe']]=app['icon']
 		return (apps)
 	#def _get_category_apps
