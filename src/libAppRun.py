@@ -3,9 +3,7 @@ import getpass
 import sys
 import os
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
-import gettext
 import subprocess
-from app2menu import App2Menu
 import signal
 import time
 QString=type("")
@@ -18,14 +16,16 @@ class th_runApp(QThread):
 		self.display=display
 		self.app=app.split(" ")
 		self.dbg=False
+	#def __init__
 
 	def _debug(self,msg):
 		if self.dbg:
 			print("th_runApp: %s"%msg)
+	#def _debug(self,msg):
 
 	def __del__(self):
 		self.wait()
-		pass
+	#def __del__
 
 	def run(self):
 		retval=False
@@ -39,6 +39,8 @@ class th_runApp(QThread):
 		except Exception as e:
 			print("Error running: %s"%e)
 		self.signal.emit(retval)
+	#def run
+#class th_runApp
 
 
 class appRun():
@@ -61,6 +63,7 @@ class appRun():
 
 	def set_topBarHeight(self,h):
 		self.topBarHeight=h+20
+	#def set_topBarHeight(self,h):
 
 	def get_wid(self,display=":13"):
 		wid=0
@@ -71,20 +74,18 @@ class appRun():
 			self._debug("User searched: %s"%self.username)
 			while not wid and count<=150:
 				p_wid=self._run_cmd_on_display(["xdotool","search","--any","--name","Xephyr on %s"%display],self.main_display)
-#				p_wid=self._run_cmd_on_display(["xdotool","search","--pid","%s"%self.xephyr_servers[display]],self.main_display)
 				wid=p_wid.stdout.decode()
 				time.sleep(0.1)
 				count+=1
 			if not wid:
 				self._debug("Searching WID for active window")
-#				p_wid=self._run_cmd_on_display(["xdotool","getactivewindow"],self.main_display)
-#				wid=p_wid.stdout.decode()
 		self._debug("WID %s"%wid)
 		return(wid)
 	#def get_wid
 
 	def new_Xephyr(self,qwidget,display=":13"):
 		return(self.init_Xephyr(qwidget,display,True))
+	#def new_Xephyr
 
 	def init_Xephyr(self,qwidget,display=":13",create_new=False):
 		os.environ["HOME"]="/home/%s"%self.username
@@ -127,16 +128,17 @@ class appRun():
 			os.kill(self.threads_pid[thread],signal.SIGKILL)
 		elif type(thread)==type(0):
 			os.kill(thread,signal.SIGKILL)
+	#def kill_thread
+
 	def stop_thread(self,thread):
 		if thread in self.threads_pid.keys():			
 			os.kill(self.threads_pid[thread],signal.SIGSTOP)
-#		elif type(thread)==type(0):
-#			os.kill(thread,signal.SIGSTOP)
+	#def stop_thread
+
 	def resume_thread(self,thread):
 		if thread in self.threads_pid.keys():			
 			os.kill(self.threads_pid[thread],signal.SIGCONT)
-#		elif type(thread)==type(0):
-#			os.kill(thread,signal.SIGCONT)
+	#def resume_thread
 
 	def launch(self,app,display=":13"):
 		def _get_th_pid(pid):
@@ -149,6 +151,7 @@ class appRun():
 		th_run.start()
 		th_run.signal.connect(_get_th_pid)
 		return(th_run)
+	#def launch
 	
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))
@@ -161,4 +164,4 @@ class appRun():
 			print ("Err: %s"%e)
 			display=":-1"
 		return("%s"%display)
-	#def get_first_display
+	#def _find_free_display

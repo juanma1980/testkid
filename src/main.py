@@ -12,7 +12,6 @@ import gettext
 import subprocess
 from edupals.ui import QAnimatedStatusBar
 from app2menu import App2Menu
-import time
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -45,11 +44,9 @@ class testKid(QWidget):
 		btnHome=QPushButton()
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-#		self.tab_icons['home']={"show":btnHome,"close":btnPrevious}
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
-#		self.showFullScreen()
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
@@ -61,6 +58,7 @@ class testKid(QWidget):
 	def _debug(self,msg):
 		if self.dbg:
 			print("%s"%msg)
+	#def _debug
 
 	def _render_gui(self):
 		self.show()
@@ -123,7 +121,6 @@ class testKid(QWidget):
 		self._debug("Current: %s"%self.currentTab)
 		index=self._get_tabId_from_index(self.currentTab)
 		self._debug("Index: %s"%index)
-#		index=self.currentTab
 		key='show'
 		if self.currentTab==0:
 			index=0
@@ -132,7 +129,6 @@ class testKid(QWidget):
 		self.runner.stop_thread(self.tab_id[index]['thread'])
 		index=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.currentTab=self.tabBar.currentIndex()
-#		index=self.currentTab
 		key='close'
 		if self.currentTab==0:
 			index=0
@@ -142,16 +138,16 @@ class testKid(QWidget):
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.runner.resume_thread(self.tab_id[index]['thread'])
 		self._debug("New: %s key:%s"%(self.currentTab,key))
+	#def _on_tabChanged
 
 	def _on_tabSelect(self,index):
 		self._debug("Select tab: %s"%index)
-#		index=self._get_tabId_from_index(index)
 		self.tabBar.setCurrentIndex(self.tab_id[index]['index'])
+	#def _on_tabSelect
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
-#		index=self._get_tabId_from_index(index)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 		self.runner.kill_thread(self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
@@ -166,6 +162,7 @@ class testKid(QWidget):
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self._on_tabChanged()
 		self._debug("Removed tab: %s"%index)
+	#def _on_tabRemove
 
 	def _get_category_apps(self,category):
 		apps={}
@@ -198,7 +195,6 @@ class testKid(QWidget):
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-#		self.tab_icons[self.tabBar.count()]={"show":btn,"close":btn_close}
 		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close}
 		self.tabBar.addTab(tabContent,"")
 		return(tabContent)
@@ -228,6 +224,8 @@ class testKid(QWidget):
 					break
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
+	#def _get_tabId_from_index
+#class testKid
 
 def _define_css():
 	css="""
