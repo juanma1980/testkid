@@ -136,6 +136,19 @@ class appRun():
 				self._debug("Kill failed on pid %s"%thread)
 	#def kill_thread
 
+	def term_thread(self,thread):
+		if thread in self.threads_pid.keys():
+			try:
+				os.kill(self.threads_pid[thread],signal.SIGTERM)
+			except:
+				self._debug("Stop failed on thread %s"%thread)
+		elif type(thread)==type(0):
+			try:
+				os.kill(thread,signal.SIGKILL)
+			except:
+				self._debug("Kill failed on pid %s"%thread)
+	#def term_thread
+
 	def stop_thread(self,thread):
 		if thread in self.threads_pid.keys():
 			try:

@@ -150,7 +150,7 @@ class testKid(QWidget):
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 		self.runner.kill_thread(self.tab_id[index]['thread'])
-		self.runner.kill_thread(self.tab_id[index]['xephyr'])
+		self.runner.term_thread(self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
 				self._debug("%s"%self.tab_id)
@@ -169,6 +169,8 @@ class testKid(QWidget):
 		apps={}
 		applist=App2Menu.app2menu().get_apps_from_category(category)
 		for key,app in applist.items():
+			if 'xdg-open' in app['exe']:
+				app['exe']=app['exe'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['exe'].split(" ")[-1]))
 			apps[app['exe']]=app['icon']
 		return (apps)
 	#def _get_category_apps
