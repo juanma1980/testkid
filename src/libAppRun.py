@@ -16,7 +16,7 @@ class th_runApp(QThread):
 	def __init__(self,app,display,parent=None):
 		QThread.__init__(self,parent)
 		self.display=display
-		self.app=app
+		self.app=app.split(" ")
 		self.dbg=False
 
 	def _debug(self,msg):
@@ -33,7 +33,7 @@ class th_runApp(QThread):
 		try:
 			dsp=os.environ['DISPLAY']
 			os.environ['DISPLAY']=self.display
-			p_pid=subprocess.Popen([self.app],stdin=None,stdout=None,stderr=None,shell=False)
+			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
 			retval=p_pid.pid
 		except Exception as e:
@@ -102,7 +102,7 @@ class appRun():
 				"-br",
 				"-ac",
 				"-screen",
-				"%sx%s"%(qwidget.width(),qwidget.height()-(self.topBarHeight)),
+				"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
 				"%s"%display]
 				p_pid=subprocess.Popen(xephyr_cmd)
 				self.xephyr_servers[display]=p_pid.pid

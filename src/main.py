@@ -30,7 +30,7 @@ class testKid(QWidget):
 		self.tab_id={}
 		self.id=0
 		self.currentTab=0
-		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
+		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education","LliureX-Author-Tools":"ode"}
 		self.sigmap_tabSelect=QSignalMapper(self)
 		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
 		self.sigmap_tabRemove=QSignalMapper(self)
