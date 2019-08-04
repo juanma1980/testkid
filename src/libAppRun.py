@@ -37,7 +37,7 @@ class th_runApp(QThread):
 		self._debug("Firefox Launch: %s"%self.app)
 
 	def _run_chromium(self):
-		self.app=[self.app[0],"--temp-profile",self.app[-1]]
+		self.app=[self.app[0],"--temp-profile","--app=%s"%self.app[-1]]
 		self._debug("Chromium Launch: %s"%self.app)
 
 	def run(self):
