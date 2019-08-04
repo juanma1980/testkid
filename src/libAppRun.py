@@ -28,6 +28,18 @@ class th_runApp(QThread):
 		self.wait()
 	#def __del__
 
+	def _run_firefox(self):
+		tmp_n=random.randint(0,999999)
+		new_prof=str(tmp_n)
+		new_prof_cmd=["firefox","-CreateProfile",new_prof]
+		subprocess.run(new_prof_cmd)
+		self.app=["firefox","-P",new_prof,"--no-remote",self.app[-1]]
+		self._debug("Firefox Launch: %s"%self.app)
+
+	def _run_chromium(self):
+		self.app=[self.app[0],"--temp-profile",self.app[-1]]
+		self._debug("Chromium Launch: %s"%self.app)
+
 	def run(self):
 		retval=False
 		self._debug("Launching thread...")
@@ -35,12 +47,10 @@ class th_runApp(QThread):
 			dsp=os.environ['DISPLAY']
 			os.environ['DISPLAY']=self.display
 			if 'firefox' in self.app:
-				tmp_n=random.randint(0,999999)
-				new_prof=str(tmp_n)
-				new_prof_cmd=["firefox","-CreateProfile",new_prof]
-				subprocess.run(new_prof_cmd)
-				self.app=["firefox","-P",new_prof,"--no-remote",self.app[-1]]
-				self._debug("Firefox Launch: %s"%self.app)
+				self._run_firefox()
+				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
+			elif 'chromium' or 'chrome' in self.app:
+				self._run_chromium()
 				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			else:
 				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
