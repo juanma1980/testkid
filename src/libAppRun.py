@@ -6,6 +6,7 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import subprocess
 import signal
 import time
+import random
 QString=type("")
 
 
@@ -33,7 +34,16 @@ class th_runApp(QThread):
 		try:
 			dsp=os.environ['DISPLAY']
 			os.environ['DISPLAY']=self.display
-			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
+			if 'firefox' in self.app:
+				tmp_n=random.randint(0,999999)
+				new_prof=str(tmp_n)
+				new_prof_cmd=["firefox","-CreateProfile",new_prof]
+				subprocess.run(new_prof_cmd)
+				self.app=["firefox","-P",new_prof,"--no-remote",self.app[-1]]
+				self._debug("Firefox Launch: %s"%self.app)
+				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
+			else:
+				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
 			retval=p_pid.pid
 		except Exception as e:
