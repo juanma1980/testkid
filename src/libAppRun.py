@@ -7,6 +7,7 @@ import subprocess
 import signal
 import time
 import tempfile
+import json
 from app2menu import App2Menu
 QString=type("")
 
@@ -84,11 +85,14 @@ class appRun():
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
+		self.confFile="/usr/share/testKid/config.json"
+		self.confFile="config.json"
 		self.xephyr_servers={}
 		self.username=getpass.getuser()
 		self.main_display=os.environ['DISPLAY']
 		self.topBarHeight=116
-		self.categories={"lliurex-infantil":"applications-games","education":"applications-education"}
+		self.categories={}
+		self.desktops={}
 		self.threads_pid={}
 		self.threads_tmp={}
 	#def __init__
@@ -208,6 +212,24 @@ class appRun():
 		return("%s"%display)
 	#def _find_free_display
 	
+	def get_categories(self):
+		if os.path.isfile(self.confFile):
+			pass 
+		else:
+			categories={
+						"lliurex-infantil":"applications-games",
+						"education":"applications-education",
+						"lliurex-author-tools":"ode",
+						"LliureX-Educacion-Especial":"rsc-entren"
+						}
+		return(categories)
+	def get_desktops(self):
+		if os.path.isfile(self.confFile):
+			pass 
+		else:
+			desktops=["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]
+		return(desktops)
+
 	def get_category_apps(self,category):
 		apps={}
 		applist=App2Menu.app2menu().get_apps_from_category(category)

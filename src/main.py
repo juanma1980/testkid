@@ -10,7 +10,6 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
 import subprocess
-import json
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -22,8 +21,6 @@ class testKid(QWidget):
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
-		self.confFile="/usr/share/testKid/config.json"
-		self.confFile="config.json"
 		self.categories={}
 		self.desktops={}
 		self.pid=0
@@ -66,16 +63,8 @@ class testKid(QWidget):
 	#def _debug
 
 	def _read_config(self):
-		if os.path.isfile(self.confFile):
-			pass 
-		else:
-			self.categories={
-						"lliurex-infantil":"applications-games",
-						"education":"applications-education",
-						"lliurex-author-tools":"ode",
-						"LliureX-Educacion-Especial":"rsc-entren"
-						}
-			self.desktops=["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]
+		self.categories=self.runner.get_categories()
+		self.desktops=self.runner.get_desktops()
 
 	def _render_gui(self):
 		self.show()
@@ -131,8 +120,8 @@ class testKid(QWidget):
 		for category,icon in self.categories.items():
 			apps=self._get_category_apps(category)
 			_add_widgets()
-		for f_desktop in self.desktops:
-			apps=self._get_desktop_apps(f_desktop)
+		for desktop in self.desktops:
+			apps=self._get_desktop_apps(desktop)
 			_add_widgets()
 
 		tabContent.setLayout(vbox)
