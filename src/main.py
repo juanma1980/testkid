@@ -10,6 +10,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
 import subprocess
+import signal
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -284,6 +285,7 @@ def _define_css():
 
 #_debug("Init %s"%sys.argv)
 app=QApplication(["Test Kid Launcher"])
+signal.signal(signal.SIGINT, lambda *a: app.quit())
 testKidLauncher=testKid()
 app.instance().setStyleSheet(_define_css())
 app.exec_()
