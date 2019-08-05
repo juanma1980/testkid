@@ -26,6 +26,7 @@ class testKid(QWidget):
 		self.app_icons={}
 		self.tab_icons={}
 		self.tab_id={}
+		self.focusWidgets=[]
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -70,12 +71,17 @@ class testKid(QWidget):
 		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged(False))
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
+		self.tabBar.setFocusPolicy(Qt.NoFocus)
+		self._debug("Focus to %s"%self.focusWidgets[0])
+		self.focusWidgets[0].setFocus()
 	#def _render_gui
 
 	def _tabBar(self):
 		tabBar=QTabWidget()
 		tabScroll=QWidget()
+		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
+		scrollArea.setFocusPolicy(Qt.NoFocus)
 		tabContent=QWidget()
 		vbox=QGridLayout()
 		row=0
@@ -100,6 +106,7 @@ class testKid(QWidget):
 				btnApp.setIcon(icnApp)
 				btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 				btnApp.setToolTip(appName)
+				self.focusWidgets.append(btnApp)
 				sigmap_run.setMapping(btnApp,appName)
 				btnApp.clicked.connect(sigmap_run.map)
 				vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
@@ -113,6 +120,7 @@ class testKid(QWidget):
 		scrollArea.alignment()
 		tabBar.addTab(tabScroll,"")
 		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['show'])
+		tabBar.tabBar().tabButton(0,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		scrollArea.setGeometry(QRect(0,0,w,h))
 		return (tabBar)
 	#def _tabBar
@@ -126,6 +134,7 @@ class testKid(QWidget):
 			index=0
 			key='close'
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("stop",self.tab_id[index]['thread'])
 		index=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.currentTab=self.tabBar.currentIndex()
@@ -136,6 +145,7 @@ class testKid(QWidget):
 		self._debug("New Tab Index: %s"%self.tab_id[index])
 		self._debug("New index: %s"%index)
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
+		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
 		self._debug("New Current Tab: %s Icon:%s"%(self.currentTab,key))
 	#def _on_tabChanged
@@ -201,6 +211,7 @@ class testKid(QWidget):
 	def _launch(self,app):
 		self.tabBar.setTabIcon(0,self.previousIcon)
 		self._debug("Tabs: %s"%self.tabBar.count())
+		#Tabs BEFORE new tab is added
 		tabCount=self.tabBar.count()
 		os.environ["HOME"]="/home/lliurex"
 		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
@@ -208,6 +219,8 @@ class testKid(QWidget):
 		tabRun=self._launchZone(app)
 		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 		self.tab_id[self.id]['xephyr']=x_pid
+		#For some reason on first launch the tab doesn't loads the content until there's a tab switch
+		#This is a quick and dirty fix...
 		if self.firstLaunch:
 			self.firstLaunch=False
 			self.tabBar.tabBar().setTabButton(self.id,QTabBar.LeftSide,self.tab_id[self.id]['close'])
@@ -215,7 +228,6 @@ class testKid(QWidget):
 			self.currentTab=tabCount
 			self.tabBar.blockSignals(True)
 			self.tabBar.setCurrentIndex(1)
-#			self.currentTab=self.tabBar.currentIndex()
 			self.tabBar.blockSignals(False)
 		else:
 			self.tabBar.setCurrentIndex(tabCount)
@@ -238,16 +250,18 @@ class testKid(QWidget):
 def _define_css():
 	css="""
 	QPushButton{
-		padding: 0px;
+		padding:10px;
 		margin:0px;
 		border:0px;
 	}
 	QPushButton:active{
-		padding: 6px;
-		margin:6px;
 		font: 14px Roboto;
 		color:black;
 		background:none;
+	}
+	QPushButton:focus{
+		border:2px solid grey;
+		border-radius:25px;
 	}
 	QStatusBar{
 		background:red;

@@ -39,7 +39,6 @@ class th_runApp(QThread):
 					"#navigator-toolbox {visibility: collapse;}",
 					"browser {margin-right: -14px; margin-bottom: -14px;}"
 					]
-
 		with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
 			f.writelines(css_content)
 		self._debug("Firefox Launch: %s"%self.app)
