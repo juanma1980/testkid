@@ -11,7 +11,6 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import gettext
 import subprocess
 from edupals.ui import QAnimatedStatusBar
-from app2menu import App2Menu
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -28,6 +27,7 @@ class testKid(QWidget):
 		self.tab_icons={}
 		self.tab_id={}
 		self.id=0
+		self.firstLaunch=True
 		self.currentTab=0
 		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education","LliureX-Author-Tools":"ode"}
 		self.sigmap_tabSelect=QSignalMapper(self)
@@ -51,8 +51,8 @@ class testKid(QWidget):
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
 		self.display=os.environ['DISPLAY']
-		self._render_gui()
 		self.runner=appRun()
+		self._render_gui()
 	#def init
 	
 	def _debug(self,msg):
@@ -126,7 +126,7 @@ class testKid(QWidget):
 			index=0
 			key='close'
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-		self.runner.stop_thread(self.tab_id[index]['thread'])
+		self.runner.send_signal_to_thread("stop",self.tab_id[index]['thread'])
 		index=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.currentTab=self.tabBar.currentIndex()
 		key='close'
@@ -136,7 +136,7 @@ class testKid(QWidget):
 		self._debug("New Tab Index: %s"%self.tab_id[index])
 		self._debug("New index: %s"%index)
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-		self.runner.resume_thread(self.tab_id[index]['thread'])
+		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
 		self._debug("New Current Tab: %s Icon:%s"%(self.currentTab,key))
 	#def _on_tabChanged
 
@@ -149,8 +149,8 @@ class testKid(QWidget):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
-		self.runner.kill_thread(self.tab_id[index]['thread'])
-		self.runner.term_thread(self.tab_id[index]['xephyr'])
+		self.runner.send_signal_to_thread("kill",self.tab_id[index]['thread'])
+		self.runner.send_signal_to_thread("term",self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
 				self._debug("%s"%self.tab_id)
@@ -166,23 +166,14 @@ class testKid(QWidget):
 	#def _on_tabRemove
 
 	def _get_category_apps(self,category):
-		apps={}
-		applist=App2Menu.app2menu().get_apps_from_category(category)
-		for key,app in applist.items():
-			if 'xdg-open' in app['exe']:
-				app['exe']=app['exe'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['exe'].split(" ")[-1]))
-			if 'chromium-browser' in app['exe']:
-				app['exe']=app['exe'].replace('chromium-browser','chromium-browser --new-window')
-			if 'chrome-browser' in app['exe']:
-				app['exe']=app['exe'].replace('chrome-browser','chrome-browser --new-window')
-			apps[app['exe']]=app['icon']
+		apps=self.runner.get_category_apps(category)
 		return (apps)
 	#def _get_category_apps
 
 	def _launchZone(self,app):
 		tabContent=QWidget()
 		box=QVBoxLayout()
-		wid=self.runner.get_wid(self.display)
+		wid=self.runner.get_wid("Xephyr on",self.display)
 		self._debug("W: %s"%wid)
 		subZone=QtGui.QWindow.fromWinId(int(wid))
 		zone=QWidget.createWindowContainer(subZone)
@@ -217,7 +208,17 @@ class testKid(QWidget):
 		tabRun=self._launchZone(app)
 		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 		self.tab_id[self.id]['xephyr']=x_pid
-		self.tabBar.setCurrentIndex(tabCount)
+		if self.firstLaunch:
+			self.firstLaunch=False
+			self.tabBar.tabBar().setTabButton(self.id,QTabBar.LeftSide,self.tab_id[self.id]['close'])
+			self.tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['close'])
+			self.currentTab=tabCount
+			self.tabBar.blockSignals(True)
+			self.tabBar.setCurrentIndex(1)
+#			self.currentTab=self.tabBar.currentIndex()
+			self.tabBar.blockSignals(False)
+		else:
+			self.tabBar.setCurrentIndex(tabCount)
 	#def _launch
 
 	def _get_tabId_from_index(self,index):

@@ -6,7 +6,8 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import subprocess
 import signal
 import time
-import random
+import tempfile
+from app2menu import App2Menu
 QString=type("")
 
 
@@ -29,33 +30,49 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		tmp_n=random.randint(0,999999)
-		new_prof=str(tmp_n)
-		new_prof_cmd=["firefox","-CreateProfile",new_prof]
-		subprocess.run(new_prof_cmd)
-		self.app=["firefox","-P",new_prof,"--no-remote",self.app[-1]]
+		newProfile=tempfile.mkdtemp()
+		self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
+		os.makedirs("%s/chrome"%newProfile)
+		css_content=[
+					"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
+					"#TabsToolbar {visibility: collapse;}",
+					"#navigator-toolbox {visibility: collapse;}",
+					"browser {margin-right: -14px; margin-bottom: -14px;}"
+					]
+
+		with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
+			f.writelines(css_content)
 		self._debug("Firefox Launch: %s"%self.app)
+	#def _run_firefox
 
 	def _run_chromium(self):
 		self.app=[self.app[0],"--temp-profile","--start-fullscreen","--app=%s"%self.app[-1]]
 		self._debug("Chromium Launch: %s"%self.app)
+	#def _run_chromium
+
+	def _run_resource(self):
+		subprocess.run(["flash-java-insecure-perms","install"],stdin=None,stderr=None,stdout=None,shell=False)
+		app=" ".join(self.app)
+		app=app.replace("/usr/bin/resources-launcher.sh",App2Menu.app2menu().get_default_app_for_file(app.split(" ")[-1]))
+		self.app=app.split(" ")
+	#def _run_resource
 
 	def run(self):
-		retval=False
+		retval=[False,None]
+		tmp_file=""
 		self._debug("Launching thread...")
 		try:
 			dsp=os.environ['DISPLAY']
 			os.environ['DISPLAY']=self.display
+			if "/usr/bin/resources-launcher.sh" in self.app:
+				self._run_resource()
 			if 'firefox' in self.app:
 				self._run_firefox()
-				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
-			elif 'chromium' or 'chrome' in self.app:
+			elif (('chromium' in self.app) or ('chrome' in self.app)):
 				self._run_chromium()
-				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
-			else:
-				p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
+			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
-			retval=p_pid.pid
+			retval=[p_pid.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
 		self.signal.emit(retval)
@@ -72,8 +89,9 @@ class appRun():
 		self.username=getpass.getuser()
 		self.main_display=os.environ['DISPLAY']
 		self.topBarHeight=116
-		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education"}
+		self.categories={"lliurex-infantil":"applications-games","education":"applications-education"}
 		self.threads_pid={}
+		self.threads_tmp={}
 	#def __init__
 
 	def _debug(self,msg):
@@ -85,7 +103,7 @@ class appRun():
 		self.topBarHeight=h+20
 	#def set_topBarHeight(self,h):
 
-	def get_wid(self,display=":13"):
+	def get_wid(self,search="Xephyr on",display=":13"):
 		wid=0
 		count=0
 		if display in self.xephyr_servers.keys():
@@ -93,7 +111,7 @@ class appRun():
 			self._debug("PID searched: %s"%self.xephyr_servers[display])
 			self._debug("User searched: %s"%self.username)
 			while not wid and count<=150:
-				p_wid=self._run_cmd_on_display(["xdotool","search","--any","--name","Xephyr on %s"%display],self.main_display)
+				p_wid=self._run_cmd_on_display(["xdotool","search","--any","--name","%s %s"%(search,display)],self.main_display)
 				wid=p_wid.stdout.decode()
 				time.sleep(0.1)
 				count+=1
@@ -143,51 +161,31 @@ class appRun():
 		return(prc)
 	#def _run_cmd_on_display
 
-	def kill_thread(self,thread):
+	def send_signal_to_thread(self,s_signal,thread):
+		self._debug("Send signal: %s"%s_signal)
+		retval=False
+		sig={'kill':signal.SIGKILL,'term':signal.SIGTERM,'stop':signal.SIGSTOP,'cont':signal.SIGCONT}
 		if thread in self.threads_pid.keys():			
 			try:
-				os.kill(self.threads_pid[thread],signal.SIGKILL)
+				os.kill(self.threads_pid[thread],sig[s_signal])
+				retval=True
 			except:
-				self._debug("Kill failed on thread %s"%thread)
-		elif type(thread)==type(0):
-			try:
-				os.kill(thread,signal.SIGKILL)
-			except:
-				self._debug("Kill failed on pid %s"%thread)
-	#def kill_thread
+				self._debug("%s failed on thread %s with pid %s"%(s_signal,thread,self.threads_pid[thread]))
 
-	def term_thread(self,thread):
-		if thread in self.threads_pid.keys():
-			try:
-				os.kill(self.threads_pid[thread],signal.SIGTERM)
-			except:
-				self._debug("Stop failed on thread %s"%thread)
-		elif type(thread)==type(0):
-			try:
-				os.kill(thread,signal.SIGKILL)
-			except:
-				self._debug("Kill failed on pid %s"%thread)
-	#def term_thread
+		elif (signal=='kill' or signal=='term'):
+			if (type(thread)==type(0)):
+				try:
+					os.kill(self.threads_pid[thread],sig[s_signal])
+					retval=True
+				except:
+					self._debug("%s failed on pid %s"%(s_signal,self.threads_pid[thread]))
 
-	def stop_thread(self,thread):
-		if thread in self.threads_pid.keys():
-			try:
-				os.kill(self.threads_pid[thread],signal.SIGSTOP)
-			except:
-				self._debug("Stop failed on thread %s"%thread)
-	#def stop_thread
-
-	def resume_thread(self,thread):
-		if thread in self.threads_pid.keys():			
-			try:
-				os.kill(self.threads_pid[thread],signal.SIGCONT)
-			except:
-				self._debug("Cont failed on thread %s"%thread)
-	#def resume_thread
+		return(retval)
 
 	def launch(self,app,display=":13"):
-		def _get_th_pid(pid):
-			self.threads_pid[th_run]=pid
+		def _get_th_pid(pid_info):
+			self.threads_pid[th_run]=pid_info[0]
+			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
 		th_run=th_runApp("ratpoison",display)
@@ -210,3 +208,14 @@ class appRun():
 			display=":-1"
 		return("%s"%display)
 	#def _find_free_display
+	
+	def get_category_apps(self,category):
+		apps={}
+		applist=App2Menu.app2menu().get_apps_from_category(category)
+		for key,app in applist.items():
+			if 'xdg-open' in app['exe']:
+				app['exe']=app['exe'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['exe'].split(" ")[-1]))
+			apps[app['exe']]=app['icon']
+		return (apps)
+	#def get_category_apps
+
