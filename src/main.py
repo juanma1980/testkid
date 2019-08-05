@@ -10,7 +10,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
 import subprocess
-from edupals.ui import QAnimatedStatusBar
+import json
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -22,6 +22,10 @@ class testKid(QWidget):
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
+		self.confFile="/usr/share/testKid/config.json"
+		self.confFile="config.json"
+		self.categories={}
+		self.desktops={}
 		self.pid=0
 		self.app_icons={}
 		self.tab_icons={}
@@ -30,7 +34,6 @@ class testKid(QWidget):
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
-		self.categories={"lliurex-infantil":"applications-games","network":"applications-internet","education":"applications-education","LliureX-Author-Tools":"ode"}
 		self.sigmap_tabSelect=QSignalMapper(self)
 		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
 		self.sigmap_tabRemove=QSignalMapper(self)
@@ -53,6 +56,7 @@ class testKid(QWidget):
 		self.setWindowState(Qt.WindowFullScreen)
 		self.display=os.environ['DISPLAY']
 		self.runner=appRun()
+		self._read_config()
 		self._render_gui()
 	#def init
 	
@@ -61,12 +65,21 @@ class testKid(QWidget):
 			print("%s"%msg)
 	#def _debug
 
+	def _read_config(self):
+		if os.path.isfile(self.confFile):
+			pass 
+		else:
+			self.categories={
+						"lliurex-infantil":"applications-games",
+						"education":"applications-education",
+						"lliurex-author-tools":"ode",
+						"LliureX-Educacion-Especial":"rsc-entren"
+						}
+			self.desktops=["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]
+
 	def _render_gui(self):
 		self.show()
 		self.box=QGridLayout()
-		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
-		self.statusBar.setStateCss("success","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(0,0,255,1), stop:1 rgba(0,0,255,0.6));color:white;")
-		self.box.addWidget(self.statusBar,0,0,1,1)
 		self.tabBar=self._tabBar()
 		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged(False))
 		self.box.addWidget(self.tabBar,0,0,1,1)
@@ -77,22 +90,11 @@ class testKid(QWidget):
 	#def _render_gui
 
 	def _tabBar(self):
-		tabBar=QTabWidget()
-		tabScroll=QWidget()
-		tabScroll.setFocusPolicy(Qt.NoFocus)
-		scrollArea=QScrollArea(tabScroll)
-		scrollArea.setFocusPolicy(Qt.NoFocus)
-		tabContent=QWidget()
-		vbox=QGridLayout()
 		row=0
 		col=0
-		scr=app.primaryScreen()
-		w=scr.size().width()-BTN_SIZE
-		h=scr.size().height()-(2*BTN_SIZE)
-		maxCol=int(w/BTN_SIZE)-3
-		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
-		for category,icon in self.categories.items():
-			apps=self._get_category_apps(category)
+		def _add_widgets():
+			nonlocal row
+			nonlocal col
 			sigmap_run=QSignalMapper(self)
 			sigmap_run.mapped[QString].connect(self._launch)
 			for appName,appIcon in apps.items():
@@ -114,6 +116,24 @@ class testKid(QWidget):
 				if col==maxCol:
 					col=0
 					row+=1
+		tabBar=QTabWidget()
+		tabScroll=QWidget()
+		tabScroll.setFocusPolicy(Qt.NoFocus)
+		scrollArea=QScrollArea(tabScroll)
+		scrollArea.setFocusPolicy(Qt.NoFocus)
+		tabContent=QWidget()
+		vbox=QGridLayout()
+		scr=app.primaryScreen()
+		w=scr.size().width()-BTN_SIZE
+		h=scr.size().height()-(2*BTN_SIZE)
+		maxCol=int(w/BTN_SIZE)-3
+		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
+		for category,icon in self.categories.items():
+			apps=self._get_category_apps(category)
+			_add_widgets()
+		for f_desktop in self.desktops:
+			apps=self._get_desktop_apps(f_desktop)
+			_add_widgets()
 
 		tabContent.setLayout(vbox)
 		scrollArea.setWidget(tabContent)
@@ -176,7 +196,12 @@ class testKid(QWidget):
 	#def _on_tabRemove
 
 	def _get_category_apps(self,category):
-		apps=self.runner.get_category_apps(category)
+		apps=self.runner.get_category_apps(category.lower())
+		return (apps)
+	#def _get_category_apps
+	
+	def _get_desktop_apps(self,desktop):
+		apps=self.runner.get_desktop_app(desktop)
 		return (apps)
 	#def _get_category_apps
 
@@ -262,30 +287,6 @@ def _define_css():
 	QPushButton:focus{
 		border:2px solid grey;
 		border-radius:25px;
-	}
-	QStatusBar{
-		background:red;
-		color:white;
-		font: 14px Roboto bold;
-	}
-	QLabel{
-		padding:6px;
-		margin:6px;
-	}
-
-	#dlgLabel{
-		font:12px Roboto;
-		margin:0px;
-		border:0px;
-		padding:3px;
-	}
-	
-	QLineEdit{
-		border:0px;
-		border-bottom:1px solid grey;
-		padding:1px;
-		font:14px Roboto;
-		margin-right:6px;
 	}
 	"""
 	return(css)

@@ -218,3 +218,11 @@ class appRun():
 		return (apps)
 	#def get_category_apps
 
+	def get_desktop_app(self,f_desktop):
+		apps={}
+		app=App2Menu.app2menu().get_desktop_info(f_desktop)
+		if 'xdg-open' in app['Exec']:
+			app['Exec']=app['Exec'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['Exec'].split(" ")[-1]))
+		apps[app['Exec']]=app['Icon']
+		return (apps)
+	#def get_desktop_app
