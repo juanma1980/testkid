@@ -43,10 +43,6 @@ class AppConfig():
 	def get_config(self):
 		self._read_config_from_system()
 		self._read_config_from_n4d()
-		for key in self.config.keys():
-			if key!='default':
-				del(self.config['default'])
-				break
 		return (self.config)
 
 	def _read_config_from_system(self):

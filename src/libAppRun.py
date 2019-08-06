@@ -222,21 +222,21 @@ class appRun():
 	def get_apps(self):
 		categories=[]
 		apps={'categories':[],'desktops':[]}
+		default={'categories':[],'desktops':[]}
+
 		data=self._read_config()
 		for confFile,section in data.items():
+			if confFile=='default':
+				default=data[confFile]
+				continue
+
 			if 'categories' in section.keys():
 				apps['categories'].extend(data[confFile]['categories'])
 			if 'desktops' in section.keys():
 				apps['desktops'].extend(data[confFile]['desktops'])
-#		if os.path.isfile(self.confFile):
-#			pass 
-#		else:
-#			categories={
-#						"lliurex-infantil":"applications-games",
-#						"education":"applications-education",
-#						"lliurex-author-tools":"ode",
-#						"LliureX-Educacion-Especial":"rsc-entren"
-#						}
+
+		if not apps['categories'] and not apps['desktops']:
+			apps=default
 		return(apps)
 
 	def get_category_apps(self,category):
