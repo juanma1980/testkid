@@ -165,7 +165,7 @@ class appRun():
 	#def _run_cmd_on_display
 
 	def send_signal_to_thread(self,s_signal,thread):
-		self._debug("Send signal: %s"%s_signal)
+		self._debug("Send signal: %s to %s"%(s_signal,thread))
 		retval=False
 		sig={'kill':signal.SIGKILL,'term':signal.SIGTERM,'stop':signal.SIGSTOP,'cont':signal.SIGCONT}
 		if thread in self.threads_pid.keys():			
@@ -175,10 +175,11 @@ class appRun():
 			except:
 				self._debug("%s failed on thread %s with pid %s"%(s_signal,thread,self.threads_pid[thread]))
 
-		elif (signal=='kill' or signal=='term'):
+		elif (s_signal=='kill' or s_signal=='term'):
 			if (type(thread)==type(0)):
+				self._debug("Killing PID: %s"%thread)
 				try:
-					os.kill(self.threads_pid[thread],sig[s_signal])
+					os.kill(thread,sig[s_signal])
 					retval=True
 				except:
 					self._debug("%s failed on pid %s"%(s_signal,self.threads_pid[thread]))

@@ -46,7 +46,7 @@ class testKid(QWidget):
 		btnHome=QPushButton()
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious}
+		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -158,6 +158,7 @@ class testKid(QWidget):
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
+		os.environ['DISPLAY']=self.tab_id[index]['display']
 		self._debug("New Current Tab: %s Icon:%s"%(self.currentTab,key))
 	#def _on_tabChanged
 
@@ -170,8 +171,8 @@ class testKid(QWidget):
 		self._debug("Remove tab: %s"%index)
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
-		self.runner.send_signal_to_thread("kill",self.tab_id[index]['thread'])
-		self.runner.send_signal_to_thread("term",self.tab_id[index]['xephyr'])
+		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
+		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
 				self._debug("%s"%self.tab_id)
@@ -219,7 +220,7 @@ class testKid(QWidget):
 		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabRemove.setMapping(btn_close,self.id)
 		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close}
+		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
 		self.tabBar.addTab(tabContent,"")
 		return(tabContent)
 	#def _launchZone
@@ -244,6 +245,7 @@ class testKid(QWidget):
 			self.currentTab=tabCount
 			self.tabBar.blockSignals(True)
 			self.tabBar.setCurrentIndex(1)
+			os.environ['DISPLAY']=self.tab_id[self.id]['display']
 			self.tabBar.blockSignals(False)
 		else:
 			self.tabBar.setCurrentIndex(tabCount)
