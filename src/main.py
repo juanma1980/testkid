@@ -64,8 +64,9 @@ class testKid(QWidget):
 	#def _debug
 
 	def _read_config(self):
-		self.categories=self.runner.get_categories()
-		self.desktops=self.runner.get_desktops()
+		data=self.runner.get_apps()
+		self.categories=data['categories']
+		self.desktops=data['desktops']
 
 	def _render_gui(self):
 		self.show()
@@ -118,7 +119,7 @@ class testKid(QWidget):
 		h=scr.size().height()-(2*BTN_SIZE)
 		maxCol=int(w/BTN_SIZE)-3
 		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
-		for category,icon in self.categories.items():
+		for category in self.categories:
 			apps=self._get_category_apps(category)
 			_add_widgets()
 		for desktop in self.desktops:

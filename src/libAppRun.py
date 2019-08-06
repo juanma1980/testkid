@@ -7,7 +7,7 @@ import subprocess
 import signal
 import time
 import tempfile
-import json
+from libAppConfig import AppConfig 
 from app2menu import App2Menu
 QString=type("")
 
@@ -86,7 +86,7 @@ class appRun():
 		self.dbg=True
 		self.pid=0
 		self.confFile="/usr/share/testKid/config.json"
-		self.confFile="config.json"
+		self.confFile="testKid.conf"
 		self.xephyr_servers={}
 		self.username=getpass.getuser()
 		self.main_display=os.environ['DISPLAY']
@@ -211,24 +211,33 @@ class appRun():
 			display=":-1"
 		return("%s"%display)
 	#def _find_free_display
-	
-	def get_categories(self):
-		if os.path.isfile(self.confFile):
-			pass 
-		else:
-			categories={
-						"lliurex-infantil":"applications-games",
-						"education":"applications-education",
-						"lliurex-author-tools":"ode",
-						"LliureX-Educacion-Especial":"rsc-entren"
-						}
-		return(categories)
-	def get_desktops(self):
-		if os.path.isfile(self.confFile):
-			pass 
-		else:
-			desktops=["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]
-		return(desktops)
+
+	def _read_config(self):
+		config=AppConfig()
+		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
+		config.set_defaultConfig(defaultConfig)
+		config.set_configFile(self.confFile)
+		return(config.get_config())
+
+	def get_apps(self):
+		categories=[]
+		apps={'categories':[],'desktops':[]}
+		data=self._read_config()
+		for confFile,section in data.items():
+			if 'categories' in section.keys():
+				apps['categories'].extend(data[confFile]['categories'])
+			if 'desktops' in section.keys():
+				apps['desktops'].extend(data[confFile]['desktops'])
+#		if os.path.isfile(self.confFile):
+#			pass 
+#		else:
+#			categories={
+#						"lliurex-infantil":"applications-games",
+#						"education":"applications-education",
+#						"lliurex-author-tools":"ode",
+#						"LliureX-Educacion-Especial":"rsc-entren"
+#						}
+		return(apps)
 
 	def get_category_apps(self,category):
 		apps={}
