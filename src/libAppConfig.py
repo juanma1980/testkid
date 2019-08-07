@@ -9,7 +9,7 @@ except ImportError:
 	raise ImportError("xmlrpc not available. Disabling server queries")
 import ssl
 
-class AppConfig():
+class appConfig():
 	def __init__(self):
 		self.dbg=True
 		self.home=os.environ['HOME']

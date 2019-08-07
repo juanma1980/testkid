@@ -7,7 +7,7 @@ import subprocess
 import signal
 import time
 import tempfile
-from libAppConfig import AppConfig 
+from libAppConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
 
@@ -214,7 +214,7 @@ class appRun():
 	#def _find_free_display
 
 	def _read_config(self):
-		config=AppConfig()
+		config=appConfig()
 		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
 		config.set_defaultConfig(defaultConfig)
 		config.set_configFile(self.confFile)

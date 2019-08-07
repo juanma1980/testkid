@@ -107,6 +107,7 @@ class testKid(QWidget):
 				if col==maxCol:
 					col=0
 					row+=1
+
 		tabBar=QTabWidget()
 		tabScroll=QWidget()
 		tabScroll.setFocusPolicy(Qt.NoFocus)
