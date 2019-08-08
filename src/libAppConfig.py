@@ -13,7 +13,7 @@ class appConfig():
 	def __init__(self):
 		self.dbg=True
 		self.home=os.environ['HOME']
-		self.baseDirs=["%s/.config"%self.home]
+		self.baseDirs={"user":"%s/.config"%self.home}
 		self.confFile="app.conf"
 		self.passFile="app.pwd"
 		self.config={}
@@ -26,7 +26,7 @@ class appConfig():
 	#def _debug
 
 	def set_baseDirs(self,dirs):
-		self.baseDirs=dirs
+		self.baseDirs=dirs.copy()
 		self._debug("baseDirs: %s"%self.baseDirs)
 	#def set_baseDirs
 
@@ -40,14 +40,13 @@ class appConfig():
 		self._debug(self.config)
 	#def set_defaultConfig
 
-	def get_config(self):
-		self._read_config_from_system()
+	def get_config(self,level=None):
+		self._read_config_from_system(level)
 		self._read_config_from_n4d()
 		return (self.config)
 
-	def _read_config_from_system(self):
-		for confDir in self.baseDirs:
-			confFile=("%s/%s"%(confDir,self.confFile))
+	def _read_config_from_system(self,level):
+		def _read_file(confFile):
 			data={}
 			if os.path.isfile(confFile):
 				self._debug("Reading %s"%confFile)
@@ -57,6 +56,39 @@ class appConfig():
 					self._debug("Error opening %s: %s"%(confFile,e))
 			if data:
 				self.config[confFile]=data
+		if level and level in self.baseDirs[level]:
+			confFile=("%s/%s"%(confDir,self.confFile))
+		else:
+			for conflevel,confDir in self.baseDirs.items():
+				confFile=("%s/%s"%(confDir,self.confFile))
+				data=_read_file(confFile)
+	#def read_config_from_system
+
+	def write_config(self,data,level=None,key=None):
+		oldConf=self.get_config()
+		newConf=oldConf.copy()
+		if key:
+			if key in newConf.keys():
+				newConf[key]=data
+		else:
+			newConf=data
+		self._write_config_to_system(newConf,level)
+		self._write_config_to_n4d(newConf,level)
+
+	def _write_config_to_system(self,conf,level=None):
+		if level and level in self.baseDirs.keys():
+			confDir=self.baseDirs[level]
+		else:
+			conDir=self.defaultDir
+		confFile=("%s/%s"%(confDir,self.confFile))
+		if os.path.isfile(confFile):
+			self._debug("Reading %s"%confFile)
+			try:
+				data=json.loads(open(confFile).read())
+			except Exception as e:
+				self._debug("Error opening %s: %s"%(confFile,e))
+		if data:
+			self.config[confFile]=data
 	#def read_config_from_system
 
 	def set_class_for_n4d(self,n4dclass):

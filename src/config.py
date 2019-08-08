@@ -4,14 +4,14 @@ import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
-				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem
+				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
+				QHeaderView
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
-from app2menu import App2Menu
 from libAppRun import appRun
-from libAppConfig import appConfig
 from edupals.ui import QAnimatedStatusBar
+from confScr import confScr
 
 gettext.textdomain('testConfig')
 _ = gettext.gettext
@@ -142,42 +142,7 @@ class confKid(QWidget):
 		return(panel)
 
 	def _render_config(self):
-		widget=QWidget()
-		data=self.runner.get_apps()
-		box=QVBoxLayout()
-		lbl_txt=QLabel(_("From here you can set visible Launchers"))
-		lbl_txt.setAlignment(Qt.AlignTop)
-		box.addWidget(lbl_txt)
-		lbl_cat=QLabel(_("Available categories"))
-		box.addWidget(lbl_cat)
-		tbl_cat=QTableWidget(1,3)
-		visible_categories=data['categories']
-		box.addWidget(tbl_cat)
-		menu=App2Menu.app2menu()
-		categories=menu.get_categories()
-		row=0
-		col=0
-		for cat in categories:
-			if cat:
-				item=QTableWidgetItem(cat)
-				tbl_cat.setItem(row,col,item)
-				row+=1
-				tbl_cat.insertRow(row)
-		tbl_cat.removeRow(row)
-		lbl_app=QLabel(_("Available apps"))
-		box.addWidget(lbl_app)
-		tbl_app=QTableWidget(1,3)
-		box.addWidget(tbl_app)
-		for cat in visible_categories:
-			for desk in menu.get_apps_from_category(cat):
-				item=QTableWidgetItem(desk[0])
-				tbl_app.setItem(row,col,item)
-				row+=1
-				tbl_app.insertRow(row)
-		tbl_app.removeRow(row)
-
-
-		widget.setLayout(box)
+		widget=confScr()
 		return(widget)
 	
 	def _render_add(self):
