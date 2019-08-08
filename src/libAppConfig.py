@@ -56,39 +56,38 @@ class appConfig():
 					self._debug("Error opening %s: %s"%(confFile,e))
 			if data:
 				self.config[confFile]=data
+		#def _read_file
+
 		if level and level in self.baseDirs[level]:
 			confFile=("%s/%s"%(confDir,self.confFile))
+			_read_file(confFile)
 		else:
 			for conflevel,confDir in self.baseDirs.items():
 				confFile=("%s/%s"%(confDir,self.confFile))
-				data=_read_file(confFile)
+				_read_file(confFile)
 	#def read_config_from_system
 
 	def write_config(self,data,level=None,key=None):
-		oldConf=self.get_config()
+		self._debug("Writing key %s to %s"%(key,level))
+		oldConf=self.get_config(level)
+		print("Old: %s"%oldConf)
 		newConf=oldConf.copy()
 		if key:
-			if key in newConf.keys():
-				newConf[key]=data
+			newConf[key]=data
 		else:
 			newConf=data
 		self._write_config_to_system(newConf,level)
-		self._write_config_to_n4d(newConf,level)
+		self._write_config_to_n4d(newConf)
 
 	def _write_config_to_system(self,conf,level=None):
+		data={}
 		if level and level in self.baseDirs.keys():
 			confDir=self.baseDirs[level]
 		else:
-			conDir=self.defaultDir
+			confDir=self.defaultDir
 		confFile=("%s/%s"%(confDir,self.confFile))
-		if os.path.isfile(confFile):
-			self._debug("Reading %s"%confFile)
-			try:
-				data=json.loads(open(confFile).read())
-			except Exception as e:
-				self._debug("Error opening %s: %s"%(confFile,e))
-		if data:
-			self.config[confFile]=data
+		self.config[confFile]=conf
+		print(self.config[confFile])
 	#def read_config_from_system
 
 	def set_class_for_n4d(self,n4dclass):
@@ -115,6 +114,8 @@ class appConfig():
 		return (self.config)
 	#def read_config_from_n4d
 
+	def _write_config_to_n4d(self,conf):
+		pass
 	def _execute_n4d_query(self):
 		retval={}
 		try:

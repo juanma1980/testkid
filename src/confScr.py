@@ -9,7 +9,6 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import gettext
 from app2menu import App2Menu
 from libAppRun import appRun
-from libAppConfig import appConfig
 
 gettext.textdomain('testConfig')
 _ = gettext.gettext
@@ -165,6 +164,7 @@ class confScr(QWidget):
 				item=self.tbl_cat.item(row,0)
 				categories.append(item.text())
 		self._debug("Categories: %s"%categories)
+		self.runner.write_config(categories,key='categories',level='user')
 		self.visible_categories=categories
 	#def _save_categories(self):
 
@@ -183,7 +183,9 @@ class confScr(QWidget):
 					if cat.lower() in self.visible_categories:
 						hidden.append(item.text())
 		self._debug("Desktops: %s"%desktops)
+		self.runner.write_config(desktops,key='desktops',level='user')
 		self._debug("Hidden: %s"%hidden)
+		self.runner.write_config(hidden,key='hidden',level='user')
 	#def _save_apps
 
 	def _define_css(self):

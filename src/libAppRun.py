@@ -258,3 +258,8 @@ class appRun():
 		apps[app['Exec']]=app['Icon']
 		return (apps)
 	#def get_desktop_app
+
+	def write_config(self,data,key=None,level=None):
+		config=appConfig()
+		config.write_config(data,level=level,key=key)
+	#def write_config
