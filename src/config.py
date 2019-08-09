@@ -142,7 +142,7 @@ class confKid(QWidget):
 		return(panel)
 
 	def _render_config(self):
-		widget=confScr()
+		widget=confScr(app)
 		return(widget)
 	
 	def _render_add(self):

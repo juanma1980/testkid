@@ -85,8 +85,9 @@ class appRun():
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
-		self.confFile="/usr/share/testKid/config.json"
 		self.confFile="testKid.conf"
+		self.config=appConfig()
+		self.__init__config()
 		self.xephyr_servers={}
 		self.username=getpass.getuser()
 		self.main_display=os.environ['DISPLAY']
@@ -101,6 +102,11 @@ class appRun():
 		if self.dbg:
 			print("appRun: %s"%msg)
 	#def _debug
+
+	def __init__config(self):
+#		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
+#		self.config.set_defaultConfig(defaultConfig)
+		self.config.set_configFile(self.confFile)
 
 	def set_topBarHeight(self,h):
 		self.topBarHeight=h+20
@@ -213,19 +219,15 @@ class appRun():
 		return("%s"%display)
 	#def _find_free_display
 
-	def _read_config(self):
-		config=appConfig()
-		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
-		config.set_defaultConfig(defaultConfig)
-		config.set_configFile(self.confFile)
-		return(config.get_config())
-
 	def get_apps(self):
 		categories=[]
 		apps={'categories':[],'desktops':[]}
 		default={'categories':[],'desktops':[]}
 
-		data=self._read_config()
+		data=self.config.get_config()
+		print("+++++")
+		print(data)
+		print("+++++")
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
@@ -260,6 +262,5 @@ class appRun():
 	#def get_desktop_app
 
 	def write_config(self,data,key=None,level=None):
-		config=appConfig()
-		config.write_config(data,level=level,key=key)
+		self.config.write_config(data,level=level,key=key)
 	#def write_config

@@ -65,6 +65,8 @@ class testKid(QWidget):
 
 	def _read_config(self):
 		data=self.runner.get_apps()
+		print("***")
+		print(data)
 		self.categories=data['categories']
 		self.desktops=data['desktops']
 

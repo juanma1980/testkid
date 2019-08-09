@@ -13,9 +13,13 @@ from libAppRun import appRun
 gettext.textdomain('testConfig')
 _ = gettext.gettext
 
+BTN_SIZE_FULL=128
+BTN_SIZE=32
+
 class confScr(QWidget):
-	def __init__(self):
+	def __init__(self,app):
 		super().__init__()
+		self.app=app
 		self.setStyleSheet(self._define_css())
 		self.dbg=True
 		self.runner=appRun()
@@ -49,48 +53,56 @@ class confScr(QWidget):
 	#def _debug
 
 	def _load_screen(self):
-		box=QGridLayout()
-		stk_widget=QStackedWidget()
-		lbl_txt=QLabel(_("From here you can set visible Launchers"))
-		lbl_txt.setAlignment(Qt.AlignTop)
-		box.addWidget(lbl_txt,0,0,1,2)
-		btn_cat=QPushButton()
-		btn_cat.setObjectName("menu")
-		btn_cat.setCheckable(True)
-		btn_cat.setChecked(True)
-		btn_cat.setText(_("Categories"))
-		box.addWidget(btn_cat,1,0,1,1)
-		btn_dsk=QPushButton()
-		btn_dsk.setObjectName("menu")
-		btn_dsk.setCheckable(True)
-		btn_dsk.setText(_("Applications"))
-		btn_cat.clicked.connect(lambda:self._show_stack(btn_cat,btn_dsk,stk_widget,0))
-		btn_dsk.clicked.connect(lambda:self._show_stack(btn_dsk,btn_cat,stk_widget,1))
-		box.addWidget(btn_dsk,1,1,1,1)
-		#Categories
-		stk_categories=QWidget()
-		cat_box=QVBoxLayout()
-		cat_box.addWidget(self.tbl_cat)
-		btn_save_cat=QPushButton(_("Apply"))
-		btn_save_cat.setMaximumSize(QSize(128,48))
-		btn_save_cat.clicked.connect(self._save_categories)
-		cat_box.addWidget(btn_save_cat)
-		stk_categories.setLayout(cat_box)
-		stk_widget.addWidget(stk_categories)
-		#Desktops
-		stk_desktops=QWidget()
-		app_box=QVBoxLayout()
-		app_box.addWidget(self.tbl_app)
-		btn_save_app=QPushButton(_("Apply"))
-		btn_save_app.setMaximumSize(QSize(128,48))
-		btn_save_app.clicked.connect(self._save_apps)
-		app_box.addWidget(btn_save_app)
-		stk_desktops.setLayout(app_box)
-		stk_widget.addWidget(stk_desktops)
-		box.addWidget(stk_widget,2,0,1,2)
-		self._update_categories()
-		self._udpate_desktops()
+		box=QHBoxLayout()
+		row=0
+		col=0
+		scr=self.app.primaryScreen()
+		w=scr.size().width()-BTN_SIZE_FULL
+		h=scr.size().height()-(2*BTN_SIZE_FULL)
+		maxCol=int(w/BTN_SIZE_FULL)-3
+		print("Col: %s"%maxCol)
+		self.tbl_app.setColumnCount(maxCol)
+		tabScroll=QWidget()
+		tabScroll.setFocusPolicy(Qt.NoFocus)
+		scrollArea=QScrollArea(tabScroll)
+		scrollArea.setFocusPolicy(Qt.NoFocus)
+		self.categories=self.menu.get_categories()
+		for cat in self.categories:
+			for deskName,deskData in self.menu.get_apps_from_category(cat).items():
+#				item=QTableWidgetItem(deskName)
+#				self.tbl_app.setItem(row,col,item)
+				btn_desktop=QPushButton()
+#				btn_desktop.setObjectName("showbtn")
+#				btn_showOn.setCheckable(True)
+#				btn_showOn.setChecked(False)
+				icnApp=QtGui.QIcon.fromTheme(deskData['icon'])
+				btn_desktop.setIcon(icnApp)
+				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+#				if cat.replace(" ","-") in self.visible_categories:
+#					btn_showOn.setChecked(True)
+#					btn_showOn.setIcon(icn_showOn)
+				self.tbl_app.setCellWidget(row,col,btn_desktop)
+				print("%s,%s"%(row,col))
+				col+=1
+				if col>maxCol:
+					col=0
+					row+=1
+					self.tbl_app.insertRow(row)
+		self.tbl_app.removeRow(row)
+		scr=self.app.primaryScreen()
+#		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
+#		for category in self.categories:
+#			apps=self._get_category_apps(category)
+#			_add_widgets()
+#		for desktop in self.desktops:
+#			apps=self._get_desktop_apps(desktop)
+#			_add_widgets()
 
+#		tabContent.setLayout(vbox)
+		scrollArea.setWidget(self.tbl_app)
+		scrollArea.alignment()
+		scrollArea.setGeometry(QRect(0,0,w,h))
+		box.addWidget(self.tbl_app)
 		self.setLayout(box)
 	#def load_screen
 
