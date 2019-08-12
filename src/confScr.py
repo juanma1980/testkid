@@ -16,10 +16,41 @@ _ = gettext.gettext
 BTN_SIZE_FULL=128
 BTN_SIZE=32
 
+
+class dropButton(QPushButton):
+	def __init__(self,title,parent):
+		super (dropButton,self).__init__(title,parent)
+		self.setAcceptDrops(True)
+
+	def mouseMoveEvent(self,e):
+		if e.button()!=Qt.RightButton:
+			return
+		mimedata=QtCore.QMimeData()
+		drag=QDrag(self)
+		drag.setMimeData(mimedata)
+		drag.setHotSpot(e.pos()-self.rect().topLeft())
+		dropAction=drag.start(Qt.MoveAction)
+
+class dropTable(QTableWidget):
+	def __init__(self,rows,columns,parent):
+		super (dropTable,self).__init__(rows,columns,parent)
+		self.setAcceptDrops(True)
+
+	def dragEnterEvent(self,e):
+		print (e.accept())
+
+	def dropEvent(self,e):
+		print("OK")
+		position=e.pos()
+		self.button.move(position)
+		e.setDropAction(Qt.MoveAction)
+		e.accept()
+
 class confScr(QWidget):
 	def __init__(self,app):
 		super().__init__()
 		self.app=app
+		self.setAcceptDrops(True)
 		self.setStyleSheet(self._define_css())
 		self.dbg=True
 		self.runner=appRun()
@@ -32,7 +63,10 @@ class confScr(QWidget):
 		self.tbl_cat.setSelectionBehavior(QTableWidget.SelectRows)
 		self.tbl_cat.setSelectionMode(QTableWidget.SingleSelection)
 		self.tbl_cat.setEditTriggers(QTableWidget.NoEditTriggers)
-		self.tbl_app=QTableWidget(1,2)
+#		self.tbl_app=QTableWidget(1,2)
+		self.tbl_app=dropTable(1,2,self)
+		self.tbl_app.setAcceptDrops(True)
+		self.tbl_app.setDragEnabled(True)
 		header=self.tbl_app.horizontalHeader()
 		header.setSectionResizeMode(0,QHeaderView.Stretch)
 		self.tbl_app.horizontalHeader().hide()
@@ -99,7 +133,10 @@ class confScr(QWidget):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
 				else:
 					continue
-				btn_desktop=QPushButton()
+#				btn_desktop=QPushButton()
+				btn_desktop=dropButton("",self.tbl_app)
+				btn_desktop.setAcceptDrops(True)
+#				btn_desktop.setDragEnabled(True)
 				btn_desktop.setMaximumWidth(BTN_SIZE)
 				btn_desktop.setIcon(icnApp)
 				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
