@@ -225,9 +225,6 @@ class appRun():
 		default={'categories':[],'desktops':[]}
 
 		data=self.config.get_config()
-		print("+++++")
-		print(data)
-		print("+++++")
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
@@ -240,6 +237,22 @@ class appRun():
 
 		if not apps['categories'] and not apps['desktops']:
 			apps=default
+		if 'categories' in apps.keys():
+			for category in apps['categories']:
+				cat_apps=self.get_category_desktops(category.lower())
+				for app in cat_apps:
+					if app not in apps['desktops']:
+						apps['desktops'].append(app)
+		return(apps)
+
+	def get_category_desktops(self,category):
+		apps=[]
+		tmp_apps=[]
+		for app,data in App2Menu.app2menu().get_apps_from_category(category).items():
+			if data['exe'] not in tmp_apps and app not in tmp_apps:
+				apps.append("/usr/share/applications/%s"%app)
+				tmp_apps.append(data['exe'])
+				tmp_apps.append(app)
 		return(apps)
 
 	def get_category_apps(self,category):

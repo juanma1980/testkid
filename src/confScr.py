@@ -60,45 +60,14 @@ class confScr(QWidget):
 		w=scr.size().width()-BTN_SIZE_FULL
 		h=scr.size().height()-(2*BTN_SIZE_FULL)
 		maxCol=int(w/BTN_SIZE_FULL)-3
-		print("Col: %s"%maxCol)
 		self.tbl_app.setColumnCount(maxCol)
 		tabScroll=QWidget()
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
 		scrollArea.setFocusPolicy(Qt.NoFocus)
-		self.categories=self.menu.get_categories()
-		for cat in self.categories:
-			for deskName,deskData in self.menu.get_apps_from_category(cat).items():
-#				item=QTableWidgetItem(deskName)
-#				self.tbl_app.setItem(row,col,item)
-				btn_desktop=QPushButton()
-#				btn_desktop.setObjectName("showbtn")
-#				btn_showOn.setCheckable(True)
-#				btn_showOn.setChecked(False)
-				icnApp=QtGui.QIcon.fromTheme(deskData['icon'])
-				btn_desktop.setIcon(icnApp)
-				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
-#				if cat.replace(" ","-") in self.visible_categories:
-#					btn_showOn.setChecked(True)
-#					btn_showOn.setIcon(icn_showOn)
-				self.tbl_app.setCellWidget(row,col,btn_desktop)
-				print("%s,%s"%(row,col))
-				col+=1
-				if col>maxCol:
-					col=0
-					row+=1
-					self.tbl_app.insertRow(row)
-		self.tbl_app.removeRow(row)
-		scr=self.app.primaryScreen()
-#		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
-#		for category in self.categories:
-#			apps=self._get_category_apps(category)
-#			_add_widgets()
-#		for desktop in self.desktops:
-#			apps=self._get_desktop_apps(desktop)
-#			_add_widgets()
+		self._update_categories(maxCol)
 
-#		tabContent.setLayout(vbox)
+		scr=self.app.primaryScreen()
 		scrollArea.setWidget(self.tbl_app)
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,w,h))
@@ -115,32 +84,34 @@ class confScr(QWidget):
 		data=self.runner.get_apps()
 		self.visible_categories=data['categories']
 		self._debug("Visible: %s"%self.visible_categories)
+		self.desktops=data['desktops']
 
-	def _update_categories(self):
+	def _update_categories(self,maxCol=1):
 		row=0
 		col=0
 		self._update_apps_data()
-		self.tbl_cat.clear()
-		self.tbl_cat.setRowCount(1)
-		self.categories=self.menu.get_categories()
-		icn_showOn=QtGui.QIcon.fromTheme("password-show-on")
-		icn_showOff=QtGui.QIcon.fromTheme("password-show-off")
-		for cat in self.categories:
-			if cat:
-				self._debug("Loading %s"%cat)
-				item=QTableWidgetItem(cat)
-				self.tbl_cat.setItem(row,col,item)
-				btn_showOn=QPushButton()
-				btn_showOn.setCheckable(True)
-				btn_showOn.setChecked(False)
-				btn_showOn.setIcon(icn_showOff)
-				if cat.replace(" ","-") in self.visible_categories:
-					btn_showOn.setChecked(True)
-					btn_showOn.setIcon(icn_showOn)
-				self.tbl_cat.setCellWidget(row,1,btn_showOn)
-				row+=1
-				self.tbl_cat.insertRow(row)
-		self.tbl_cat.removeRow(row)
+		self.tbl_app.clear()
+		self.tbl_app.setRowCount(1)
+		for desktop in self.desktops:
+			deskInfo=self.runner.get_desktop_app(desktop)
+			for appName,appIcon in deskInfo.items():
+				if QtGui.QIcon.hasThemeIcon(appIcon):
+					icnApp=QtGui.QIcon.fromTheme(appIcon)
+				else:
+					continue
+				btn_desktop=QPushButton()
+				btn_desktop.setMaximumWidth(BTN_SIZE)
+				btn_desktop.setIcon(icnApp)
+				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+				self._debug("Adding %s"%appName)
+				self.tbl_app.setCellWidget(row,col,btn_desktop)
+				col+=1
+				if col>maxCol:
+					col=0
+					row+=1
+					self.tbl_app.insertRow(row)
+		self.tbl_app.removeRow(row)
+		self.tbl_app.resizeColumnsToContents()
 
 	def _udpate_desktops(self):
 		row=0
