@@ -96,7 +96,7 @@ class confScr(QWidget):
 	#def _debug
 
 	def _load_screen(self):
-		box=QHBoxLayout()
+		box=QVBoxLayout()
 		row=0
 		col=0
 		scr=self.app.primaryScreen()
@@ -114,13 +114,11 @@ class confScr(QWidget):
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,w,h))
 		box.addWidget(self.tbl_app)
+		btn_apply=QPushButton("Apply")
+		btn_apply.clicked.connect(self._save_apps)
+		box.addWidget(btn_apply)
 		self.setLayout(box)
 	#def load_screen
-
-	def _show_stack(self,btn_to,btn_from,stk,index):
-		btn_from.setChecked(False)
-		btn_to.setChecked(True)
-		stk.setCurrentIndex(index)
 
 	def _update_apps_data(self):
 		data=self.runner.get_apps()
