@@ -20,14 +20,19 @@ BTN_SIZE=32
 class dropButton(QPushButton):
 	signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self,title,parent):
-		super (dropButton,self).__init__(title,parent)
+		super (dropButton,self).__init__("",parent)
+		self.title=title
+		self.parent=parent
+		self.img=None
 		self.setAcceptDrops(True)
+		self.setMaximumWidth(BTN_SIZE)
 
 	def dragEnterEvent(self,e):
 		print (e.accept())
 	
 	def mousePressEvent(self,e):
 		print("Press %s"%self)
+		print("Press %s"%self.title)
 		self.signal.emit({"drag":self})
 		mimedata=QMimeData()
 		drag=QtGui.QDrag(self)
@@ -43,6 +48,20 @@ class dropButton(QPushButton):
 		e.accept()
 		self.signal.emit({"drop":self})
 
+	def set_image(self,img):
+		self.img=img
+		if QtGui.QIcon.hasThemeIcon(self.img):
+			icnApp=QtGui.QIcon.fromTheme(self.img)
+		else:
+			return None
+		self.setIcon(icnApp)
+		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+		return True
+
+	def clone(self):
+		btn=dropButton(self.title,self.parent)
+		btn.set_image(self.img)
+		return(btn)
 #	def mouseMoveEvent(self,e):
 #		if e.button()!=Qt.RightButton:
 #			return
@@ -114,7 +133,6 @@ class confScr(QWidget):
 		w=scr.size().width()-BTN_SIZE_FULL
 		h=scr.size().height()-(2*BTN_SIZE_FULL)
 		maxCol=int(w/BTN_SIZE_FULL)-3
-		self.tbl_app.setColumnCount(maxCol)
 		tabScroll=QWidget()
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
@@ -146,35 +164,36 @@ class confScr(QWidget):
 		self._update_apps_data()
 		self.tbl_app.clear()
 		self.tbl_app.setRowCount(1)
+		self.tbl_app.setColumnCount(maxCol)
 		for desktop in self.desktops:
 			deskInfo=self.runner.get_desktop_app(desktop)
+			print(deskInfo)
 			for appName,appIcon in deskInfo.items():
-				if QtGui.QIcon.hasThemeIcon(appIcon):
-					icnApp=QtGui.QIcon.fromTheme(appIcon)
-				else:
-					continue
 #				btn_desktop=QPushButton()
-				btn_desktop=dropButton("",self.tbl_app)
+				btn_desktop=dropButton(appName,self.tbl_app)
+				if not btn_desktop.set_image(appIcon):
+					print("Discard: %s"%appName)
+					btn_desktop.deleteLater()
+					continue
 				self.btn_grid[btn_desktop]={"row":row,"col":col}
 				btn_desktop.signal.connect(self._dragDropEvent)
-				btn_desktop.setAcceptDrops(True)
-				btn_desktop.setMaximumWidth(BTN_SIZE)
-				btn_desktop.setIcon(icnApp)
-				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
-				self._debug("Adding %s"%appName)
+				self._debug("Adding %s at %s %s"%(appName,row,col))
 				self.tbl_app.setCellWidget(row,col,btn_desktop)
 				col+=1
-				if col>maxCol:
+				if col>=maxCol:
 					col=0
 					row+=1
 					self.tbl_app.insertRow(row)
-		self.tbl_app.removeRow(row)
+					print("Insert row %s"%self.tbl_app.rowCount())
+#		self.tbl_app.removeRow(row)
 		self.tbl_app.resizeColumnsToContents()
 
 	def _dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
 			self.btn_drag=btnEv['drag']
 		else:
+			if btnEv['drop']==self.btn_drag:
+				return False
 			btn=btnEv['drop']
 			rowTo=self.btn_grid[btn]['row']
 			colTo=self.btn_grid[btn]['col']
@@ -182,19 +201,18 @@ class confScr(QWidget):
 			rowFrom=self.btn_grid[self.btn_drag]['row']
 			colFrom=self.btn_grid[self.btn_drag]['col']
 			print("From %s at %s %s"%(self.btn_drag,rowFrom,colFrom))
-			btn.setParent(self)
-			self.btn_drag.setParent(self)
-#			self.tbl_app.removeCellWidget(rowTo,colTo)
-#			wdg=self.tbl_app.cellWidget(rowFrom,colFrom)
-#			self.tbl_app.setCellWidget(rowTo,colTo,wdg)
-#			wdg2=self.tbl_app.cellWidget(rowFrom,colFrom)
-			self.tbl_app.removeCellWidget(rowFrom,colFrom)
-			self.tbl_app.removeCellWidget(rowTo,colTo)
-#			wdg=self.tbl_app.cellWidget(rowFrom,colFrom)
-			self.tbl_app.setCellWidget(rowFrom,colFrom,btn)
-			print(self.tbl_app.cellWidget(rowTo,colTo))
-			print(self.tbl_app.cellWidget(rowFrom,colFrom))
-#			self.tbl_app.setCellWidget(rowTo,colTo,self.btn_drag)
+			btnTo=btn.clone()
+			btnTo.signal.connect(self._dragDropEvent)
+			self.btn_grid[btnTo]=self.btn_grid[self.btn_drag]
+			print(self.btn_grid[btnTo])
+			btnFrom=self.btn_drag.clone()
+			btnFrom.signal.connect(self._dragDropEvent)
+			self.btn_grid[btnFrom]=self.btn_grid[btn]
+			print("%s - %s"%(btnFrom,self.btn_drag))
+			del self.btn_grid[btn] 
+			del self.btn_grid[self.btn_drag] 
+			self.tbl_app.setCellWidget(rowFrom,colFrom,btnTo)
+			self.tbl_app.setCellWidget(rowTo,colTo,btnFrom)
 
 	def _save_categories(self):
 		categories=[]
