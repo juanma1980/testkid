@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
 				QHeaderView
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
+from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
 import gettext
 from app2menu import App2Menu
 from libAppRun import appRun
@@ -18,18 +18,39 @@ BTN_SIZE=32
 
 
 class dropButton(QPushButton):
+	signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self,title,parent):
 		super (dropButton,self).__init__(title,parent)
 		self.setAcceptDrops(True)
 
-	def mouseMoveEvent(self,e):
-		if e.button()!=Qt.RightButton:
-			return
-		mimedata=QtCore.QMimeData()
-		drag=QDrag(self)
+	def dragEnterEvent(self,e):
+		print (e.accept())
+	
+	def mousePressEvent(self,e):
+		print("Press %s"%self)
+		self.signal.emit({"drag":self})
+		mimedata=QMimeData()
+		drag=QtGui.QDrag(self)
 		drag.setMimeData(mimedata)
-		drag.setHotSpot(e.pos()-self.rect().topLeft())
-		dropAction=drag.start(Qt.MoveAction)
+#		drag.setHotSpot(e.pos()-self.rect().topLeft())
+		dropAction=drag.exec_(Qt.MoveAction)
+
+	def dropEvent(self,e):
+		print("OK %s"%self)
+		position=e.pos()
+#		self.button.move(position)
+		e.setDropAction(Qt.MoveAction)
+		e.accept()
+		self.signal.emit({"drop":self})
+
+#	def mouseMoveEvent(self,e):
+#		if e.button()!=Qt.RightButton:
+#			return
+#		mimedata=QtCore.QMimeData()
+#		drag=QDrag(self)
+#		drag.setMimeData(mimedata)
+#		drag.setHotSpot(e.pos()-self.rect().topLeft())
+#		dropAction=drag.start(Qt.MoveAction)
 
 class dropTable(QTableWidget):
 	def __init__(self,rows,columns,parent):
@@ -47,12 +68,12 @@ class dropTable(QTableWidget):
 		e.accept()
 
 class confScr(QWidget):
+	dragdrop_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self,app):
 		super().__init__()
-		self.app=app
-		self.setAcceptDrops(True)
-		self.setStyleSheet(self._define_css())
 		self.dbg=True
+		self.app=app
+		self.setStyleSheet(self._define_css())
 		self.runner=appRun()
 		self.tbl_cat=QTableWidget(1,2)
 		header=self.tbl_cat.horizontalHeader()
@@ -69,12 +90,11 @@ class confScr(QWidget):
 		self.tbl_app.setDragEnabled(True)
 		header=self.tbl_app.horizontalHeader()
 		header.setSectionResizeMode(0,QHeaderView.Stretch)
+		self.tbl_app.setShowGrid(False)
 		self.tbl_app.horizontalHeader().hide()
 		self.tbl_app.verticalHeader().hide()
-		self.tbl_app.setShowGrid(False)
-		self.tbl_app.setSelectionBehavior(QTableWidget.SelectRows)
-		self.tbl_app.setSelectionMode(QTableWidget.SingleSelection)
-		self.tbl_app.setEditTriggers(QTableWidget.NoEditTriggers)
+		self.btn_grid={}
+		self.btn_drag=None
 		self.visible_categories=[]
 		self.menu=App2Menu.app2menu()
 		self.categories=[]
@@ -135,8 +155,9 @@ class confScr(QWidget):
 					continue
 #				btn_desktop=QPushButton()
 				btn_desktop=dropButton("",self.tbl_app)
+				self.btn_grid[btn_desktop]={"row":row,"col":col}
+				btn_desktop.signal.connect(self._dragDropEvent)
 				btn_desktop.setAcceptDrops(True)
-#				btn_desktop.setDragEnabled(True)
 				btn_desktop.setMaximumWidth(BTN_SIZE)
 				btn_desktop.setIcon(icnApp)
 				btn_desktop.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
@@ -150,29 +171,30 @@ class confScr(QWidget):
 		self.tbl_app.removeRow(row)
 		self.tbl_app.resizeColumnsToContents()
 
-	def _udpate_desktops(self):
-		row=0
-		col=0
-		self.tbl_app.clear()
-		self.tbl_app.setRowCount(1)
-		icn_showOn=QtGui.QIcon.fromTheme("password-show-on")
-		icn_showOff=QtGui.QIcon.fromTheme("password-show-off")
-		for cat in self.categories:
-			for desk in self.menu.get_apps_from_category(cat):
-				item=QTableWidgetItem(desk)
-				self.tbl_app.setItem(row,col,item)
-				btn_showOn=QPushButton()
-				btn_showOn.setObjectName("showbtn")
-				btn_showOn.setCheckable(True)
-				btn_showOn.setChecked(False)
-				btn_showOn.setIcon(icn_showOff)
-				if cat.replace(" ","-") in self.visible_categories:
-					btn_showOn.setChecked(True)
-					btn_showOn.setIcon(icn_showOn)
-				self.tbl_app.setCellWidget(row,1,btn_showOn)
-				row+=1
-				self.tbl_app.insertRow(row)
-		self.tbl_app.removeRow(row)
+	def _dragDropEvent(self,btnEv):
+		if 'drag' in btnEv.keys():
+			self.btn_drag=btnEv['drag']
+		else:
+			btn=btnEv['drop']
+			rowTo=self.btn_grid[btn]['row']
+			colTo=self.btn_grid[btn]['col']
+			print("To %s at %s %s"%(btn,rowTo,colTo))
+			rowFrom=self.btn_grid[self.btn_drag]['row']
+			colFrom=self.btn_grid[self.btn_drag]['col']
+			print("From %s at %s %s"%(self.btn_drag,rowFrom,colFrom))
+			btn.setParent(self)
+			self.btn_drag.setParent(self)
+#			self.tbl_app.removeCellWidget(rowTo,colTo)
+#			wdg=self.tbl_app.cellWidget(rowFrom,colFrom)
+#			self.tbl_app.setCellWidget(rowTo,colTo,wdg)
+#			wdg2=self.tbl_app.cellWidget(rowFrom,colFrom)
+			self.tbl_app.removeCellWidget(rowFrom,colFrom)
+			self.tbl_app.removeCellWidget(rowTo,colTo)
+#			wdg=self.tbl_app.cellWidget(rowFrom,colFrom)
+			self.tbl_app.setCellWidget(rowFrom,colFrom,btn)
+			print(self.tbl_app.cellWidget(rowTo,colTo))
+			print(self.tbl_app.cellWidget(rowFrom,colFrom))
+#			self.tbl_app.setCellWidget(rowTo,colTo,self.btn_drag)
 
 	def _save_categories(self):
 		categories=[]
