@@ -35,7 +35,7 @@ class appConfig():
 		self._debug("ConfFile: %s"%self.confFile)
 	#def set_confFile
 
-	def get_configFile(self,level):
+	def get_configFile(self,level=None):
 		confFile={}
 		if level in self.baseDirs.keys():
 			confFile.update({level:"%s/%s"%(self.baseDirs[level],self.confFile)})
@@ -53,10 +53,9 @@ class appConfig():
 		self._read_config_from_system(level)
 		self._read_config_from_n4d()
 		config=self.config.copy()
-		print(config)
 		return (config)
 
-	def _read_config_from_system(self,level):
+	def _read_config_from_system(self,level=None):
 		def _read_file(confFile,level):
 			data={}
 			self._debug("Reading %s -> %s"%(confFile,level))
@@ -65,37 +64,38 @@ class appConfig():
 					data=json.loads(open(confFile).read())
 				except Exception as e:
 					self._debug("Error opening %s: %s"%(confFile,e))
+					
 			if data:
-				self.config.update(data)
+				self.config.update({level:data})
 		#def _read_file
 		confFiles=self.get_configFile(level)
-		for level,confFile in confFiles.items():
-			_read_file(confFile,level)
+		for confLevel,confFile in confFiles.items():
+			_read_file(confFile,confLevel)
 	#def read_config_from_system
 
-	def write_config(self,data,level=None,key=None):
+	def write_config(self,data,level='user',key=None):
 		self._debug("Writing key %s to %s"%(key,level))
 		oldConf=self.get_config(level)
-		print("Old: %s"%oldConf)
+		self._debug("Old: %s"%oldConf)
 		newConf=oldConf.copy()
 		if key:
-			for confLevel in newConf.keys():
-				newConf[confLevel][key]=data
+			newConf[level][key]=data
 		else:
-			newConf=data
+			for key in data.keys():
+				newConf[level][key]=data[key]
 		self._write_config_to_system(newConf,level)
 		self._write_config_to_n4d(newConf)
 
 	def _write_config_to_system(self,conf,level='user'):
 		data={}
-		print("Writing info %s"%self.config[level])
+		self._debug("Writing info %s"%self.config[level])
 		if level and level in self.baseDirs.keys():
 			confDir=self.baseDirs[level]
 		else:
 			confDir=self.defaultDir
 		confFile=("%s/%s"%(confDir,self.confFile))
-		self.config.update({level:conf})
-		print("New: %s"%self.config[level])
+		self.config[level]=conf[level]
+		self._debug("New: %s"%self.config[level])
 		try:
 			with open(confFile,'w') as f:
 				json.dump(self.config[level],f,indent=4,sort_keys=True)

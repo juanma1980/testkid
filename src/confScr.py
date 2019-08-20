@@ -97,6 +97,25 @@ class confScr(QWidget):
 
 	def _load_screen(self):
 		box=QVBoxLayout()
+		btnBox=QHBoxLayout()
+		btn_cat=QPushButton(_("Show Categories"))
+		btn_add=QPushButton()
+		btn_add.setToolTip(_("Add Launcher"))
+		icnAdd=QtGui.QIcon.fromTheme("list-add")
+		btn_add.setIcon(icnAdd)
+		btn_del=QPushButton()
+		btn_del.setToolTip(_("Remove Launcher"))
+		icnDel=QtGui.QIcon.fromTheme("list-remove")
+		btn_del.setIcon(icnDel)
+		btn_hid=QPushButton()
+		btn_hid.setToolTip(_("Hide Launcher"))
+		icnHid=QtGui.QIcon.fromTheme("password-show-on")
+		btn_hid.setIcon(icnHid)
+		btnBox.addWidget(btn_cat)
+		btnBox.addWidget(btn_add)
+		btnBox.addWidget(btn_del)
+		btnBox.addWidget(btn_hid)
+		box.addLayout(btnBox)
 		row=0
 		col=0
 		scr=self.app.primaryScreen()
@@ -136,11 +155,12 @@ class confScr(QWidget):
 		for desktop in self.desktops:
 			deskInfo=self.runner.get_desktop_app(desktop)
 			for appName,appIcon in deskInfo.items():
-				btn_desktop=dropButton(appName,self.tbl_app)
+				btn_desktop=dropButton(desktop,self.tbl_app)
 				if not btn_desktop.set_image(appIcon):
 					self._debug("Discard: %s"%appName)
 					btn_desktop.deleteLater()
 					continue
+				btn_desktop.setToolTip(desktop)
 				btn_desktop.setObjectName("confBtn")
 				self.btn_grid[btn_desktop]={"row":row,"col":col}
 				btn_desktop.signal.connect(self._dragDropEvent)
@@ -163,18 +183,14 @@ class confScr(QWidget):
 			btn=btnEv['drop']
 			rowTo=self.btn_grid[btn]['row']
 			colTo=self.btn_grid[btn]['col']
-			print("To %s at %s %s"%(btn,rowTo,colTo))
 			rowFrom=self.btn_grid[self.btn_drag]['row']
 			colFrom=self.btn_grid[self.btn_drag]['col']
-			print("From %s at %s %s"%(self.btn_drag,rowFrom,colFrom))
 			btnTo=btn.clone()
 			btnTo.signal.connect(self._dragDropEvent)
 			self.btn_grid[btnTo]=self.btn_grid[self.btn_drag]
-			print(self.btn_grid[btnTo])
 			btnFrom=self.btn_drag.clone()
 			btnFrom.signal.connect(self._dragDropEvent)
 			self.btn_grid[btnFrom]=self.btn_grid[btn]
-			print("%s - %s"%(btnFrom,self.btn_drag))
 			del self.btn_grid[btn] 
 			del self.btn_grid[self.btn_drag] 
 			self.tbl_app.setCellWidget(rowFrom,colFrom,btnTo)
@@ -184,16 +200,18 @@ class confScr(QWidget):
 		desktops=[]
 		hidden=[]
 		for row in range(0,self.tbl_app.rowCount()):
-			btn_visible=self.tbl_app.cellWidget(row,1)
-			self._debug("Item at %s: %s"%(row,btn_visible))
-			item=self.tbl_app.item(row,0)
-			if btn_visible and btn_visible.isChecked():
-				desktops.append(item.text())
-			elif btn_visible: 
-				info=self.menu.get_desktop_info("/usr/share/applications/%s"%item.text())
-				for cat in info['Categories']:
-					if cat.lower() in self.visible_categories:
-						hidden.append(item.text())
+			for col in range(0,self.tbl_app.columnCount()):
+				btn=self.tbl_app.cellWidget(row,col)
+				if btn:
+					self._debug("Item at %s: %s"%(row,btn))
+					desktops.append(btn.title)
+#			if btn_visible and btn_visible.isChecked():
+#				desktops.append(item.text())
+#			elif btn_visible: 
+#				info=self.menu.get_desktop_info("/usr/share/applications/%s"%item.text())
+#				for cat in info['Categories']:
+#					if cat.lower() in self.visible_categories:
+#						hidden.append(item.text())
 		self._debug("Desktops: %s"%desktops)
 		self.runner.write_config(desktops,key='desktops',level='user')
 		self._debug("Hidden: %s"%hidden)
