@@ -57,7 +57,8 @@ class dropButton(QPushButton):
 			if state!='show':
 				print("Bg %s"%self.title)
 				pixmap=self.icon.pixmap(QSize(32,32))
-				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Mono)
+#				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Mono)
+				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Grayscale8)
 				bg_pixmap=QtGui.QPixmap.fromImage(image)
 				self.icon=QtGui.QIcon(bg_pixmap)
 		else:

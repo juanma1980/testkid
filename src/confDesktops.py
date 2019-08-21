@@ -2,7 +2,7 @@
 
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 import gettext
@@ -20,9 +20,10 @@ class confDesktops(QWidget):
 		super().__init__()
 		self.dbg=True
 		self.runner=appRun()
+		self._load_screen()
 	#def __init__
 		
-	def _render_add(self):
+	def _load_screen(self):
 		def _save_desktop():
 			categories=[]
 			desktop={}
