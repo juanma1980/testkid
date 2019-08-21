@@ -235,14 +235,10 @@ class confScr(QWidget):
 				btn=self.tbl_app.cellWidget(row,col)
 				if btn:
 					self._debug("Item at %s: %s"%(row,btn))
-					desktops.append(btn.title)
-#			if btn_visible and btn_visible.isChecked():
-#				desktops.append(item.text())
-#			elif btn_visible: 
-#				info=self.menu.get_desktop_info("/usr/share/applications/%s"%item.text())
-#				for cat in info['Categories']:
-#					if cat.lower() in self.visible_categories:
-#						hidden.append(item.text())
+					if self.btn_grid[btn]['state']=='show':
+						desktops.append(btn.title)
+					else:
+						hidden.append(btn.title)
 		self._debug("Desktops: %s"%desktops)
 		self.runner.write_config(desktops,key='desktops',level='user')
 		self._debug("Hidden: %s"%hidden)
