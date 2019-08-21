@@ -12,6 +12,8 @@ import gettext
 from libAppRun import appRun
 from edupals.ui import QAnimatedStatusBar
 from confLaunchers import confLaunchers  
+from confPass import confPass
+from confKeys import confKeys
 
 gettext.textdomain('testConfig')
 _ = gettext.gettext
@@ -33,11 +35,7 @@ class confKid(QWidget):
 		self.app_icons={}
 		self.icon='shell'
 		self.sigmap_tabSelect=QSignalMapper(self)
-#		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
-#		self.sigmap_tabRemove=QSignalMapper(self)
-#		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
 		self.runner=appRun()
-#		self._read_config()
 		self._render_gui()
 		self.keymap={}
 		for key,value in vars(Qt).items():
@@ -237,95 +235,18 @@ class confKid(QWidget):
 			return(fchoosed)
 	
 	def _render_keys(self):
-		def _grab_alt_keys(*args):
-			btn_tab.setText("")
-			self.grabKeyboard()
-			try:
-				self.keybind_signal.disconnect(_set_close_key)
-			except:
-				pass
-			self.keybind_signal.connect(_set_tab_key)
-		def _grab_close_keys(*args):
-			btn_close.setText("")
-			self.grabKeyboard()
-			try:
-				self.keybind_signal.disconnect(_set_tab_key)
-			except:
-				pass
-			self.keybind_signal.connect(_set_close_key)
-		def _set_tab_key(keypress):
-			btn_tab.setText(keypress)
-		def _set_close_key(keypress):
-			btn_close.setText(keypress)
-		self.installEventFilter(self)
-		widget=QWidget()
-		box=QGridLayout()
-		lbl_txt=QLabel(_("From here you can define the keybindings"))
-		box.addWidget(lbl_txt,0,0,1,2,Qt.AlignTop)
-		inp_tab=QLabel("Navigation between tabs")
-		btn_tab=QPushButton(_("Tab"))
-		btn_tab.clicked.connect(_grab_alt_keys)
-		btn_tab.setFixedSize(QSize(96,48))
-		box.addWidget(inp_tab,1,0,1,1)
-		box.addWidget(btn_tab,1,1,1,1,Qt.Alignment(1))
-		inp_close=QLabel("Close app")
-		btn_close=QPushButton(_("Alt+F4"))
-		btn_close.setFixedSize(QSize(96,48))
-		btn_close.clicked.connect(_grab_close_keys)
-		box.addWidget(inp_close,2,0,1,1,Qt.AlignLeft)
-		box.addWidget(btn_close,2,1,1,1,Qt.AlignLeft)
-		btn_Ok=QPushButton(_("Apply"))
-		btn_Cancel=QPushButton(_("Cancel"))
-		box.addWidget(btn_Ok,3,0,1,1,Qt.AlignLeft)
-		box.addWidget(btn_Cancel,3,1,1,1,Qt.AlignRight)
-
-		widget.setLayout(box)
+		widget=confKeys()
 		return(widget)
-
-	def eventFilter(self,source,event):
-		sw_mod=False
-		keypressed=[]
-		if (event.type()==QEvent.KeyPress):
-			for modifier,text in self.modmap.items():
-				if event.modifiers() & modifier:
-					sw_mod=True
-					keypressed.append(text)
-			key=self.keymap.get(event.key(),event.text())
-			if key not in keypressed:
-				if sw_mod==True:
-					sw_mod=False
-				keypressed.append(key)
-			if sw_mod==False:
-				self.keybind_signal.emit("+".join(keypressed))
-		if (event.type()==QEvent.KeyRelease):
-			self.releaseKeyboard()
-
-		return False
+	#def _render_keys
 	
 	def _render_pass(self):
-		widget=QWidget()
-		box=QVBoxLayout()
-		lbl_txt=QLabel(_("If a master password is set then the app will prompt for it to exit"))
-		lbl_txt.setAlignment(Qt.AlignTop)
-		box.addWidget(lbl_txt)
-		txt_pass=QLineEdit()
-		txt_pass.setPlaceholderText(_("Password"))
-		box.addWidget(txt_pass)
-		txt_pass2=QLineEdit()
-		txt_pass2.setPlaceholderText(_("Repeat password"))
-		box.addWidget(txt_pass2)
-		box_btns=QHBoxLayout()
-		btn_Ok=QPushButton(_("Apply"))
-		btn_Cancel=QPushButton(_("Cancel"))
-		box_btns.addWidget(btn_Ok)
-		box_btns.addWidget(btn_Cancel)
-		box.addLayout(box_btns)
-		widget.setLayout(box)
+		widget=confPass()
 		return(widget)
+	#def _render_pass
 
 	def _show_stack(self):
 		self.stk_widget.setCurrentIndex(self.lst_options.currentRow())
-		
+	#def _show_stack
 
 	def _show_message(self,msg,status=None):
 		self.statusBar.setText(msg)
@@ -333,6 +254,7 @@ class confKid(QWidget):
 			self.statusBar.show(status)
 		else:
 			self.statusBar.show()
+	#def _show_message
 
 def _define_css():
 	css="""
