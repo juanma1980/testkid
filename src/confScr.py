@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
-				QHeaderView
+				QHeaderView,QMenu
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
 import gettext
@@ -24,8 +24,10 @@ class dropButton(QPushButton):
 		self.title=title
 		self.parent=parent
 		self.img=None
+		self.icon=None
 		self.setAcceptDrops(True)
 		self.setMaximumWidth(BTN_SIZE)
+		self.position=0
 	#def __init__(self,title,parent):
 
 	def dragEnterEvent(self,e):
@@ -34,6 +36,7 @@ class dropButton(QPushButton):
 	
 	def mousePressEvent(self,e):
 		self.signal.emit({"drag":self})
+		self.position=e.pos()
 		mimedata=QMimeData()
 		drag=QtGui.QDrag(self)
 		drag.setMimeData(mimedata)
@@ -47,13 +50,19 @@ class dropButton(QPushButton):
 		self.signal.emit({"drop":self})
 	#def dropEvent
 
-	def set_image(self,img):
+	def set_image(self,img,state='show'):
 		self.img=img
 		if QtGui.QIcon.hasThemeIcon(self.img):
-			icnApp=QtGui.QIcon.fromTheme(self.img)
+			self.icon=QtGui.QIcon.fromTheme(self.img)
+			if state!='show':
+				print("Bg %s"%self.title)
+				pixmap=self.icon.pixmap(QSize(32,32))
+				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Mono)
+				bg_pixmap=QtGui.QPixmap.fromImage(image)
+				self.icon=QtGui.QIcon(bg_pixmap)
 		else:
 			return None
-		self.setIcon(icnApp)
+		self.setIcon(self.icon)
 		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 		return True
 	#def set_image
@@ -61,6 +70,7 @@ class dropButton(QPushButton):
 	def clone(self):
 		btn=dropButton(self.title,self.parent)
 		btn.set_image(self.img)
+		btn.setMenu(self.menu())
 		return(btn)
 	#def clone
 #class dropButton
@@ -98,23 +108,13 @@ class confScr(QWidget):
 	def _load_screen(self):
 		box=QVBoxLayout()
 		btnBox=QHBoxLayout()
-		btn_cat=QPushButton(_("Show Categories"))
+		btn_cat=QPushButton(_("Categories"))
 		btn_add=QPushButton()
 		btn_add.setToolTip(_("Add Launcher"))
 		icnAdd=QtGui.QIcon.fromTheme("list-add")
 		btn_add.setIcon(icnAdd)
-		btn_del=QPushButton()
-		btn_del.setToolTip(_("Remove Launcher"))
-		icnDel=QtGui.QIcon.fromTheme("list-remove")
-		btn_del.setIcon(icnDel)
-		btn_hid=QPushButton()
-		btn_hid.setToolTip(_("Hide Launcher"))
-		icnHid=QtGui.QIcon.fromTheme("password-show-on")
-		btn_hid.setIcon(icnHid)
 		btnBox.addWidget(btn_cat)
 		btnBox.addWidget(btn_add)
-		btnBox.addWidget(btn_del)
-		btnBox.addWidget(btn_hid)
 		box.addLayout(btnBox)
 		row=0
 		col=0
@@ -126,7 +126,8 @@ class confScr(QWidget):
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
 		scrollArea.setFocusPolicy(Qt.NoFocus)
-		self._update_categories(maxCol)
+		apps=self._update_apps_data()
+		self._update_categories(apps,maxCol)
 
 		scr=self.app.primaryScreen()
 		scrollArea.setWidget(self.tbl_app)
@@ -140,47 +141,77 @@ class confScr(QWidget):
 	#def load_screen
 
 	def _update_apps_data(self):
-		data=self.runner.get_apps()
-		self.visible_categories=data['categories']
+		apps=self.runner.get_apps()
+		self.visible_categories=apps['categories']
 		self._debug("Visible: %s"%self.visible_categories)
-		self.desktops=data['desktops']
+		return apps
 
-	def _update_categories(self,maxCol=1):
+	def _update_categories(self,apps,maxCol=1):
 		row=0
 		col=0
-		self._update_apps_data()
+		def _add_desktop(desktops,state="show"):
+			nonlocal row
+			nonlocal col
+			for desktop in desktops:
+				deskInfo=self.runner.get_desktop_app(desktop)
+				for appName,appIcon in deskInfo.items():
+					btn_desktop=dropButton(desktop,self.tbl_app)
+					if not btn_desktop.set_image(appIcon,state):
+						self._debug("Discard: %s"%appName)
+						btn_desktop.deleteLater()
+						continue
+					btnMenu=QMenu()
+					action=_("Show button")
+					if state=="show":
+						action=_("Hide button")
+					btnMenu.addAction(action)
+					btnMenu.triggered.connect(lambda:self._changeBtnState(apps,maxCol,state))
+					btn_desktop.setToolTip(desktop)
+					btn_desktop.setMenu(btnMenu)
+					btn_desktop.setObjectName("confBtn")
+					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
+					btn_desktop.signal.connect(self._dragDropEvent)
+					self._debug("Adding %s at %s %s"%(appName,row,col))
+					self.tbl_app.setCellWidget(row,col,btn_desktop)
+					col+=1
+					if col>=maxCol:
+						col=0
+						row+=1
+						self.tbl_app.insertRow(row)
+						self._debug("Insert row %s"%self.tbl_app.rowCount())
+
 		self.tbl_app.clear()
 		self.tbl_app.setRowCount(1)
 		self.tbl_app.setColumnCount(maxCol)
-		for desktop in self.desktops:
-			deskInfo=self.runner.get_desktop_app(desktop)
-			for appName,appIcon in deskInfo.items():
-				btn_desktop=dropButton(desktop,self.tbl_app)
-				if not btn_desktop.set_image(appIcon):
-					self._debug("Discard: %s"%appName)
-					btn_desktop.deleteLater()
-					continue
-				btn_desktop.setToolTip(desktop)
-				btn_desktop.setObjectName("confBtn")
-				self.btn_grid[btn_desktop]={"row":row,"col":col}
-				btn_desktop.signal.connect(self._dragDropEvent)
-				self._debug("Adding %s at %s %s"%(appName,row,col))
-				self.tbl_app.setCellWidget(row,col,btn_desktop)
-				col+=1
-				if col>=maxCol:
-					col=0
-					row+=1
-					self.tbl_app.insertRow(row)
-					self._debug("Insert row %s"%self.tbl_app.rowCount())
+		_add_desktop(apps['desktops'])
+		_add_desktop(apps['hidden'],"hidden")
 		self.tbl_app.resizeColumnsToContents()
+
+	def _changeBtnState(self,apps,maxCol,state='show'):
+		row=self.tbl_app.currentRow()
+		col=self.tbl_app.currentColumn()
+		btn=self.tbl_app.cellWidget(row,col)
+		if state=='show':
+			state='hidden'
+			apps['desktops'].remove(btn.title)
+			apps['hidden'].append(btn.title)
+		else:
+			state='show'
+			apps['desktops'].append(btn.title)
+			apps['hidden'].remove(btn.title)
+		self.btn_grid['state']=state
+		self._update_categories(apps,maxCol)
 
 	def _dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
 			self.btn_drag=btnEv['drag']
 		else:
 			if btnEv['drop']==self.btn_drag:
+				self.btn_drag.showMenu()
 				return False
 			btn=btnEv['drop']
+			if self.btn_grid[btn]['state']=='hidden' or self.btn_grid[self.btn_drag]['state']=='hidden':
+				return False
 			rowTo=self.btn_grid[btn]['row']
 			colTo=self.btn_grid[btn]['col']
 			rowFrom=self.btn_grid[self.btn_drag]['row']

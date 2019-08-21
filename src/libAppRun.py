@@ -225,26 +225,24 @@ class appRun():
 		default={'categories':[],'desktops':[]}
 
 		data=self.config.get_config()
-		print(data)
 		
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
 				continue
 
-			if 'categories' in section.keys():
-				apps['categories'].extend(data[confFile]['categories'])
-			if 'desktops' in section.keys():
-				apps['desktops'].extend(data[confFile]['desktops'])
+			apps['categories']=data[confFile].get('categories')
+			apps['desktops']=data[confFile].get('desktops')
+			apps['hidden']=data[confFile].get('hidden')
 
 		if not apps['categories'] and not apps['desktops']:
 			apps=default
-#		if 'categories' in apps.keys():
-#			for category in apps['categories']:
-#				cat_apps=self.get_category_desktops(category.lower())
-#				for app in cat_apps:
-#					if app not in apps['desktops']:
-#						apps['desktops'].append(app)
+		elif 'categories' in apps.keys():
+			for category in apps['categories']:
+				cat_apps=self.get_category_desktops(category.lower())
+				for app in cat_apps:
+					if ((app not in apps['desktops']) and (app not in apps['hidden'])):
+						apps['desktops'].append(app)
 		return(apps)
 
 	def get_category_desktops(self,category):
