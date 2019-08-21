@@ -76,7 +76,7 @@ class dropButton(QPushButton):
 #class dropButton
 
 
-class confScr(QWidget):
+class confLaunchers(QWidget):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self,app):
 		super().__init__()

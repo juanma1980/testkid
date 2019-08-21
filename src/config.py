@@ -11,7 +11,7 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import gettext
 from libAppRun import appRun
 from edupals.ui import QAnimatedStatusBar
-from confScr import confScr
+from confLaunchers import confLaunchers  
 
 gettext.textdomain('testConfig')
 _ = gettext.gettext
@@ -142,7 +142,7 @@ class confKid(QWidget):
 		return(panel)
 
 	def _render_config(self):
-		widget=confScr(app)
+		widget=confLaunchers(app)
 		return(widget)
 	
 	def _render_add(self):
