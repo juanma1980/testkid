@@ -17,6 +17,42 @@ QInt=type(0)
 TAB_BTN_SIZE=96
 BTN_SIZE=128
 
+class navButton(QPushButton):
+	keypress=pyqtSignal("PyQt_PyObject")
+	def __init__(self,parent):
+		super (navButton,self).__init__("",parent)
+		self.keymap={}
+		for key,value in vars(Qt).items():
+			if isinstance(value, Qt.Key):
+				self.keymap[value]=key.partition('_')[2]
+		self.modmap={
+					Qt.ControlModifier: self.keymap[Qt.Key_Control],
+					Qt.AltModifier: self.keymap[Qt.Key_Alt],
+					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
+					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
+					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
+					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
+					}
+	
+	def keyPressEvent(self,event):
+		sw_mod=False
+		keypressed=[]
+		if (event.type()==QEvent.KeyPress):
+			for modifier,text in self.modmap.items():
+				if event.modifiers() & modifier:
+					sw_mod=True
+					keypressed.append(text)
+			key=self.keymap.get(event.key(),event.text())
+			if key not in keypressed:
+				if sw_mod==True:
+					sw_mod=False
+				keypressed.append(key)
+			if sw_mod==False:
+				key=("+".join(keypressed))
+		self.keypress.emit(key)
+	#def eventFilter
+
+
 class testKid(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
@@ -32,6 +68,19 @@ class testKid(QWidget):
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
+		self.currentBtn=0
+		self.keymap={}
+		for key,value in vars(Qt).items():
+			if isinstance(value, Qt.Key):
+				self.keymap[value]=key.partition('_')[2]
+		self.modmap={
+					Qt.ControlModifier: self.keymap[Qt.Key_Control],
+					Qt.AltModifier: self.keymap[Qt.Key_Alt],
+					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
+					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
+					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
+					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
+					}
 		self.sigmap_tabSelect=QSignalMapper(self)
 		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
 		self.sigmap_tabRemove=QSignalMapper(self)
@@ -65,8 +114,10 @@ class testKid(QWidget):
 
 	def _read_config(self):
 		data=self.runner.get_apps()
-		self.categories=data['categories']
-		self.desktops=data['desktops']
+		self.categories=data.get('categories')
+		self.desktops=data.get('desktops')
+		self.keybinds=data.get('keybinds')
+		self.password=data.get('password')
 
 	def _render_gui(self):
 		self.show()
@@ -79,6 +130,57 @@ class testKid(QWidget):
 		self._debug("Focus to %s"%self.focusWidgets[0])
 		self.focusWidgets[0].setFocus()
 	#def _render_gui
+
+	def keyPressEvent(self,event):
+		sw_mod=False
+		keypressed=[]
+		if (event.type()==QEvent.KeyPress):
+			for modifier,text in self.modmap.items():
+				if event.modifiers() & modifier:
+					sw_mod=True
+					keypressed.append(text)
+			key=self.keymap.get(event.key(),event.text())
+			if key not in keypressed:
+				if sw_mod==True:
+					sw_mod=False
+				keypressed.append(key)
+			if sw_mod==False:
+				key=("+".join(keypressed))
+		print(key)
+	#def eventFilter
+
+	def _set_focus(self,key):
+		if key=="Space":
+			self.focusWidgets[self.currentBtn].clicked.emit()
+		elif key=="Tab":
+			tabCount=self.tabBar.count()
+			newTab=self.tabBar.currentIndex()+1
+			if newTab>tabCount:
+				newTab=0
+			self.tabBar.setCurrentIndex(newTab)
+
+		else:
+			if key=="Right":
+				self.currentBtn+=1
+				if self.currentBtn>=len(self.focusWidgets):
+					self.currentBtn=0
+			elif key=="Left":
+				self.currentBtn-=1
+				if self.currentBtn<0:
+					self.currentBtn=len(self.focusWidgets)-1
+			elif key=="Up":
+				currentBtn=self.currentBtn
+				currentBtn-=self.maxCol
+				if currentBtn<0:
+					currentBtn=self.currentBtn
+				self.currentBtn=currentBtn
+			elif key=="Down":
+				currentBtn=self.currentBtn
+				currentBtn+=self.maxCol
+				if currentBtn>=len(self.focusWidgets):
+					currentBtn=self.currentBtn
+				self.currentBtn=currentBtn
+			self.focusWidgets[self.currentBtn].setFocus()
 
 	def _tabBar(self):
 		row=0
@@ -95,16 +197,18 @@ class testKid(QWidget):
 					continue
 				self.app_icons[appName]=appIcon
 				self._debug("Adding %s"%appName)
-				btnApp=QPushButton()
+				btnApp=navButton(self)
 				btnApp.setIcon(icnApp)
 				btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 				btnApp.setToolTip(appName)
+				btnApp.setFocusPolicy(Qt.NoFocus)
+				btnApp.keypress.connect(self._set_focus)
 				self.focusWidgets.append(btnApp)
 				sigmap_run.setMapping(btnApp,appName)
 				btnApp.clicked.connect(sigmap_run.map)
 				vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
 				col+=1
-				if col==maxCol:
+				if col==self.maxCol:
 					col=0
 					row+=1
 
@@ -118,8 +222,8 @@ class testKid(QWidget):
 		scr=app.primaryScreen()
 		w=scr.size().width()-BTN_SIZE
 		h=scr.size().height()-(2*BTN_SIZE)
-		maxCol=int(w/BTN_SIZE)-3
-		self._debug("Size: %s\nCols: %s"%(self.width(),maxCol))
+		self.maxCol=int(w/BTN_SIZE)-3
+		self._debug("Size: %s\nCols: %s"%(self.width(),self.maxCol))
 #		for category in self.categories:
 #			apps=self._get_category_apps(category)
 #			_add_widgets()
@@ -152,6 +256,7 @@ class testKid(QWidget):
 		self.currentTab=self.tabBar.currentIndex()
 		key='close'
 		if self.currentTab==0:
+			self.focusWidgets[self.currentBtn].setFocus()
 			index=0
 			key='show'
 		self._debug("New Tab Index: %s"%self.tab_id[index])
@@ -207,6 +312,7 @@ class testKid(QWidget):
 		zone=QWidget.createWindowContainer(subZone)
 		zone.setParent(self)
 		box.addWidget(zone)
+		zone.setFocusPolicy(Qt.NoFocus)
 		tabContent.setLayout(box)
 		icn=QtGui.QIcon.fromTheme(self.app_icons[app])
 		btn=QPushButton()
