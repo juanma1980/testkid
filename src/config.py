@@ -35,21 +35,8 @@ class confKid(QWidget):
 		self.desktops={}
 		self.app_icons={}
 		self.icon='shell'
-		self.sigmap_tabSelect=QSignalMapper(self)
 		self.runner=appRun()
 		self._render_gui()
-		self.keymap={}
-		for key,value in vars(Qt).items():
-			if isinstance(value, Qt.Key):
-				self.keymap[value]=key.partition('_')[2]
-		self.modmap={
-					Qt.ControlModifier: self.keymap[Qt.Key_Control],
-					Qt.AltModifier: self.keymap[Qt.Key_Alt],
-					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
-					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
-					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
-					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
-					}
 	#def init
 	
 	def _debug(self,msg):

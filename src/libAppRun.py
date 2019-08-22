@@ -219,23 +219,29 @@ class appRun():
 		return("%s"%display)
 	#def _find_free_display
 
-	def get_apps(self):
-		categories=[]
-		apps={'categories':[],'desktops':[]}
-		default={'categories':[],'desktops':[]}
+	def get_apps(self,categories=[],load_categories=True):
+		apps={'categories':[],'desktops':[],'hidden':[]}
+		default={'categories':[],'desktops':[],'hidden':[]}
 
 		data=self.config.get_config()
+		
+		if categories:
+			apps['categories']=categories
 		
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
 				continue
 
-			apps['categories']=data[confFile].get('categories')
-			apps['desktops']=data[confFile].get('desktops')
-			apps['hidden']=data[confFile].get('hidden')
+			if categories==[] and load_categories:
+				apps['categories']=data[confFile].get('categories')
+				apps['desktops']=data[confFile].get('desktops')
+				apps['hidden']=data[confFile].get('hidden')
+			elif categories!=[]:
+				apps['hidden']=data[confFile].get('hidden')
 
-		if not apps['categories'] and not apps['desktops']:
+
+		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
 		elif 'categories' in apps.keys():
 			for category in apps['categories']:
