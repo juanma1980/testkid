@@ -130,6 +130,17 @@ class confLaunchers(QWidget):
 				self.visible_categories.append(cat)
 			apps=self.runner.get_apps(self.visible_categories,False)
 			self._update_screen(apps)
+		
+		def _update_desktops():
+			fdia=QFileDialog()
+			fchoosed=''
+			fdia.setFileMode(QFileDialog.AnyFile)
+			fdia.setNameFilter(_("desktops(*.desktop)"))
+			fdia.setDirectory("/usr/share/applications")
+			if (fdia.exec_()):
+				fchoosed=fdia.selectedFiles()[0]
+				apps['desktops'].append(fchoosed)
+				self._update_screen(apps)
 
 		apps=self._update_apps_data()
 		sigmap_catSelect=QSignalMapper(self)
@@ -152,6 +163,7 @@ class confLaunchers(QWidget):
 		btn_add.setToolTip(_("Add Launcher"))
 		icnAdd=QtGui.QIcon.fromTheme("list-add")
 		btn_add.setIcon(icnAdd)
+		btn_add.clicked.connect(_update_desktops)
 		btnBox.addWidget(btn_cat)
 		btnBox.addWidget(btn_add)
 		box.addLayout(btnBox)
@@ -245,13 +257,31 @@ class confLaunchers(QWidget):
 			btn=btnEv['drop']
 			if self.btn_grid[btn]['state']=='hidden' or self.btn_grid[self.btn_drag]['state']=='hidden':
 				return False
-			#Build desktops array
-			apps=self._get_table_apps()
-			position=apps['desktops'].index(btn.title)
-			self._debug("Btn at pos: %s"%position)
-			apps['desktops'].remove(self.btn_drag.title)
-			apps['desktops'].insert(position,self.btn_drag.title)
-			self._update_screen(apps)
+
+			replace=False
+			if replace:
+				rowTo=self.btn_grid[btn]['row']
+				colTo=self.btn_grid[btn]['col']
+				rowFrom=self.btn_grid[self.btn_drag]['row']
+				colFrom=self.btn_grid[self.btn_drag]['col']
+				btnTo=btn.clone()
+				btnTo.signal.connect(self._dragDropEvent)
+				self.btn_grid[btnTo]=self.btn_grid[self.btn_drag]
+				btnFrom=self.btn_drag.clone()
+				btnFrom.signal.connect(self._dragDropEvent)
+				self.btn_grid[btnFrom]=self.btn_grid[btn]
+				del self.btn_grid[btn] 
+				del self.btn_grid[self.btn_drag] 
+				self.tbl_app.setCellWidget(rowFrom,colFrom,btnTo)
+				self.tbl_app.setCellWidget(rowTo,colTo,btnFrom)
+			else:
+				#Build desktops array
+				apps=self._get_table_apps()
+				position=apps['desktops'].index(btn.title)
+				self._debug("Btn at pos: %s"%position)
+				apps['desktops'].remove(self.btn_drag.title)
+				apps['desktops'].insert(position,self.btn_drag.title)
+				self._update_screen(apps)
 	#def _dragDropEvent
 
 	def _save_apps(self):
@@ -259,6 +289,7 @@ class confLaunchers(QWidget):
 		self._debug("Apps: %s"%apps)
 		for key,data in apps.items():
 			self.runner.write_config(data,key=key,level='user')
+		self.runner.write_config(self.visible_categories,key='categories',level='user')
 	#def _save_apps
 
 	def _get_table_apps(self):

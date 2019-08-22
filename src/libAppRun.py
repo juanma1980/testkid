@@ -237,9 +237,6 @@ class appRun():
 				apps['categories']=data[confFile].get('categories')
 				apps['desktops']=data[confFile].get('desktops')
 				apps['hidden']=data[confFile].get('hidden')
-			elif categories!=[]:
-				apps['hidden']=data[confFile].get('hidden')
-
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default

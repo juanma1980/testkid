@@ -2,6 +2,7 @@
 
 import sys
 import os
+import subprocess
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
@@ -20,9 +21,15 @@ class confDesktops(QWidget):
 		super().__init__()
 		self.dbg=True
 		self.runner=appRun()
+		self.icon=''
 		self._load_screen()
 	#def __init__
 		
+	def _debug(self,msg):
+		if self.dbg:
+			print("ConfDesktops: %s"%msg)
+	#def _debug
+
 	def _load_screen(self):
 		def _save_desktop():
 			categories=[]
@@ -35,9 +42,8 @@ class confDesktops(QWidget):
 			self._debug("Saving %s"%desktop)
 			try:
 				subprocess.check_call(["pkexec","/usr/share/deskedit/bin/deskedit-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec']])
-				self._show_message(_("Added %s"%desktop['Name']),"success")
-			except:
-				self._show_message(_("Error adding %s"%desktop['Name']))
+			except Exception as e:
+				self._debug(e)
 		#def _save_desktop
 
 		box=QGridLayout()
