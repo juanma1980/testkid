@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
@@ -19,8 +20,37 @@ BTN_SIZE_FULL=128
 BTN_SIZE=32
 
 
+class dropTable(QTableWidget):
+	drop=pyqtSignal("PyQt_PyObject")
+	def __init__(self,parent,row,col):
+		super (dropTable,self).__init__(row,col,parent)
+		self.parent=parent
+		self.setAcceptDrops(True)
+		self.setDragEnabled(True)
+		Hheader=self.horizontalHeader()
+		Vheader=self.verticalHeader()
+		self.setShowGrid(False)
+		self.horizontalHeader().hide()
+		self.verticalHeader().hide()
+	
+	def dragEnterEvent(self,e):
+		e.accept()
+	#def dragEnterEvent
+	
+	def dragMoveEvent(self,e):
+		e.accept()
+	#def dragEnterEvent
+	
+	def dropEvent(self,e):
+		path=None
+		e.setDropAction(Qt.MoveAction)
+		e.accept()
+		if e.mimeData().hasUrls():
+			path=e.mimeData().urls()[0].path()
+		self.drop.emit(path)
+
 class dropButton(QPushButton):
-	signal=pyqtSignal("PyQt_PyObject")
+	drop=pyqtSignal("PyQt_PyObject")
 	def __init__(self,title,parent):
 		super (dropButton,self).__init__("",parent)
 		self.title=title
@@ -38,7 +68,7 @@ class dropButton(QPushButton):
 	#def dragEnterEvent
 	
 	def mousePressEvent(self,e):
-		self.signal.emit({"drag":self})
+		self.drop.emit({"drag":self})
 		self.position=e.pos()
 		mimedata=QMimeData()
 		drag=QtGui.QDrag(self)
@@ -52,7 +82,10 @@ class dropButton(QPushButton):
 		position=e.pos()
 		e.setDropAction(Qt.MoveAction)
 		e.accept()
-		self.signal.emit({"drop":self})
+		path=None
+		if e.mimeData().hasUrls():
+			path=e.mimeData().urls()[0].path()
+		self.drop.emit({"drop":self,'path':path})
 	#def dropEvent
 
 	def set_image(self,img,state='show'):
@@ -87,16 +120,8 @@ class confLaunchers(QWidget):
 		self.app=app
 		self.setStyleSheet(self._define_css())
 		self.runner=appRun()
-		self.tbl_app=QTableWidget(1,2)
-		self.tbl_app.setAcceptDrops(True)
-		self.tbl_app.setDragEnabled(True)
-		Hheader=self.tbl_app.horizontalHeader()
-#		Hheader.setSectionResizeMode(0,QHeaderView.Stretch)
-		Vheader=self.tbl_app.verticalHeader()
-#		Vheader.setSectionResizeMode(0,QHeaderView.Stretch)
-		self.tbl_app.setShowGrid(False)
-		self.tbl_app.horizontalHeader().hide()
-		self.tbl_app.verticalHeader().hide()
+		self.tbl_app=dropTable(self,1,2)
+		self.tbl_app.drop.connect(self._tbl_DropEvent)
 		self.btn_grid={}
 		self.btn_drag=None
 		self.visible_categories=[]
@@ -109,7 +134,7 @@ class confLaunchers(QWidget):
 
 	def _debug(self,msg):
 		if self.dbg:
-			print("ConfScr: %s"%msg)
+			print("ConfLaunchers: %s"%msg)
 	#def _debug
 
 	def _get_screen_size(self):
@@ -158,7 +183,6 @@ class confLaunchers(QWidget):
 			sigmap_catSelect.setMapping(act,cat)
 			act.triggered.connect(sigmap_catSelect.map)
 		btn_cat.setMenu(menu_cat)
-#		btn_cat.clicked.connect(self._show_categories)
 		btn_add=QPushButton()
 		btn_add.setToolTip(_("Add Launcher"))
 		icnAdd=QtGui.QIcon.fromTheme("list-add")
@@ -182,6 +206,15 @@ class confLaunchers(QWidget):
 		box.addWidget(btn_apply)
 		self.setLayout(box)
 	#def load_screen
+	
+	def _tbl_DropEvent(self,path):
+		if path.endswith('desktop'):
+			if os.path.isfile(path):
+				apps=self._get_table_apps()
+				apps['desktops'].append(path)
+				self._update_screen(apps)
+
+	#def _tbl_DropEvent
 
 	def _update_apps_data(self):
 		apps=self.runner.get_apps()
@@ -214,7 +247,7 @@ class confLaunchers(QWidget):
 					btn_desktop.setMenu(btnMenu)
 					btn_desktop.setObjectName("confBtn")
 					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
-					btn_desktop.signal.connect(self._dragDropEvent)
+					btn_desktop.drop.connect(self._btn_dragDropEvent)
 					self._debug("Adding %s at %s %s"%(appName,row,col))
 					self.tbl_app.setCellWidget(row,col,btn_desktop)
 					col+=1
@@ -247,17 +280,21 @@ class confLaunchers(QWidget):
 		self._update_screen(apps)
 	#def _changeBtnState
 
-	def _dragDropEvent(self,btnEv):
+	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
 			self.btn_drag=btnEv['drag']
 		else:
-			if btnEv['drop']==self.btn_drag:
+			if btnEv.get('drop')==self.btn_drag:
 				self.btn_drag.showMenu()
+				self.btn_drag=None
 				return False
-			btn=btnEv['drop']
-			if self.btn_grid[btn]['state']=='hidden' or self.btn_grid[self.btn_drag]['state']=='hidden':
+			btn=btnEv.get('drop')
+			if self.btn_grid.get(btn,{}).get('state')=='hidden' or self.btn_grid.get(self.btn_drag,{}).get('state')=='hidden':
+				self.btn_drag=None
 				return False
 
+			if self.btn_drag==None and btnEv.get('path',None)==None:
+				return False
 			replace=False
 			if replace:
 				rowTo=self.btn_grid[btn]['row']
@@ -265,24 +302,29 @@ class confLaunchers(QWidget):
 				rowFrom=self.btn_grid[self.btn_drag]['row']
 				colFrom=self.btn_grid[self.btn_drag]['col']
 				btnTo=btn.clone()
-				btnTo.signal.connect(self._dragDropEvent)
+				btnTo.drop.connect(self._btn_dragDropEvent)
 				self.btn_grid[btnTo]=self.btn_grid[self.btn_drag]
 				btnFrom=self.btn_drag.clone()
-				btnFrom.signal.connect(self._dragDropEvent)
+				btnFrom.drop.connect(self._btn_dragDropEvent)
 				self.btn_grid[btnFrom]=self.btn_grid[btn]
 				del self.btn_grid[btn] 
 				del self.btn_grid[self.btn_drag] 
 				self.tbl_app.setCellWidget(rowFrom,colFrom,btnTo)
 				self.tbl_app.setCellWidget(rowTo,colTo,btnFrom)
+				self.btn_drag=None
 			else:
 				#Build desktops array
 				apps=self._get_table_apps()
 				position=apps['desktops'].index(btn.title)
 				self._debug("Btn at pos: %s"%position)
-				apps['desktops'].remove(self.btn_drag.title)
-				apps['desktops'].insert(position,self.btn_drag.title)
+				if btnEv.get('path',None):
+					apps['desktops'].insert(position,btnEv['path'])
+				else:
+					apps['desktops'].remove(self.btn_drag.title)
+					apps['desktops'].insert(position,self.btn_drag.title)
 				self._update_screen(apps)
-	#def _dragDropEvent
+				self.btn_drag=None
+	#def _btn_dragDropEvent
 
 	def _save_apps(self):
 		apps=self._get_table_apps()
