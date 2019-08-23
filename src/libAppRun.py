@@ -18,6 +18,7 @@ class th_runApp(QThread):
 		QThread.__init__(self,parent)
 		self.display=display
 		self.app=app.split(" ")
+		self.menu=App2Menu.app2menu()
 		self.dbg=False
 	#def __init__
 
@@ -53,7 +54,7 @@ class th_runApp(QThread):
 	def _run_resource(self):
 		subprocess.run(["flash-java-insecure-perms","install"],stdin=None,stderr=None,stdout=None,shell=False)
 		app=" ".join(self.app)
-		app=app.replace("/usr/bin/resources-launcher.sh",App2Menu.app2menu().get_default_app_for_file(app.split(" ")[-1]))
+		app=app.replace("/usr/bin/resources-launcher.sh",self.menu.get_default_app_for_file(app.split(" ")[-1]))
 		self.app=app.split(" ")
 	#def _run_resource
 
@@ -96,6 +97,7 @@ class appRun():
 		self.desktops={}
 		self.threads_pid={}
 		self.threads_tmp={}
+		self.menu=App2Menu.app2menu()
 	#def __init__
 
 	def _debug(self,msg):
@@ -198,6 +200,12 @@ class appRun():
 			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
+		#Generate ratposionrc if don't exist
+		if not os.path.isfile("%s/.ratpoisonrc"%os.environ["HOME"]):
+			with open("%s/.ratpoisonrc"%os.environ["HOME"],'w') as f:
+				f.write("exec wmname LG3D\n")
+				f.write("set border 0\n")
+				f.write("startup message off\n")
 		th_run=th_runApp("ratpoison",display)
 		th_run.start()
 		th_run=th_runApp(app,display)
@@ -222,12 +230,11 @@ class appRun():
 	def get_apps(self,categories=[],load_categories=True):
 		apps={'categories':[],'desktops':[],'hidden':[]}
 		default={'categories':[],'desktops':[],'hidden':[]}
-
-		data=self.config.get_config()
 		
 		if categories:
 			apps['categories']=categories
-		
+
+		data=self.config.get_config()
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
@@ -237,6 +244,8 @@ class appRun():
 				apps['categories']=data[confFile].get('categories')
 				apps['desktops']=data[confFile].get('desktops')
 				apps['hidden']=data[confFile].get('hidden')
+				apps['keybinds']=data[confFile].get('keybinds')
+				apps['password']=data[confFile].get('password')
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
@@ -251,28 +260,42 @@ class appRun():
 	def get_category_desktops(self,category):
 		apps=[]
 		tmp_apps=[]
-		for app,data in App2Menu.app2menu().get_apps_from_category(category).items():
+		self.menu.set_desktop_system()
+		applist=self.menu.get_apps_from_category(category)
+		for app,data in applist.items():
 			if data['exe'] not in tmp_apps and app not in tmp_apps:
-				apps.append("/usr/share/applications/%s"%app)
+				apps.append("%s/%s"%(self.menu.desktoppath,app))
 				tmp_apps.append(data['exe'])
 				tmp_apps.append(app)
+		self.menu.set_desktop_user()
+		applist=(self.menu.get_apps_from_category(category))
+		for app,data in applist.items():
+			if data['exe'] not in tmp_apps and app not in tmp_apps:
+				apps.append("%s/%s"%(self.menu.desktoppath,app))
+				tmp_apps.append(data['exe'])
+				tmp_apps.append(app)
+		self.menu.set_desktop_system()
 		return(apps)
 
 	def get_category_apps(self,category):
 		apps={}
-		applist=App2Menu.app2menu().get_apps_from_category(category)
+		self.menu.set_desktop_system()
+		applist=self.menu.get_apps_from_category(category)
+		self.menu.set_desktop_user()
+		applist.extend(self.menu.get_apps_from_category(category))
 		for key,app in applist.items():
 			if 'xdg-open' in app['exe']:
-				app['exe']=app['exe'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['exe'].split(" ")[-1]))
+				app['exe']=app['exe'].replace("xdg-open",self.menu.get_default_app_for_file(app['exe'].split(" ")[-1]))
 			apps[app['exe']]=app['icon']
+		self.menu.set_desktop_system()
 		return (apps)
 	#def get_category_apps
 
 	def get_desktop_app(self,f_desktop):
 		apps={}
-		app=App2Menu.app2menu().get_desktop_info(f_desktop)
+		app=self.menu.get_desktop_info(f_desktop)
 		if 'xdg-open' in app['Exec']:
-			app['Exec']=app['Exec'].replace("xdg-open",App2Menu.app2menu().get_default_app_for_file(app['Exec'].split(" ")[-1]))
+			app['Exec']=app['Exec'].replace("xdg-open",self.menu.get_default_app_for_file(app['Exec'].split(" ")[-1]))
 		apps[app['Exec']]=app['Icon']
 		return (apps)
 	#def get_desktop_app

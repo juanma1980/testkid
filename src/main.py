@@ -5,17 +5,20 @@ import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
 				QDialog,QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
-				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange
+				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 import gettext
 import subprocess
 import signal
+from passlib.hash import pbkdf2_sha256 as hashpwd
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
 TAB_BTN_SIZE=96
 BTN_SIZE=128
+gettext.textdomain('testConfig')
+_ = gettext.gettext
 
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
@@ -98,9 +101,10 @@ class testKid(QWidget):
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 #		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
 		self.runner=appRun()
 		self._read_config()
@@ -131,6 +135,18 @@ class testKid(QWidget):
 		self.focusWidgets[0].setFocus()
 	#def _render_gui
 
+	def closeEvent(self,event):
+		if self.password:
+			pwd,resp=QInputDialog.getText(self,_("Master Password"),_("Insert the password"))
+			if resp:
+				if not hashpwd.verify(pwd,self.password):
+					event.ignore()
+			else:
+				event.ignore()
+		for index in self.tab_id.keys():
+			self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
+			self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+
 	def keyPressEvent(self,event):
 		sw_mod=False
 		keypressed=[]
@@ -150,7 +166,8 @@ class testKid(QWidget):
 	#def eventFilter
 
 	def _set_focus(self,key):
-		if key=="Space":
+		print(key)
+		if key=="Space" or key=="NumLock+Enter" or key=="Return":
 			self.focusWidgets[self.currentBtn].clicked.emit()
 		elif key=="Tab":
 			tabCount=self.tabBar.count()
@@ -194,6 +211,11 @@ class testKid(QWidget):
 				if QtGui.QIcon.hasThemeIcon(appIcon):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
 				else:
+					if os.path.isfile(appIcon):
+						icnApp=QtGui.QIcon(appIcon)
+					else:
+						continue
+				if not appName:
 					continue
 				self.app_icons[appName]=appIcon
 				self._debug("Adding %s"%appName)

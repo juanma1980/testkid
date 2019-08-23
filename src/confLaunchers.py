@@ -98,7 +98,10 @@ class dropButton(QPushButton):
 				bg_pixmap=QtGui.QPixmap.fromImage(image)
 				self.icon=QtGui.QIcon(bg_pixmap)
 		else:
-			return None
+			if os.path.isfile(self.img):
+				self.icon=QtGui.QIcon(self.img)
+			else:
+				return None
 		self.setIcon(self.icon)
 		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 		return True
@@ -183,10 +186,10 @@ class confLaunchers(QWidget):
 			sigmap_catSelect.setMapping(act,cat)
 			act.triggered.connect(sigmap_catSelect.map)
 		btn_cat.setMenu(menu_cat)
-		btn_add=QPushButton()
+		btn_add=QPushButton(_("Add launcher"))
 		btn_add.setToolTip(_("Add Launcher"))
-		icnAdd=QtGui.QIcon.fromTheme("list-add")
-		btn_add.setIcon(icnAdd)
+#		icnAdd=QtGui.QIcon.fromTheme("list-add")
+#		btn_add.setIcon(icnAdd)
 		btn_add.clicked.connect(_update_desktops)
 		btnBox.addWidget(btn_cat)
 		btnBox.addWidget(btn_add)
@@ -350,6 +353,7 @@ class confLaunchers(QWidget):
 	def _get_all_categories(self):
 		categories=[]
 		categories=self.menu.get_categories()
+		categories.insert(0,'run-o-matic')
 		return categories
 
 	def _define_css(self):

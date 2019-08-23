@@ -36,6 +36,13 @@ class confKid(QWidget):
 		self.app_icons={}
 		self.icon='shell'
 		self.runner=appRun()
+		self.options={
+				1:{'name':"Options",'icon':'icon'},
+				2:{'name':"Modify launchers",'icon':'edit-group','tooltip':_("From here you can modify the launchers")},
+				3:{'name':"Add custom launcher",'icon':'org.kde.plasma.quicklaunch','tooltip':_("From here you can add a custom launcher")},
+#				4:{'name':"Modify keybindings",'icon':'configure-shortcuts','tooltip':_("From here you can modify the keybinding")},
+				5:{'name':"Set master password",'icon':'dialog-password','tooltip':_("From here you can set the master password")}
+				}
 		self._render_gui()
 	#def init
 	
@@ -76,14 +83,7 @@ class confKid(QWidget):
 		btn_menu.setToolTip(_("Options"))
 		btn_menu.setObjectName("menuButton")
 		box.addWidget(btn_menu,Qt.Alignment(1))
-		options={
-				1:{'name':"Options",'icon':'icon'},
-				2:{'name':"Modify launchers",'icon':'edit-group','tooltip':_("From here you can modify the launchers")},
-				3:{'name':"Add custom launcher",'icon':'org.kde.plasma.quicklaunch','tooltip':_("From here you can add a custom launcher")},
-				4:{'name':"Modify keybindings",'icon':'configure-shortcuts','tooltip':_("From here you can modify the keybinding")},
-				5:{'name':"Set master password",'icon':'dialog-password','tooltip':_("From here you can set the master password")}
-				}
-		for index,option in options.items():
+		for index,option in self.options.items():
 			lst_widget=QListWidgetItem(self.lst_options)
 			lst_widget.setText(option['name'])
 			if index==1:
@@ -99,41 +99,52 @@ class confKid(QWidget):
 		self.lst_options.itemClicked.connect(self._show_stack)
 		panel.setLayout(box)
 		return(panel)
+	#def _left_panel
 
 	def _right_panel(self):
 		panel=QWidget()
 		box=QVBoxLayout()
-		for i in range(0,5):
-			if i==0:
-				stack=QWidget()
-				stack.setObjectName("panel")
-				s_box=QVBoxLayout()
-				lbl_txt=QLabel(_("Welcome to Run-O-Matic config.\nFrom here you can:\n * Configure visible launchers\n * Add new launchers\n\
-* Set keybindings for close and navigation\n * Set a master password"))
-				lbl_txt.setAlignment(Qt.AlignTop)
-				s_box.addWidget(lbl_txt,Qt.Alignment(1))
-				stack.setLayout(s_box)
-			elif i==1:
+		idx=0
+		stack=QWidget()
+		stack.setObjectName("panel")
+		s_box=QVBoxLayout()
+		text=[
+			_("Welcome to Run-O-Matic config."),
+			_("From here you can:"),
+			_(" * Configure visible launchers"),
+			_(" * Add new launchers"),
+#			_(" * Set keybindings for close and navigation"),
+			_(" * Set a master password")
+			]
+		lbl_txt=QLabel("\n".join(text))
+		lbl_txt.setAlignment(Qt.AlignTop)
+		s_box.addWidget(lbl_txt,Qt.Alignment(1))
+		stack.setLayout(s_box)
+		for key,data in self.options.items():
+			if key==2:
 				stack=self._render_config()
-			elif i==2:
+			elif key==3:
 				stack=self._render_add()
-			elif i==3:
+			elif key==4:
 				stack=self._render_keys()
-			elif i==4:
+			elif key==5:
 				stack=self._render_pass()
-
 			self.stk_widget.addWidget(stack)
+
 		box.addWidget(self.stk_widget)
 		panel.setLayout(box)
 		return(panel)
+	#def _right_panel
 
 	def _render_config(self):
 		widget=confLaunchers(app)
 		return(widget)
+	#def _render_config
 	
 	def _render_add(self):
 		widget=confDesktops()
 		return(widget)
+	#def _render_add
 	
 	def _render_keys(self):
 		widget=confKeys()

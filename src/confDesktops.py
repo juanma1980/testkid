@@ -3,7 +3,7 @@
 import sys
 import os
 import subprocess
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 import gettext
@@ -15,13 +15,15 @@ from libAppRun import appRun
 gettext.textdomain('testConfig')
 _ = gettext.gettext
 
-
 class confDesktops(QWidget):
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
 		self.runner=appRun()
-		self.icon=''
+		self.menu=App2Menu.app2menu()
+		home=os.environ['HOME']
+		self.menu.desktoppath="%s/.local/share/applications/"%home
+		self.icon='shell'
 		self._load_screen()
 	#def __init__
 		
@@ -32,16 +34,19 @@ class confDesktops(QWidget):
 
 	def _load_screen(self):
 		def _save_desktop():
+			if not os.path.isdir(self.menu.desktoppath):
+				os.makedirs(self.menu.desktoppath)
 			categories=[]
 			desktop={}
-			desktop['Categories']=cmb_cat.currentText()+";"
 			desktop['Name']=inp_name.text()
 			desktop['Exec']=inp_exec.text()
+			desktop['Categories']='run-o-matic;'
 			desktop['Icon']=self.icon
 			desktop['Comment']=inp_desc.text()
+			desktop['NoDisplay']='True'
 			self._debug("Saving %s"%desktop)
 			try:
-				subprocess.check_call(["pkexec","/usr/share/deskedit/bin/deskedit-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec']])
+				self.menu.write_custom_desktop(desktop,self.menu.desktoppath)
 			except Exception as e:
 				self._debug(e)
 		#def _save_desktop
@@ -57,7 +62,7 @@ class confDesktops(QWidget):
 		btn_icon.setIcon(icn_desktop)
 		btn_icon.setIconSize(QSize(64,64))
 		btn_icon.setToolTip(_("Push to change icon"))
-		btn_icon.clicked.connect(lambda:self._file_chooser(widget=btn_icon,imgDialog=True))
+		btn_icon.clicked.connect(lambda:self._file_chooser(widget=btn_icon,path="/usr/share/icons",imgDialog=True))
 		box.addWidget(btn_icon,2,2,3,1,Qt.AlignTop)
 		lbl_name=QLabel(_("Name: "))
 		box.addWidget(lbl_name,1,0,1,2)
@@ -74,7 +79,7 @@ class confDesktops(QWidget):
 		btn_exec=QPushButton("...")
 		btn_exec.setObjectName("btnFile")
 		btn_exec.setToolTip(_("Press button to select an executable"))
-		btn_exec.clicked.connect(lambda:self._file_chooser(widget=inp_exec))
+		btn_exec.clicked.connect(lambda:self._file_chooser(widget=inp_exec,path="/usr/bin"))
 		box.addWidget(btn_exec,4,1,1,1,Qt.Alignment(1))
 		lbl_desc=QLabel(_("Description: "))
 		box.addWidget(lbl_desc,5,0,1,2)
@@ -82,13 +87,13 @@ class confDesktops(QWidget):
 		inp_desc.setPlaceholderText(_("Description"))
 		inp_desc.setToolTip(_("Insert a description for the app"))
 		box.addWidget(inp_desc,6,0,1,3)
-		lbl_cat=QLabel(_("Category: "))
-		box.addWidget(lbl_cat,7,0,1,2)
-		cmb_cat=QComboBox()
-		data=self.runner.get_apps()
-		for cat in data['categories']:
-			cmb_cat.addItem(cat)
-		box.addWidget(cmb_cat,8,0,1,2,Qt.AlignLeft)
+#		lbl_cat=QLabel(_("Category: "))
+#		box.addWidget(lbl_cat,7,0,1,2)
+#		cmb_cat=QComboBox()
+#		data=self.runner.get_apps()
+#		for cat in data['categories']:
+#			cmb_cat.addItem(cat)
+#		box.addWidget(cmb_cat,8,0,1,2,Qt.AlignLeft)
 		btn_apply=QPushButton(_("Apply"))
 		btn_apply.setToolTip(_("Save desktop"))
 		btn_apply.setIconSize(QSize(48,48))

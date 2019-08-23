@@ -4,6 +4,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
+from passlib.hash import pbkdf2_sha256 as hashpwd
 import gettext
 from libAppRun import appRun
 import gettext
@@ -12,7 +13,6 @@ from libAppRun import appRun
 
 gettext.textdomain('testConfig')
 _ = gettext.gettext
-
 
 class confPass(QWidget):
 	def __init__(self):
@@ -42,5 +42,7 @@ class confPass(QWidget):
 		self.setLayout(box)
 	
 	def _save_pass(self):
-		self.runner.write_config(self.txt_pass.text(),key='password',level='user')
+		pwd=self.txt_pass.text()
+		pwd=hashpwd.hash(pwd)
+		self.runner.write_config(pwd,key='password',level='user')
 	#def _save_apps
