@@ -118,6 +118,7 @@ class testKid(QWidget):
 
 	def _read_config(self):
 		data=self.runner.get_apps()
+		print(data)
 		self.categories=data.get('categories')
 		self.desktops=data.get('desktops')
 		self.keybinds=data.get('keybinds')
@@ -141,11 +142,14 @@ class testKid(QWidget):
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
+					return
 			else:
 				event.ignore()
+				return
 		for index in self.tab_id.keys():
-			self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
-			self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+			if index:
+				self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
+				self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
 
 	def keyPressEvent(self,event):
 		sw_mod=False

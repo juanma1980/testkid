@@ -44,5 +44,5 @@ class confPass(QWidget):
 	def _save_pass(self):
 		pwd=self.txt_pass.text()
 		pwd=hashpwd.hash(pwd)
-		self.runner.write_config(pwd,key='password',level='user')
+		self.runner.write_config(pwd,key='password',level='system')
 	#def _save_apps

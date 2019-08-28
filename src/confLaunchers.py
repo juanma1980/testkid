@@ -333,8 +333,8 @@ class confLaunchers(QWidget):
 		apps=self._get_table_apps()
 		self._debug("Apps: %s"%apps)
 		for key,data in apps.items():
-			self.runner.write_config(data,key=key,level='user')
-		self.runner.write_config(self.visible_categories,key='categories',level='user')
+			self.runner.write_config(data,key=key,level='system')
+		self.runner.write_config(self.visible_categories,key='categories',level='system')
 	#def _save_apps
 
 	def _get_table_apps(self):

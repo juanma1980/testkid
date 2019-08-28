@@ -7,7 +7,7 @@ import subprocess
 import signal
 import time
 import tempfile
-from libAppConfig import appConfig 
+from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
 
@@ -86,7 +86,7 @@ class appRun():
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
-		self.confFile="testKid.conf"
+		self.confFile="runomatic.conf"
 		self.config=appConfig()
 		self.__init__config()
 		self.xephyr_servers={}
@@ -108,6 +108,7 @@ class appRun():
 	def __init__config(self):
 #		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
 #		self.config.set_defaultConfig(defaultConfig)
+		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
 		self.config.set_configFile(self.confFile)
 
 	def set_topBarHeight(self,h):
@@ -234,7 +235,7 @@ class appRun():
 		if categories:
 			apps['categories']=categories
 
-		data=self.config.get_config()
+		data=self.config.get_config('system')
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]
