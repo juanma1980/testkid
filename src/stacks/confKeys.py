@@ -30,6 +30,13 @@ class confKeys(QWidget):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
+		self.menu_description=(_("Set keybindings for close and navigation"))
+		self.description=(_("Modify keybindings"))
+		self.icon=('configure-shortcuts')
+		self.tooltip=(_("From here you can modify the keybinding"))
+		self.index=4
+		self.enabled=False
+		self.sw_changes=False
 		self._load_screen()
 	#def __init__
 	
@@ -107,3 +114,6 @@ class confKeys(QWidget):
 		keysDict['close']=self.btn_close.text()
 		self.runner.write_config(keysDict,key='keybinds',level='user')
 	#def _save_keys
+	
+	def get_changes(self):
+		return (self.sw_changes)

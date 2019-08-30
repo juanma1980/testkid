@@ -23,7 +23,14 @@ class confDesktops(QWidget):
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
 		self.menu.desktoppath="%s/.local/share/applications/"%home
-		self.icon='shell'
+		self.default_icon='shell'
+		self.menu_description=(_("Add new launchers"))
+		self.description=(_("Add custom launcher"))
+		self.icon=('org.kde.plasma.quicklaunch')
+		self.tooltip=(_("From here you can add a custom launcher"))
+		self.index=3
+		self.enabled=True
+		self.sw_changes=False
 		self._load_screen()
 	#def __init__
 		
@@ -41,7 +48,7 @@ class confDesktops(QWidget):
 			desktop['Name']=inp_name.text()
 			desktop['Exec']=inp_exec.text()
 			desktop['Categories']='run-o-matic;'
-			desktop['Icon']=self.icon
+			desktop['Icon']=self.default_icon
 			desktop['Comment']=inp_desc.text()
 			desktop['NoDisplay']='True'
 			self._debug("Saving %s"%desktop)
@@ -116,9 +123,12 @@ class confDesktops(QWidget):
 			fchoosed=fdia.selectedFiles()[0]
 			if widget:
 				if imgDialog:
-					self.icon=fdia.selectedFiles()[0]
-					icn=QtGui.QIcon(self.icon)
+					self.default_icon=fdia.selectedFiles()[0]
+					icn=QtGui.QIcon(self.default_icon)
 					widget.setIcon(icn)
 				else:
 					widget.setText(fchoosed)
 			return(fchoosed)
+	
+	def get_changes(self):
+		return (self.sw_changes)

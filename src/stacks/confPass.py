@@ -23,6 +23,13 @@ class confPass(QWidget):
 		self.txt_pass.setPlaceholderText(_("Password"))
 		self.txt_pass2=QLineEdit()
 		self.txt_pass2.setPlaceholderText(_("Repeat password"))
+		self.menu_description=(_("Set a master password"))
+		self.description=(_("Set master password"))
+		self.icon=('dialog-password')
+		self.tooltip=(_("From here you can set the master password"))
+		self.enabled=True
+		self.index=5
+		self.sw_changes=False
 		self._load_screen()
 
 	def _load_screen(self):
@@ -44,5 +51,8 @@ class confPass(QWidget):
 	def _save_pass(self):
 		pwd=self.txt_pass.text()
 		pwd=hashpwd.hash(pwd)
-		self.runner.write_config(pwd,key='password',level='system')
+		self.runner.write_config(pwd,key='password',level='n4d')
 	#def _save_apps
+	
+	def get_changes(self):
+		return (self.sw_changes)

@@ -117,10 +117,12 @@ class dropButton(QPushButton):
 
 class confLaunchers(QWidget):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
-	def __init__(self,app):
+	def __init__(self,app=None):
 		super().__init__()
 		self.dbg=True
-		self.app=app
+		self.parm="app"
+		self.app=None
+		(self.columns,self.width,self.height)=(3,800,600)
 		self.setStyleSheet(self._define_css())
 		self.runner=appRun()
 		self.tbl_app=dropTable(self,1,2)
@@ -130,8 +132,13 @@ class confLaunchers(QWidget):
 		self.visible_categories=[]
 		self.menu=App2Menu.app2menu()
 		self.categories=[]
-		(self.columns,self.width,self.height)=self._get_screen_size()
-		self._load_screen()
+		self.menu_description=(_("Configure visible launchers"))
+		self.description=(_("Modify launchers"))
+		self.icon=('edit-group')
+		self.tooltip=(_("From here you can modify the launchers"))
+		self.index=2
+		self.enabled=True
+		self.sw_changes=False
 		self.setStyleSheet(self._define_css())
 	#def __init__
 
@@ -140,12 +147,22 @@ class confLaunchers(QWidget):
 			print("ConfLaunchers: %s"%msg)
 	#def _debug
 
+	def apply_parms(self,app):
+		self._debug("Set parm %s"%app)
+		self.app=app
+		(self.columns,self.width,self.height)=self._get_screen_size()
+		self._load_screen()
+
 	def _get_screen_size(self):
 		row=0
 		col=0
-		scr=self.app.primaryScreen()
-		w=scr.size().width()-BTN_SIZE_FULL
-		h=scr.size().height()-(2*BTN_SIZE_FULL)
+		if self.app:
+			scr=self.app.primaryScreen()
+			w=scr.size().width()-BTN_SIZE_FULL
+			h=scr.size().height()-(2*BTN_SIZE_FULL)
+		else:
+			w=800
+			h=600
 		columns=int(w/BTN_SIZE_FULL)-3
 		return (columns,w,h)
 	#def _get_screen_size
@@ -199,7 +216,6 @@ class confLaunchers(QWidget):
 		scrollArea=QScrollArea(tabScroll)
 		scrollArea.setFocusPolicy(Qt.NoFocus)
 		self._update_screen(apps)
-		scr=self.app.primaryScreen()
 		scrollArea.setWidget(self.tbl_app)
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
@@ -368,3 +384,6 @@ class confLaunchers(QWidget):
 		"""
 		return(css)
 		#def _define_css
+	
+	def get_changes(self):
+		return (self.sw_changes)
