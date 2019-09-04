@@ -52,11 +52,15 @@ class navButton(QPushButton):
 				keypressed.append(key)
 			if sw_mod==False:
 				key=("+".join(keypressed))
-		self.keypress.emit(key)
+		if key!="Alt":
+			self.keypress.emit(key)
+		else:
+			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
+			event.setAccepted(False)
 	#def eventFilter
 
 
-class testKid(QWidget):
+class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
@@ -152,25 +156,18 @@ class testKid(QWidget):
 				self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
 
 	def keyPressEvent(self,event):
-		sw_mod=False
-		keypressed=[]
-		if (event.type()==QEvent.KeyPress):
-			for modifier,text in self.modmap.items():
-				if event.modifiers() & modifier:
-					sw_mod=True
-					keypressed.append(text)
-			key=self.keymap.get(event.key(),event.text())
-			if key not in keypressed:
-				if sw_mod==True:
-					sw_mod=False
-				keypressed.append(key)
-			if sw_mod==False:
-				key=("+".join(keypressed))
-		print(key)
+		self.grabKeyboard()
+	#def eventFilter
+	
+	def keyReleaseEvent(self,event):
+		key=self.keymap.get(event.key(),event.text())
+		if key!='Tab':
+			self.releaseKeyboard()
+			if key=='F4':
+				self.close()
 	#def eventFilter
 
 	def _set_focus(self,key):
-		print(key)
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
 			self.focusWidgets[self.currentBtn].clicked.emit()
 		elif key=="Tab":
@@ -179,6 +176,8 @@ class testKid(QWidget):
 			if newTab>tabCount:
 				newTab=0
 			self.tabBar.setCurrentIndex(newTab)
+		if key=="Alt":
+			return(True)
 
 		else:
 			if key=="Right":
@@ -396,7 +395,7 @@ class testKid(QWidget):
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
 	#def _get_tabId_from_index
-#class testKid
+#class runomatic
 
 def _define_css():
 	css="""
@@ -420,8 +419,9 @@ def _define_css():
 
 
 #_debug("Init %s"%sys.argv)
-app=QApplication(["Test Kid Launcher"])
+app=QApplication(["Run-O-Matic"])
 signal.signal(signal.SIGINT, lambda *a: app.quit())
-testKidLauncher=testKid()
+runomaticLauncher=runomatic()
 app.instance().setStyleSheet(_define_css())
 app.exec_()
+
