@@ -8,7 +8,6 @@ from passlib.hash import pbkdf2_sha256 as hashpwd
 import gettext
 from libAppRun import appRun
 
-gettext.textdomain('testConfig')
 _ = gettext.gettext
 
 class confApp(QWidget):
@@ -24,6 +23,15 @@ class confApp(QWidget):
 		self._load_screen()
 		self.enabled=True
 		self.sw_changes=False
+	
+	def _debug(self,msg):
+		if self.dbg:
+			print("ConfApp: %s"%msg)
+	#def _debug
+	
+	def set_textDomain(self,textDomain):
+		gettext.textdomain(textDomain)
+	#def set_textDomain
 
 	def _load_screen(self):
 		def _change_osh():

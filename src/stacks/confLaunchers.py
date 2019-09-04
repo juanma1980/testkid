@@ -11,7 +11,6 @@ import gettext
 from app2menu import App2Menu
 from libAppRun import appRun
 
-gettext.textdomain('testConfig')
 _ = gettext.gettext
 
 QString=type("")
@@ -135,7 +134,7 @@ class confLaunchers(QWidget):
 		self.menu_description=(_("Configure visible launchers"))
 		self.description=(_("Modify launchers"))
 		self.icon=('edit-group')
-		self.tooltip=(_("From here you can modify the launchers"))
+		self.tooltip=(_("Add custom launcher that will be shown in run-o-matic category"))
 		self.index=2
 		self.enabled=True
 		self.sw_changes=False
@@ -146,6 +145,9 @@ class confLaunchers(QWidget):
 		if self.dbg:
 			print("ConfLaunchers: %s"%msg)
 	#def _debug
+
+	def set_textDomain(self,textDomain):
+		gettext.textdomain(textDomain)
 
 	def apply_parms(self,app):
 		self._debug("Set parm %s"%app)

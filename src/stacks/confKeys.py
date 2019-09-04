@@ -6,11 +6,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 import gettext
 from libAppRun import appRun
-import gettext
 from app2menu import App2Menu
-from libAppRun import appRun
 
-gettext.textdomain('testConfig')
 _ = gettext.gettext
 
 class confKeys(QWidget):
@@ -39,6 +36,15 @@ class confKeys(QWidget):
 		self.sw_changes=False
 		self._load_screen()
 	#def __init__
+	
+	def _debug(self,msg):
+		if self.dbg:
+			print("ConfKeys: %s"%msg)
+	#def _debug
+
+	def set_textDomain(self,textDomain):
+		gettext.textdomain(textDomain)
+	#def set_textDomain
 	
 	def _load_screen(self):
 		def _grab_alt_keys(*args):

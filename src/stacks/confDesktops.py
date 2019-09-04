@@ -8,11 +8,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 import gettext
 from libAppRun import appRun
-import gettext
 from app2menu import App2Menu
-from libAppRun import appRun
 
-gettext.textdomain('testConfig')
 _ = gettext.gettext
 
 class confDesktops(QWidget):
@@ -38,6 +35,10 @@ class confDesktops(QWidget):
 		if self.dbg:
 			print("ConfDesktops: %s"%msg)
 	#def _debug
+
+	def set_textDomain(self,textDomain):
+		gettext.textdomain(textDomain)
+	#def set_textDomain
 
 	def _load_screen(self):
 		def _save_desktop():
