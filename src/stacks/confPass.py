@@ -7,7 +7,6 @@ from PyQt5.QtCore import Qt
 from passlib.hash import pbkdf2_sha256 as hashpwd
 import gettext
 from libAppRun import appRun
-from app2menu import App2Menu
 
 _ = gettext.gettext
 
@@ -27,6 +26,7 @@ class confPass(QWidget):
 		self.enabled=True
 		self.index=5
 		self.sw_changes=False
+		self.level='user'
 		self._load_screen()
 	
 	def _debug(self,msg):
@@ -36,6 +36,11 @@ class confPass(QWidget):
 
 	def set_textDomain(self,textDomain):
 		gettext.textdomain(textDomain)
+	#def set_textDomain
+
+	def set_confLevel(self,level):
+		self.level=level
+	#def set_confLevel
 
 	def _load_screen(self):
 		box=QVBoxLayout()
@@ -55,8 +60,11 @@ class confPass(QWidget):
 	
 	def _save_pass(self):
 		pwd=self.txt_pass.text()
-		pwd=hashpwd.hash(pwd)
-		self.runner.write_config(pwd,key='password',level='n4d')
+		if pwd==self.txt2_pass.text():
+			pwd=hashpwd.hash(pwd)
+			self.runner.write_config(pwd,key='password',level='n4d')
+		else:
+			self._debug("Pâssword don't match")
 	#def _save_apps
 	
 	def get_changes(self):

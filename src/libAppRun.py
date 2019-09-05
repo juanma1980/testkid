@@ -116,13 +116,13 @@ class appRun():
 	#def set_topBarHeight(self,h):
 
 	def get_wid(self,search="Xephyr on",display=":13"):
-		wid=0
+		wid=None
 		count=0
 		if display in self.xephyr_servers.keys():
 			self._debug("Search WID for server at display %s"%display)
 			self._debug("PID searched: %s"%self.xephyr_servers[display])
 			self._debug("User searched: %s"%self.username)
-			while not wid and count<=150:
+			while not wid and count<=100:
 				p_wid=self._run_cmd_on_display(["xdotool","search","--any","--name","%s %s"%(search,display)],self.main_display)
 				wid=p_wid.stdout.decode()
 				time.sleep(0.1)

@@ -33,8 +33,9 @@ class confN4d(QWidget):
 		gettext.textdomain(textDomain)
 	#def set_textDomain
 
-	def set_confLevel(self,level):
+	def set_configLevel(self,level):
 		self.level=level
+	#def set_configLevel
 
 	def _load_screen(self):
 		box=QVBoxLayout()

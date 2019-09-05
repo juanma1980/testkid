@@ -28,6 +28,7 @@ class confDesktops(QWidget):
 		self.index=3
 		self.enabled=True
 		self.sw_changes=False
+		self.level='user'
 		self._load_screen()
 	#def __init__
 		
@@ -39,6 +40,10 @@ class confDesktops(QWidget):
 	def set_textDomain(self,textDomain):
 		gettext.textdomain(textDomain)
 	#def set_textDomain
+
+	def set_configLevel(self,level):
+		self.level=level
+	#def set_configLevel
 
 	def _load_screen(self):
 		def _save_desktop():

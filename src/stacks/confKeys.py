@@ -27,13 +27,14 @@ class confKeys(QWidget):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
-		self.menu_description=(_("Set keybindings for close and navigation"))
+		self.menu_description=(_("Set keybindings for launch the configuration from Run-O-Matic"))
 		self.description=(_("Modify keybindings"))
 		self.icon=('configure-shortcuts')
 		self.tooltip=(_("From here you can modify the keybinding"))
 		self.index=4
-		self.enabled=False
+		self.enabled=True
 		self.sw_changes=False
+		self.level='user'
 		self._load_screen()
 	#def __init__
 	
@@ -45,6 +46,10 @@ class confKeys(QWidget):
 	def set_textDomain(self,textDomain):
 		gettext.textdomain(textDomain)
 	#def set_textDomain
+
+	def set_configLevel(self,level):
+		self.level=level
+	#def set_configLevel
 	
 	def _load_screen(self):
 		def _grab_alt_keys(*args):
@@ -71,18 +76,18 @@ class confKeys(QWidget):
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can define the keybindings"))
 		box.addWidget(lbl_txt,0,0,1,2,Qt.AlignTop)
-		inp_tab=QLabel("Navigation between tabs")
-		self.btn_tab=QPushButton(_("Tab"))
+		inp_tab=QLabel("Launch configuration")
+		self.btn_tab=QPushButton(_(""))
 		self.btn_tab.clicked.connect(_grab_alt_keys)
 		self.btn_tab.setFixedSize(QSize(96,48))
 		box.addWidget(inp_tab,1,0,1,1)
 		box.addWidget(self.btn_tab,1,1,1,1,Qt.Alignment(1))
-		inp_close=QLabel("Close app")
-		self.btn_close=QPushButton(_("Alt+F4"))
-		self.btn_close.setFixedSize(QSize(96,48))
-		self.btn_close.clicked.connect(_grab_close_keys)
-		box.addWidget(inp_close,2,0,1,1,Qt.AlignLeft)
-		box.addWidget(self.btn_close,2,1,1,1,Qt.AlignLeft)
+#		inp_close=QLabel("Close app")
+#		self.btn_close=QPushButton(_("Alt+F4"))
+#		self.btn_close.setFixedSize(QSize(96,48))
+#		self.btn_close.clicked.connect(_grab_close_keys)
+#		box.addWidget(inp_close,2,0,1,1,Qt.AlignLeft)
+#		box.addWidget(self.btn_close,2,1,1,1,Qt.AlignLeft)
 		btn_ok=QPushButton(_("Apply"))
 		btn_ok.clicked.connect(self._save_keys)
 		btn_cancel=QPushButton(_("Cancel"))
@@ -115,10 +120,10 @@ class confKeys(QWidget):
 	#def eventFilter
 	
 	def _save_keys(self):
-		keysDict={'nav':"",'close':""}
-		keysDict['nav']=self.btn_tab.text()
-		keysDict['close']=self.btn_close.text()
-		self.runner.write_config(keysDict,key='keybinds',level='user')
+#		keysDict={'conf':"",'close':""}
+		keysDict['conf']=self.btn_tab.text()
+#		keysDict['close']=self.btn_close.text()
+		self.runner.write_config(keysDict,key='keybinds',level=self.level)
 	#def _save_keys
 	
 	def get_changes(self):

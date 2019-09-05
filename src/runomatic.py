@@ -110,6 +110,7 @@ class runomatic(QWidget):
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
+		self.grab=False
 		self.runner=appRun()
 		self._read_config()
 		self._render_gui()
@@ -122,7 +123,6 @@ class runomatic(QWidget):
 
 	def _read_config(self):
 		data=self.runner.get_apps()
-		print(data)
 		self.categories=data.get('categories')
 		self.desktops=data.get('desktops')
 		self.keybinds=data.get('keybinds')
@@ -137,7 +137,8 @@ class runomatic(QWidget):
 		self.setLayout(self.box)
 		self.tabBar.setFocusPolicy(Qt.NoFocus)
 		self._debug("Focus to %s"%self.focusWidgets[0])
-		self.focusWidgets[0].setFocus()
+		if self.focusWidgets:
+			self.focusWidgets[0].setFocus()
 	#def _render_gui
 
 	def closeEvent(self,event):
@@ -152,16 +153,21 @@ class runomatic(QWidget):
 				return
 		for index in self.tab_id.keys():
 			if index:
-				self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
-				self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
+				self.runner.send_signal_to_thread("term",self.tab_id[index].get('xephyr',None))
+				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
+				if os.path.isfile(xlockFile):
+					os.remove(xlockFile)
 
 	def keyPressEvent(self,event):
+#		key=self.keymap.get(event.key(),event.text())
 		self.grabKeyboard()
 	#def eventFilter
 	
 	def keyReleaseEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
 		if key!='Tab':
+			self.grab=''
 			self.releaseKeyboard()
 			if key=='F4':
 				self.close()
@@ -275,7 +281,11 @@ class runomatic(QWidget):
 			index=0
 			key='close'
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
+		self._debug("BTN1: %s"%self.tab_id[index][key])
+		try:
+			self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
+		except:
+			pass
 		self.runner.send_signal_to_thread("stop",self.tab_id[index]['thread'])
 		index=self._get_tabId_from_index(self.tabBar.currentIndex())
 		self.currentTab=self.tabBar.currentIndex()
@@ -286,6 +296,7 @@ class runomatic(QWidget):
 			key='show'
 		self._debug("New Tab Index: %s"%self.tab_id[index])
 		self._debug("New index: %s"%index)
+		self._debug("BTN: %s"%self.tab_id[index][key])
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
@@ -304,6 +315,9 @@ class runomatic(QWidget):
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
 		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+		xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index]['display'].replace(":",""))
+		if os.path.isfile(xlockFile):
+			os.remove(xlockFile)
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
 				self._debug("%s"%self.tab_id)
@@ -312,9 +326,12 @@ class runomatic(QWidget):
 					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
 					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
 		self.tab_id[index]={}
-		self.tabBar.blockSignals(False)
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
+		index=self.currentTab
+		self._debug("NEW TAB: %s"%self.currentTab)
 		self._on_tabChanged()
+		self.tabBar.blockSignals(False)
+		self.tabBar.setCurrentIndex(index)
 		self._debug("Removed tab: %s"%index)
 	#def _on_tabRemove
 
@@ -374,7 +391,7 @@ class runomatic(QWidget):
 			self.firstLaunch=False
 			self.tabBar.tabBar().setTabButton(self.id,QTabBar.LeftSide,self.tab_id[self.id]['close'])
 			self.tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['close'])
-			self.currentTab=tabCount
+			self.currentTab=1
 			self.tabBar.blockSignals(True)
 			self.tabBar.setCurrentIndex(1)
 			os.environ['DISPLAY']=self.tab_id[self.id]['display']
