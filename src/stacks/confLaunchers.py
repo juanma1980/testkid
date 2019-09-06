@@ -169,6 +169,10 @@ class confLaunchers(QWidget):
 		return (columns,w,h)
 	#def _get_screen_size
 
+	def update_screen(self):
+		apps=self._update_apps_data()
+		self.update_apps(apps)
+
 	def _load_screen(self):
 		def _update_categories(cat):
 			if cat in self.visible_categories:
@@ -176,7 +180,7 @@ class confLaunchers(QWidget):
 			else:
 				self.visible_categories.append(cat)
 			apps=self.runner.get_apps(self.visible_categories,False)
-			self._update_screen(apps)
+			self.update_apps(apps)
 		
 		def _update_desktops():
 			fdia=QFileDialog()
@@ -187,7 +191,7 @@ class confLaunchers(QWidget):
 			if (fdia.exec_()):
 				fchoosed=fdia.selectedFiles()[0]
 				apps['desktops'].append(fchoosed)
-				self._update_screen(apps)
+				self.update_apps(apps)
 
 		apps=self._update_apps_data()
 		sigmap_catSelect=QSignalMapper(self)
@@ -217,13 +221,13 @@ class confLaunchers(QWidget):
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
 		scrollArea.setFocusPolicy(Qt.NoFocus)
-		self._update_screen(apps)
+		self.update_apps(apps)
 		scrollArea.setWidget(self.tbl_app)
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
 		box.addWidget(self.tbl_app)
 		btn_apply=QPushButton("Apply")
-		btn_apply.clicked.connect(self._save_apps)
+		btn_apply.clicked.connect(self.write_config)
 		box.addWidget(btn_apply)
 		self.setLayout(box)
 	#def load_screen
@@ -233,7 +237,7 @@ class confLaunchers(QWidget):
 			if os.path.isfile(path):
 				apps=self._get_table_apps()
 				apps['desktops'].append(path)
-				self._update_screen(apps)
+				self.update_apps(apps)
 
 	#def _tbl_DropEvent
 
@@ -244,7 +248,7 @@ class confLaunchers(QWidget):
 		return apps
 	#def _update_apps_data
 
-	def _update_screen(self,apps):
+	def update_apps(self,apps):
 		row=0
 		col=0
 		def _add_desktop(desktops,state="show"):
@@ -298,7 +302,7 @@ class confLaunchers(QWidget):
 			apps['desktops'].append(btn.title)
 			apps['hidden'].remove(btn.title)
 		self.btn_grid['state']=state
-		self._update_screen(apps)
+		self.update_apps(apps)
 	#def _changeBtnState
 
 	def _btn_dragDropEvent(self,btnEv):
@@ -343,17 +347,17 @@ class confLaunchers(QWidget):
 				else:
 					apps['desktops'].remove(self.btn_drag.title)
 					apps['desktops'].insert(position,self.btn_drag.title)
-				self._update_screen(apps)
+				self.update_apps(apps)
 				self.btn_drag=None
 	#def _btn_dragDropEvent
 
-	def _save_apps(self):
+	def write_config(self):
 		apps=self._get_table_apps()
 		self._debug("Apps: %s"%apps)
 		for key,data in apps.items():
 			self.runner.write_config(data,key=key,level='system')
 		self.runner.write_config(self.visible_categories,key='categories',level='system')
-	#def _save_apps
+	#def write_config
 
 	def _get_table_apps(self):
 		apps={'desktops':[],'hidden':[]}

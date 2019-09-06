@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
-import sys
 import os
-import subprocess
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
@@ -41,9 +39,10 @@ class confDesktops(QWidget):
 		gettext.textdomain(textDomain)
 	#def set_textDomain
 
-	def set_configLevel(self,level):
-		self.level=level
-	#def set_configLevel
+	def get_config(self):
+		data=self.runner.get_default_config()
+		self.level=data['system']['config']
+	#def get_config
 
 	def _load_screen(self):
 		def _save_desktop():

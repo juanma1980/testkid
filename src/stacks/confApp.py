@@ -34,9 +34,12 @@ class confApp(QWidget):
 		gettext.textdomain(textDomain)
 	#def set_textDomain
 	
-	def set_configLevel(self,level):
-		self.level=level
-	#def set_configLevel
+	def get_config(self):
+		data=self.runner.get_default_config()
+		self.level=data['system']['config']
+		self.close=data['system'].get('close',None)
+		self.startup=data['system'].get('startup',None)
+	#def get_config
 
 	def _load_screen(self):
 		def _change_osh():
@@ -68,27 +71,41 @@ class confApp(QWidget):
 
 		box_btns=QHBoxLayout()
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self._save_config)
+		btn_ok.clicked.connect(self.write_config)
 		btn_cancel=QPushButton(_("Cancel"))
 		box_btns.addWidget(btn_ok)
 		box_btns.addWidget(btn_cancel)
 		box.addLayout(box_btns)
 		self.setLayout(box)
+		self.update_screen()
 	#def _load_screen
 	
-	def _save_config(self):
+	def update_screen(self):
+		self.get_config()
+		if self.level:
+			idx=0
+			if self.level.lower()=='system':
+				idx=1
+			elif self.level.lower()=='n4d':
+				idx=2
+			self.cmb_level.setCurrentIndex(idx)
+			self.cmb_level.activated.emit(idx)
+		if self.close:
+			if self.close=='true':
+				self.chk_close.setChecked(True)
+		if self.startup:
+			if self.startup=='true':
+				self.chk_startup.setChecked(True)
+	#def _udpate_screen
+	
+	def write_config(self):
 		configLevel=self.cmb_level.currentText().lower()
-		self.runner.write_config(configLevel,key='enabled',level=configLevel)
-		if configLevel=='system':
-			self.runner.write_config(configLevel,key='enabled',level='user',create=False)
-			self.runner.write_config(configLevel,key='enabled',level='n4d',create=False)
-		if configLevel=='n4d':
-			self.runner.write_config(configLevel,key='enabled',level='user',create=False)
-			self.runner.write_config(configLevel,key='enabled',level='system',create=False)
-		if configLevel=='user':
-			self.runner.write_config(configLevel,key='enabled',level='n4d',create=False)
-			self.runner.write_config(configLevel,key='enabled',level='system',create=False)
-	#def _save_config
+		startup=self.chk_startup.isChecked()
+		close=self.chk_close.isChecked()
+		self.runner.write_config(configLevel,key='config',level='system')
+		self.runner.write_config(startup,key='startup',level='system')
+		self.runner.write_config(close,key='close',level='system')
+	#def write_config
 
 	def get_changes(self):
 		return (self.sw_changes)

@@ -42,6 +42,10 @@ class confPass(QWidget):
 		self.level=level
 	#def set_confLevel
 
+	def update_screen(self):
+		pass
+	#def update_screen
+
 	def _load_screen(self):
 		box=QVBoxLayout()
 		lbl_txt=QLabel(_("If a master password is set then the app will prompt for it to exit"))
@@ -51,14 +55,14 @@ class confPass(QWidget):
 		box.addWidget(self.txt_pass2)
 		box_btns=QHBoxLayout()
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self._save_pass)
+		btn_ok.clicked.connect(self.write_config)
 		btn_cancel=QPushButton(_("Cancel"))
 		box_btns.addWidget(btn_ok)
 		box_btns.addWidget(btn_cancel)
 		box.addLayout(box_btns)
 		self.setLayout(box)
 	
-	def _save_pass(self):
+	def write_config(self):
 		pwd=self.txt_pass.text()
 		if pwd==self.txt2_pass.text():
 			pwd=hashpwd.hash(pwd)

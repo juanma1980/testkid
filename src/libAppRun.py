@@ -97,6 +97,7 @@ class appRun():
 		self.desktops={}
 		self.threads_pid={}
 		self.threads_tmp={}
+		self.level='system'
 		self.menu=App2Menu.app2menu()
 	#def __init__
 
@@ -228,14 +229,36 @@ class appRun():
 		return("%s"%display)
 	#def _find_free_display
 
+	def get_default_config(self):
+		data={}
+		data=self.config.get_config('system')
+		if 'config' not in data['system'].keys():
+			data['system']['config']='user'
+		self.level=data['system']['config']
+		self._debug("Read level from config: %s"%self.level)
+		return (data)
+	#def get_config(self,level):
+
+	def get_config(self,level):
+		data={}
+		data=self.config.get_config(level)
+		self._debug("Read level from config: %s"%level)
+		return (data)
+	#def get_config(self,level):
+
 	def get_apps(self,categories=[],load_categories=True):
+		#First read system config
+		sysconfig=self.get_default_config()
 		apps={'categories':[],'desktops':[],'hidden':[]}
 		default={'categories':[],'desktops':[],'hidden':[]}
 		
 		if categories:
 			apps['categories']=categories
 
-		data=self.config.get_config('system')
+		if self.level=='system':
+			data=sysconfig.copy()
+		else:
+			data=self.config.get_config(self.level)
 		for confFile,section in data.items():
 			if confFile=='default':
 				default=data[confFile]

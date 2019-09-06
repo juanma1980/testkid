@@ -35,6 +35,7 @@ class confKeys(QWidget):
 		self.enabled=True
 		self.sw_changes=False
 		self.level='user'
+		self.keys={}
 		self._load_screen()
 	#def __init__
 	
@@ -51,52 +52,48 @@ class confKeys(QWidget):
 		self.level=level
 	#def set_configLevel
 	
+	def get_config(self):
+		data=self.runner.get_default_config()
+		self.level=data['system']['config']
+		if self.level!='system':
+			data=self.runner.get_config(self.level)
+		self.keys=data[self.level].get('keybinds',{})
+	#def get_config
+	
 	def _load_screen(self):
 		def _grab_alt_keys(*args):
-			self.btn_tab.setText("")
+			self.btn_conf.setText("")
 			self.grabKeyboard()
-			try:
-				self.keybind_signal.disconnect(_set_close_key)
-			except:
-				pass
-			self.keybind_signal.connect(_set_tab_key)
-		def _grab_close_keys(*args):
-			self.btn_close.setText("")
-			self.grabKeyboard()
-			try:
-				self.keybind_signal.disconnect(_set_tab_key)
-			except:
-				pass
-			self.keybind_signal.connect(_set_close_key)
-		def _set_tab_key(keypress):
-			self.btn_tab.setText(keypress)
-		def _set_close_key(keypress):
-			self.btn_close.setText(keypress)
+			self.keybind_signal.connect(_set_config_key)
+		def _set_config_key(keypress):
+			self.btn_conf.setText(keypress)
 		self.installEventFilter(self)
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can define the keybindings"))
 		box.addWidget(lbl_txt,0,0,1,2,Qt.AlignTop)
-		inp_tab=QLabel("Launch configuration")
-		self.btn_tab=QPushButton(_(""))
-		self.btn_tab.clicked.connect(_grab_alt_keys)
-		self.btn_tab.setFixedSize(QSize(96,48))
-		box.addWidget(inp_tab,1,0,1,1)
-		box.addWidget(self.btn_tab,1,1,1,1,Qt.Alignment(1))
-#		inp_close=QLabel("Close app")
-#		self.btn_close=QPushButton(_("Alt+F4"))
-#		self.btn_close.setFixedSize(QSize(96,48))
-#		self.btn_close.clicked.connect(_grab_close_keys)
-#		box.addWidget(inp_close,2,0,1,1,Qt.AlignLeft)
-#		box.addWidget(self.btn_close,2,1,1,1,Qt.AlignLeft)
+		inp_conf=QLabel("Launch configuration")
+		self.btn_conf=QPushButton(_(""))
+		self.btn_conf.clicked.connect(_grab_alt_keys)
+		self.btn_conf.setFixedSize(QSize(96,48))
+		box.addWidget(inp_conf,1,0,1,1)
+		box.addWidget(self.btn_conf,1,1,1,1,Qt.Alignment(1))
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self._save_keys)
+		btn_ok.clicked.connect(self.write_config)
 		btn_cancel=QPushButton(_("Cancel"))
 		box.addWidget(btn_ok,3,0,1,1,Qt.AlignLeft)
 		box.addWidget(btn_cancel,3,1,1,1,Qt.AlignRight)
 
 		self.setLayout(box)
+		self.update_screen()
 		return(self)
 	#def _load_screen
+
+	def update_screen(self):
+		self.get_config()
+		confKey=self.keys.get('conf',None)
+		if confKey:
+			self.btn_conf.setText(confKey)
+	#def update_screen
 
 	def eventFilter(self,source,event):
 		sw_mod=False
@@ -119,12 +116,11 @@ class confKeys(QWidget):
 		return False
 	#def eventFilter
 	
-	def _save_keys(self):
-#		keysDict={'conf':"",'close':""}
-		keysDict['conf']=self.btn_tab.text()
-#		keysDict['close']=self.btn_close.text()
+	def write_config(self):
+		keysDict={}
+		keysDict['conf']=self.btn_conf.text()
 		self.runner.write_config(keysDict,key='keybinds',level=self.level)
-	#def _save_keys
+	#def write_config
 	
 	def get_changes(self):
 		return (self.sw_changes)
