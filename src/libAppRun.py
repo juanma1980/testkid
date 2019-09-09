@@ -270,6 +270,8 @@ class appRun():
 				apps['hidden']=data[confFile].get('hidden')
 				apps['keybinds']=data[confFile].get('keybinds')
 				apps['password']=data[confFile].get('password')
+				apps['close']=data[confFile].get('close')
+				apps['startup']=data[confFile].get('startup')
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default

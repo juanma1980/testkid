@@ -65,6 +65,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
+		self.username=getpass.getuser()
 		self.categories={}
 		self.desktops={}
 		self.pid=0
@@ -127,6 +128,7 @@ class runomatic(QWidget):
 		self.desktops=data.get('desktops')
 		self.keybinds=data.get('keybinds')
 		self.password=data.get('password')
+		self.close_on_exit=data.get('close',None)
 
 	def _render_gui(self):
 		self.show()
@@ -158,6 +160,10 @@ class runomatic(QWidget):
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
+		print("Close: %s"%self.close_on_exit)
+		if self.close_on_exit:
+			if self.close_on_exit:
+				subprocess.run(["loginctl","terminate-user","%s"%self.username])
 
 	def keyPressEvent(self,event):
 #		key=self.keymap.get(event.key(),event.text())
@@ -379,8 +385,8 @@ class runomatic(QWidget):
 		self._debug("Tabs: %s"%self.tabBar.count())
 		#Tabs BEFORE new tab is added
 		tabCount=self.tabBar.count()
-		os.environ["HOME"]="/home/lliurex"
-		os.environ["XAUTHORITY"]="/home/lliurex/.Xauthority"
+		os.environ["HOME"]="/home/%s"%self.username
+		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
 		tabRun=self._launchZone(app)
 		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
