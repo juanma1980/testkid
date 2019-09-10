@@ -10,6 +10,7 @@ config.setRsrcPath="/home/lliurex/git/testkid/rsrc"
 config.setIcon('runomatic.svg')
 config.setBanner('banner.png')
 config.setBackgroundImage('background.png')
-config.load_stacks()
+config.setConfig(confDirs={'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']},confFile="runomatic.conf")
+config.Show()
 
 app.exec_()

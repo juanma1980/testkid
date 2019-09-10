@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 				QHeaderView,QMenu,QAction
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
-import gettext
-from app2menu import App2Menu
 from libAppRun import appRun
-
+from app2menu import App2Menu
+from appconfig.appConfigStack import appConfigStack as confStack
+import gettext
 _ = gettext.gettext
 
 QString=type("")
@@ -114,10 +114,9 @@ class dropButton(QPushButton):
 	#def clone
 #class dropButton
 
-class confLaunchers(QWidget):
+class confLaunchers(confStack):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
-	def __init__(self,app=None):
-		super().__init__()
+	def __init_stack__(self,app=None):
 		self.dbg=True
 		self.parm="app"
 		self.app=None

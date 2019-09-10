@@ -5,16 +5,15 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 import gettext
-from libAppRun import appRun
 from app2menu import App2Menu
-
+from appconfig.appConfigStack import appConfigStack as confStack
+import gettext
 _ = gettext.gettext
 
-class confDesktops(QWidget):
+class confDesktops(confStack):
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
-		self.runner=appRun()
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
 		self.menu.desktoppath="%s/.local/share/applications/"%home
@@ -27,7 +26,7 @@ class confDesktops(QWidget):
 		self.enabled=True
 		self.sw_changes=False
 		self.level='user'
-		self._load_screen()
+#		self._load_screen()
 	#def __init__
 		
 	def _debug(self,msg):
@@ -35,14 +34,6 @@ class confDesktops(QWidget):
 			print("ConfDesktops: %s"%msg)
 	#def _debug
 
-	def set_textDomain(self,textDomain):
-		gettext.textdomain(textDomain)
-	#def set_textDomain
-
-	def get_config(self):
-		data=self.runner.get_default_config()
-		self.level=data['system']['config']
-	#def get_config
 
 	def _load_screen(self):
 		def _save_desktop():
@@ -134,6 +125,3 @@ class confDesktops(QWidget):
 				else:
 					widget.setText(fchoosed)
 			return(fchoosed)
-	
-	def get_changes(self):
-		return (self.sw_changes)

@@ -4,17 +4,14 @@ import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
+from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
-from libAppRun import appRun
-from app2menu import App2Menu
-
 _ = gettext.gettext
 
-class confKeys(QWidget):
+class confKeys(confStack):
 	keybind_signal=pyqtSignal("PyQt_PyObject")
-	def __init__(self):
-		super().__init__()
-		self.runner=appRun()
+
+	def __init_stack__(self):
 		self.keymap={}
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
@@ -33,32 +30,9 @@ class confKeys(QWidget):
 		self.tooltip=(_("From here you can modify the keybinding"))
 		self.index=4
 		self.enabled=True
-		self.sw_changes=False
-		self.level='user'
 		self.keys={}
-		self._load_screen()
+#		self._load_screen()
 	#def __init__
-	
-	def _debug(self,msg):
-		if self.dbg:
-			print("ConfKeys: %s"%msg)
-	#def _debug
-
-	def set_textDomain(self,textDomain):
-		gettext.textdomain(textDomain)
-	#def set_textDomain
-
-	def set_configLevel(self,level):
-		self.level=level
-	#def set_configLevel
-	
-	def get_config(self):
-		data=self.runner.get_default_config()
-		self.level=data['system']['config']
-		if self.level!='system':
-			data=self.runner.get_config(self.level)
-		self.keys=data[self.level].get('keybinds',{})
-	#def get_config
 	
 	def _load_screen(self):
 		def _grab_alt_keys(*args):
@@ -78,22 +52,25 @@ class confKeys(QWidget):
 		box.addWidget(inp_conf,1,0,1,1)
 		box.addWidget(self.btn_conf,1,1,1,1,Qt.Alignment(1))
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.write_config)
+		btn_ok.clicked.connect(self.writeConfig)
 		btn_cancel=QPushButton(_("Cancel"))
 		box.addWidget(btn_ok,3,0,1,1,Qt.AlignLeft)
 		box.addWidget(btn_cancel,3,1,1,1,Qt.AlignRight)
 
 		self.setLayout(box)
-		self.update_screen()
+		self.updateScreen()
 		return(self)
 	#def _load_screen
 
-	def update_screen(self):
-		self.get_config()
-		confKey=self.keys.get('conf',None)
-		if confKey:
-			self.btn_conf.setText(confKey)
-	#def update_screen
+	def updateScreen(self):
+		config=self.getConfig()
+		keytext=''
+		if config:
+			keybinds=config[self.level].get('keybinds',None)
+			if keybinds:
+				keytext=keybinds.get('conf',None)
+		self.btn_conf.setText(keytext)
+	#def updateScreen
 
 	def eventFilter(self,source,event):
 		sw_mod=False
@@ -115,12 +92,13 @@ class confKeys(QWidget):
 
 		return False
 	#def eventFilter
-	
-	def write_config(self):
-		keysDict={}
-		keysDict['conf']=self.btn_conf.text()
-		self.runner.write_config(keysDict,key='keybinds',level=self.level)
-	#def write_config
-	
-	def get_changes(self):
-		return (self.sw_changes)
+
+	def getData(self):
+		key='keybinds'
+		data={'conf':self.btn_conf.text()}
+		return({key:data})
+
+	def writeConfig(self):
+		key='keybinds'
+		data={'conf':self.btn_conf.text()}
+		self.saveChanges(key,data)

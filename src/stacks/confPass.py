@@ -5,16 +5,13 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from passlib.hash import pbkdf2_sha256 as hashpwd
+from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
-from libAppRun import appRun
-
 _ = gettext.gettext
 
-class confPass(QWidget):
-	def __init__(self):
-		super().__init__()
+class confPass(confStack):
+	def __init_stack__(self):
 		self.dbg=True
-		self.runner=appRun()
 		self.txt_pass=QLineEdit()
 		self.txt_pass.setPlaceholderText(_("Password"))
 		self.txt_pass2=QLineEdit()
@@ -27,24 +24,12 @@ class confPass(QWidget):
 		self.index=5
 		self.sw_changes=False
 		self.level='user'
-		self._load_screen()
+#		self._load_screen()
 	
 	def _debug(self,msg):
 		if self.dbg:
 			print("ConfPass: %s"%msg)
 	#def _debug
-
-	def set_textDomain(self,textDomain):
-		gettext.textdomain(textDomain)
-	#def set_textDomain
-
-	def set_confLevel(self,level):
-		self.level=level
-	#def set_confLevel
-
-	def update_screen(self):
-		pass
-	#def update_screen
 
 	def _load_screen(self):
 		box=QVBoxLayout()
@@ -55,21 +40,20 @@ class confPass(QWidget):
 		box.addWidget(self.txt_pass2)
 		box_btns=QHBoxLayout()
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.write_config)
+		btn_ok.clicked.connect(self.writeConfig)
 		btn_cancel=QPushButton(_("Cancel"))
 		box_btns.addWidget(btn_ok)
 		box_btns.addWidget(btn_cancel)
 		box.addLayout(box_btns)
 		self.setLayout(box)
 	
-	def write_config(self):
+	def writeConfig(self):
 		pwd=self.txt_pass.text()
-		if pwd==self.txt2_pass.text():
+		if pwd==self.txt_pass2.text():
 			pwd=hashpwd.hash(pwd)
-			self.runner.write_config(pwd,key='password',level='n4d')
+			key='password'
+			self.saveChanges(key,pwd)
 		else:
 			self._debug("Pâssword don't match")
 	#def _save_apps
 	
-	def get_changes(self):
-		return (self.sw_changes)

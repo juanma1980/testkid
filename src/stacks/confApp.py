@@ -4,43 +4,26 @@ import os
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QComboBox,QCheckBox
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-import gettext
-from libAppRun import appRun
+from appconfig.appConfigStack import appConfigStack as confStack
 
+import gettext
 _ = gettext.gettext
 
-class confApp(QWidget):
-	def __init__(self):
-		super().__init__()
-		self.dbg=True
+class confApp(confStack):
+	def __init_stack__(self):
 		self.menu_description=(_("Choose the app behaviour"))
 		self.description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
 		self.tooltip=(_("From here you can set the behaviour of the app"))
 		self.index=1
-		self.runner=appRun()
-		self._load_screen()
 		self.enabled=True
 		self.level='user'
 		self.sw_changes=False
+		self.close=None
+		self.startup=None
+#		self._load_screen()
 	#def __init__
 	
-	def _debug(self,msg):
-		if self.dbg:
-			print("ConfApp: %s"%msg)
-	#def _debug
-	
-	def set_textDomain(self,textDomain):
-		gettext.textdomain(textDomain)
-	#def set_textDomain
-	
-	def get_config(self):
-		data=self.runner.get_default_config()
-		self.level=data['system']['config']
-		self.close=data['system'].get('close',None)
-		self.startup=data['system'].get('startup',None)
-	#def get_config
-
 	def _load_screen(self):
 		def _change_osh():
 			txt=self.cmb_level.currentText()
@@ -71,17 +54,19 @@ class confApp(QWidget):
 
 		box_btns=QHBoxLayout()
 		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.write_config)
+		btn_ok.clicked.connect(self.writeConfig)
 		btn_cancel=QPushButton(_("Cancel"))
 		box_btns.addWidget(btn_ok)
 		box_btns.addWidget(btn_cancel)
 		box.addLayout(box_btns)
 		self.setLayout(box)
-		self.update_screen()
+		self.updateScreen()
+		return(self)
 	#def _load_screen
-	
-	def update_screen(self):
-		self.get_config()
+
+	def updateScreen(self):
+		config=self.getConfig()
+		print(self.level)
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -98,14 +83,12 @@ class confApp(QWidget):
 				self.chk_startup.setChecked(True)
 	#def _udpate_screen
 	
-	def write_config(self):
+	def writeConfig(self):
 		configLevel=self.cmb_level.currentText().lower()
+		self.saveChanges('config',configLevel,'system')
 		startup=self.chk_startup.isChecked()
+		self.saveChanges('startup',startup)
 		close=self.chk_close.isChecked()
-		self.runner.write_config(configLevel,key='config',level='system')
-		self.runner.write_config(startup,key='startup',level='system')
-		self.runner.write_config(close,key='close',level='system')
-	#def write_config
+		self.saveChanges('close',close)
+	#def writeConfig
 
-	def get_changes(self):
-		return (self.sw_changes)
