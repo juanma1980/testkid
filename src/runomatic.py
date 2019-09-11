@@ -126,7 +126,7 @@ class runomatic(QWidget):
 		data=self.runner.get_apps()
 		self.categories=data.get('categories')
 		self.desktops=data.get('desktops')
-		self.keybinds=data.get('keybinds')
+		self.keybinds=data.get('keybinds',{})
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',None)
 
@@ -138,8 +138,8 @@ class runomatic(QWidget):
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
 		self.tabBar.setFocusPolicy(Qt.NoFocus)
-		self._debug("Focus to %s"%self.focusWidgets[0])
 		if self.focusWidgets:
+			self._debug("Focus to %s"%self.focusWidgets[0])
 			self.focusWidgets[0].setFocus()
 	#def _render_gui
 
@@ -149,10 +149,11 @@ class runomatic(QWidget):
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
-					return
+					return(False)
 			else:
 				event.ignore()
 				return
+				return(False)
 		for index in self.tab_id.keys():
 			if index:
 				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
@@ -160,7 +161,6 @@ class runomatic(QWidget):
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
-		print("Close: %s"%self.close_on_exit)
 		if self.close_on_exit:
 			if self.close_on_exit:
 				subprocess.run(["loginctl","terminate-user","%s"%self.username])
@@ -172,11 +172,16 @@ class runomatic(QWidget):
 	
 	def keyReleaseEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
+		confKey=self.keybinds.get('conf',None)
+		print("ConfKey: %s"%confKey)
 		if key!='Tab':
 			self.grab=''
 			self.releaseKeyboard()
 			if key=='F4':
 				self.close()
+			if key==confKey:
+				if self.close():
+					os.execv("runoconfig.py",["1"])
 	#def eventFilter
 
 	def _set_focus(self,key):

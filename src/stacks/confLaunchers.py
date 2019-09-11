@@ -59,7 +59,6 @@ class dropButton(QPushButton):
 		self.setAcceptDrops(True)
 		self.setMaximumWidth(BTN_SIZE)
 		self.position=0
-
 	#def __init__(self,title,parent):
 
 	def dragEnterEvent(self,e):
@@ -145,14 +144,10 @@ class confLaunchers(confStack):
 			print("ConfLaunchers: %s"%msg)
 	#def _debug
 
-	def set_textDomain(self,textDomain):
-		gettext.textdomain(textDomain)
-
 	def apply_parms(self,app):
 		self._debug("Set parm %s"%app)
 		self.app=app
 		(self.columns,self.width,self.height)=self._get_screen_size()
-		self._load_screen()
 
 	def _get_screen_size(self):
 		row=0
@@ -168,9 +163,11 @@ class confLaunchers(confStack):
 		return (columns,w,h)
 	#def _get_screen_size
 
-	def update_screen(self):
+	def updateScreen(self):
 		apps=self._update_apps_data()
+		print(apps)
 		self.update_apps(apps)
+	#def updateScreen
 
 	def _load_screen(self):
 		def _update_categories(cat):
@@ -192,6 +189,9 @@ class confLaunchers(confStack):
 				apps['desktops'].append(fchoosed)
 				self.update_apps(apps)
 
+		b=QGridLayout()
+		b.addWidget(self.tbl_app)
+		self.tbl_app.clear()
 		apps=self._update_apps_data()
 		sigmap_catSelect=QSignalMapper(self)
 		sigmap_catSelect.mapped[QString].connect(_update_categories)
@@ -226,10 +226,17 @@ class confLaunchers(confStack):
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
 		box.addWidget(self.tbl_app)
 		btn_apply=QPushButton("Apply")
-		btn_apply.clicked.connect(self.write_config)
+		btn_apply.clicked.connect(self.writeConfig)
 		box.addWidget(btn_apply)
 		self.setLayout(box)
 	#def load_screen
+	
+	def _get_all_categories(self):
+		categories=[]
+		categories=self.menu.get_categories()
+		categories.insert(0,'run-o-matic')
+		return categories
+	#def _get_all_categories(self):
 	
 	def _tbl_DropEvent(self,path):
 		if path.endswith('desktop'):
@@ -237,11 +244,13 @@ class confLaunchers(confStack):
 				apps=self._get_table_apps()
 				apps['desktops'].append(path)
 				self.update_apps(apps)
-
 	#def _tbl_DropEvent
 
 	def _update_apps_data(self):
 		apps=self.runner.get_apps()
+		print("***")
+		print(apps)
+		print("***")
 		self.visible_categories=apps['categories']
 		self._debug("Visible: %s"%self.visible_categories)
 		return apps
@@ -287,6 +296,7 @@ class confLaunchers(confStack):
 		_add_desktop(apps['desktops'])
 		_add_desktop(apps['hidden'],"hidden")
 		self.tbl_app.resizeColumnsToContents()
+	#def update_apps
 
 	def _changeBtnState(self,apps,state='show'):
 		row=self.tbl_app.currentRow()
@@ -350,13 +360,12 @@ class confLaunchers(confStack):
 				self.btn_drag=None
 	#def _btn_dragDropEvent
 
-	def write_config(self):
+	def writeConfig(self):
 		apps=self._get_table_apps()
-		self._debug("Apps: %s"%apps)
 		for key,data in apps.items():
-			self.runner.write_config(data,key=key,level='system')
-		self.runner.write_config(self.visible_categories,key='categories',level='system')
-	#def write_config
+			self.saveChanges(key,data)
+		self.saveChanges('categories',self.visible_categories)
+	#def writeConfig(self):
 
 	def _get_table_apps(self):
 		apps={'desktops':[],'hidden':[]}
@@ -370,12 +379,8 @@ class confLaunchers(confStack):
 					else:
 						apps['hidden'].append(btn.title)
 		return apps
+	#def _get_table_apps
 
-	def _get_all_categories(self):
-		categories=[]
-		categories=self.menu.get_categories()
-		categories.insert(0,'run-o-matic')
-		return categories
 
 	def _define_css(self):
 		css="""

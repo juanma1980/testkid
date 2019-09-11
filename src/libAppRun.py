@@ -208,6 +208,7 @@ class appRun():
 				f.write("exec wmname LG3D\n")
 				f.write("set border 0\n")
 				f.write("startup message off\n")
+				f.write("xsetbg /home/lliurex/git/testkid/rsrc/background.png\n")
 		th_run=th_runApp("ratpoison",display)
 		th_run.start()
 		th_run=th_runApp(app,display)
@@ -249,6 +250,7 @@ class appRun():
 	def get_apps(self,categories=[],load_categories=True):
 		#First read system config
 		sysconfig=self.get_default_config()
+		self._debug("Getting apps for level %s"%self.level)
 		apps={'categories':[],'desktops':[],'hidden':[]}
 		default={'categories':[],'desktops':[],'hidden':[]}
 		
@@ -259,19 +261,41 @@ class appRun():
 			data=sysconfig.copy()
 		else:
 			data=self.config.get_config(self.level)
-		for confFile,section in data.items():
-			if confFile=='default':
-				default=data[confFile]
-				continue
 
+		self._debug("Read Data: %s"%data)
+		level=self.level
+		if not self.level in data.keys():
+			if 'default' in data.keys():
+				level='default'
+			else:
+				level=''
+
+		if level:
+			self._debug("Read file %s"%level)
 			if categories==[] and load_categories:
-				apps['categories']=data[confFile].get('categories')
-				apps['desktops']=data[confFile].get('desktops')
-				apps['hidden']=data[confFile].get('hidden')
-				apps['keybinds']=data[confFile].get('keybinds')
-				apps['password']=data[confFile].get('password')
-				apps['close']=data[confFile].get('close')
-				apps['startup']=data[confFile].get('startup')
+				apps['categories']=data[level].get('categories')
+				apps['desktops']=data[level].get('desktops')
+				apps['hidden']=data[level].get('hidden')
+				apps['keybinds']=data[level].get('keybinds')
+				apps['password']=data[level].get('password')
+				apps['close']=data[level].get('close')
+				apps['startup']=data[level].get('startup')
+
+					#		for confFile,section in data.items():
+#			self._debug("Read file %s"%confFile)
+#			if confFile=='default':
+#				default=data[confFile]
+#				continue
+
+#			if categories==[] and load_categories:
+#				apps['categories']=data[confFile].get('categories')
+#				apps['desktops']=data[confFile].get('desktops')
+#				apps['hidden']=data[confFile].get('hidden')
+#				apps['keybinds']=data[confFile].get('keybinds')
+#				apps['password']=data[confFile].get('password')
+#				apps['close']=data[confFile].get('close')
+#				apps['startup']=data[confFile].get('startup')
+			self._debug("Readed %s"%apps)
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default

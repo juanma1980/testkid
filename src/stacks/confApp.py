@@ -66,7 +66,6 @@ class confApp(confStack):
 
 	def updateScreen(self):
 		config=self.getConfig()
-		print(self.level)
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
