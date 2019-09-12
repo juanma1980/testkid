@@ -76,11 +76,21 @@ class confApp(confStack):
 	#def _udpate_screen
 	
 	def writeConfig(self):
+		sw_ko=False
+		level=self.level
 		configLevel=self.cmb_level.currentText().lower()
-		self.saveChanges('config',configLevel,'system')
-		startup=self.chk_startup.isChecked()
-		self.saveChanges('startup',startup)
-		close=self.chk_close.isChecked()
-		self.saveChanges('close',close)
+		if self.saveChanges('config',configLevel,'system'):
+			startup=self.chk_startup.isChecked()
+			if self.saveChanges('startup',startup):
+				close=self.chk_close.isChecked()
+				if not self.saveChanges('close',close):
+					sw_ko=True
+			else:
+				sw_ko=True
+		else:
+			sw_ko=True
+		if sw_ko:
+			configLevel=level
+			self.saveChanges('config',configLevel,'system')
 	#def writeConfig
 
