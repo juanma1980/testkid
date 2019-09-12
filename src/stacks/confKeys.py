@@ -30,33 +30,35 @@ class confKeys(confStack):
 		self.tooltip=(_("From here you can modify the keybinding"))
 		self.index=4
 		self.enabled=True
+		self.keytext=''
 		self.keys={}
 #		self._load_screen()
 	#def __init__
 	
 	def _load_screen(self):
 		def _grab_alt_keys(*args):
+			self.lbl_info.show()
 			self.btn_conf.setText("")
 			self.grabKeyboard()
 			self.keybind_signal.connect(_set_config_key)
 		def _set_config_key(keypress):
+			self.lbl_info.hide()
 			self.btn_conf.setText(keypress)
+			if keypress!=self.keytext:
+				self.changes=True
 		self.installEventFilter(self)
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can define the keybindings"))
 		box.addWidget(lbl_txt,0,0,1,2,Qt.AlignTop)
 		inp_conf=QLabel("Launch configuration")
+		self.lbl_info=QLabel(_("Press a key"))
+		box.addWidget(self.lbl_info,1,0,1,2,Qt.AlignCenter)
+		self.lbl_info.hide()
 		self.btn_conf=QPushButton(_(""))
 		self.btn_conf.clicked.connect(_grab_alt_keys)
 		self.btn_conf.setFixedSize(QSize(96,48))
-		box.addWidget(inp_conf,1,0,1,1)
-		box.addWidget(self.btn_conf,1,1,1,1,Qt.Alignment(1))
-		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.writeConfig)
-		btn_cancel=QPushButton(_("Cancel"))
-		box.addWidget(btn_ok,3,0,1,1,Qt.AlignLeft)
-		box.addWidget(btn_cancel,3,1,1,1,Qt.AlignRight)
-
+		box.addWidget(inp_conf,2,0,1,1)
+		box.addWidget(self.btn_conf,2,1,1,1,Qt.Alignment(1))
 		self.setLayout(box)
 		self.updateScreen()
 		return(self)
@@ -64,12 +66,12 @@ class confKeys(confStack):
 
 	def updateScreen(self):
 		config=self.getConfig()
-		keytext=''
+		self.keytext=''
 		if config:
 			keybinds=config[self.level].get('keybinds',None)
 			if keybinds:
-				keytext=keybinds.get('conf',None)
-		self.btn_conf.setText(keytext)
+				self.keytext=keybinds.get('conf',None)
+		self.btn_conf.setText(self.keytext)
 	#def updateScreen
 
 	def eventFilter(self,source,event):

@@ -22,9 +22,7 @@ class confPass(confStack):
 		self.tooltip=(_("From here you can set the master password"))
 		self.enabled=True
 		self.index=5
-		self.sw_changes=False
 		self.level='user'
-#		self._load_screen()
 	
 	def _debug(self,msg):
 		if self.dbg:
@@ -38,22 +36,23 @@ class confPass(confStack):
 		box.addWidget(lbl_txt)
 		box.addWidget(self.txt_pass)
 		box.addWidget(self.txt_pass2)
-		box_btns=QHBoxLayout()
-		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.writeConfig)
-		btn_cancel=QPushButton(_("Cancel"))
-		box_btns.addWidget(btn_ok)
-		box_btns.addWidget(btn_cancel)
-		box.addLayout(box_btns)
 		self.setLayout(box)
 	
 	def writeConfig(self):
 		pwd=self.txt_pass.text()
-		if pwd==self.txt_pass2.text():
+		if pwd==self.txt_pass2.text() and pwd.replace(' ','')!='':
 			pwd=hashpwd.hash(pwd)
 			key='password'
 			self.saveChanges(key,pwd)
+		elif pwd==self.txt_pass2.text:
+			self._debug("Password don't match")
+			self.showMsg(_("Passwords don't match"))
 		else:
-			self._debug("Pâssword don't match")
+			self._debug("Blank Password")
+			self.showMsg(_("Password is empty"))
 	#def _save_apps
-	
+
+	def updateScreen(self):
+		self.txt_pass.setText('')
+		self.txt_pass2.setText('')
+	#def updateScreen

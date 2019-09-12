@@ -15,11 +15,9 @@ class confN4d(confStack):
 		self.description=(_("Configure n4d settings"))
 		self.icon=('dialog-password')
 		self.tooltip=(_("From here you can set the n4d settings"))
-		self.enabled=True
+		self.enabled=False
 		self.index=6
-		self.sw_changes=False
 		self.level='n4d'
-#		self._load_screen()
 
 	def _debug(self,msg):
 		if self.dbg:
@@ -31,14 +29,5 @@ class confN4d(confStack):
 		lbl_txt=QLabel(_("Apply n4d policies"))
 		lbl_txt.setAlignment(Qt.AlignTop)
 		box.addWidget(lbl_txt)
-		box_btns=QHBoxLayout()
-		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.writeConfig)
-		btn_cancel=QPushButton(_("Cancel"))
-		box_btns.addWidget(btn_ok)
-		box_btns.addWidget(btn_cancel)
-		box.addLayout(box_btns)
 		self.setLayout(box)
 
-	def writeConfig(self):
-		pass

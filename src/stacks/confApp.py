@@ -18,7 +18,6 @@ class confApp(confStack):
 		self.index=1
 		self.enabled=True
 		self.level='user'
-		self.sw_changes=False
 		self.close=None
 		self.startup=None
 #		self._load_screen()
@@ -33,7 +32,6 @@ class confApp(confStack):
 				lbl_help.setText(_("The config will be applied to all users"))
 			elif txt=='N4d':
 				lbl_help.setText(_("The config will be applied to all users and clients"))
-			self.sw_changes=True
 		box=QVBoxLayout()
 		lbl_txt=QLabel(_("Choose the config level that should use the app"))
 		lbl_txt.setAlignment(Qt.AlignTop)
@@ -52,13 +50,6 @@ class confApp(confStack):
 		self.chk_close=QCheckBox("Close session when application exits")
 		box.addWidget(self.chk_close)
 
-		box_btns=QHBoxLayout()
-		btn_ok=QPushButton(_("Apply"))
-		btn_ok.clicked.connect(self.writeConfig)
-		btn_cancel=QPushButton(_("Cancel"))
-		box_btns.addWidget(btn_ok)
-		box_btns.addWidget(btn_cancel)
-		box.addLayout(box_btns)
 		self.setLayout(box)
 		self.updateScreen()
 		return(self)
@@ -74,9 +65,11 @@ class confApp(confStack):
 				idx=2
 			self.cmb_level.setCurrentIndex(idx)
 			self.cmb_level.activated.emit(idx)
+		self.chk_close.setChecked(False)
 		if self.close:
 			if self.close=='true':
 				self.chk_close.setChecked(True)
+		self.chk_startup.setChecked(False)
 		if self.startup:
 			if self.startup=='true':
 				self.chk_startup.setChecked(True)

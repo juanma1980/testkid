@@ -135,7 +135,6 @@ class confLaunchers(confStack):
 		self.tooltip=(_("Add custom launcher that will be shown in run-o-matic category"))
 		self.index=2
 		self.enabled=True
-		self.sw_changes=False
 		self.setStyleSheet(self._define_css())
 	#def __init__
 
@@ -165,7 +164,6 @@ class confLaunchers(confStack):
 
 	def updateScreen(self):
 		apps=self._update_apps_data()
-		print(apps)
 		self.update_apps(apps)
 	#def updateScreen
 
@@ -185,6 +183,7 @@ class confLaunchers(confStack):
 			fdia.setNameFilter(_("desktops(*.desktop)"))
 			fdia.setDirectory("/usr/share/applications")
 			if (fdia.exec_()):
+				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
 				apps['desktops'].append(fchoosed)
 				self.update_apps(apps)
@@ -210,8 +209,6 @@ class confLaunchers(confStack):
 		btn_cat.setMenu(menu_cat)
 		btn_add=QPushButton(_("Add launcher"))
 		btn_add.setToolTip(_("Add Launcher"))
-#		icnAdd=QtGui.QIcon.fromTheme("list-add")
-#		btn_add.setIcon(icnAdd)
 		btn_add.clicked.connect(_update_desktops)
 		btnBox.addWidget(btn_cat)
 		btnBox.addWidget(btn_add)
@@ -225,9 +222,6 @@ class confLaunchers(confStack):
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
 		box.addWidget(self.tbl_app)
-		btn_apply=QPushButton("Apply")
-		btn_apply.clicked.connect(self.writeConfig)
-		box.addWidget(btn_apply)
 		self.setLayout(box)
 	#def load_screen
 	
@@ -248,9 +242,6 @@ class confLaunchers(confStack):
 
 	def _update_apps_data(self):
 		apps=self.runner.get_apps()
-		print("***")
-		print(apps)
-		print("***")
 		self.visible_categories=apps['categories']
 		self._debug("Visible: %s"%self.visible_categories)
 		return apps
@@ -330,6 +321,7 @@ class confLaunchers(confStack):
 			if self.btn_drag==None and btnEv.get('path',None)==None:
 				return False
 			replace=False
+			self.setChanged(True)
 			if replace:
 				rowTo=self.btn_grid[btn]['row']
 				colTo=self.btn_grid[btn]['col']
@@ -394,6 +386,3 @@ class confLaunchers(confStack):
 		"""
 		return(css)
 		#def _define_css
-	
-	def get_changes(self):
-		return (self.sw_changes)
