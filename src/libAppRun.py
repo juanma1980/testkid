@@ -71,6 +71,20 @@ class th_runApp(QThread):
 				self._run_firefox()
 			elif (('chromium' in self.app) or ('chrome' in self.app)):
 				self._run_chromium()
+			elif 'loffice' in self.app:
+				self.app.append("--display %s"%self.display)
+
+			app=" ".join(self.app)
+			if '%' in app:
+				if '%s' in app.lower():
+					app=app.replace("%s","")
+					self.app=app.replace("%S","").split(" ")
+				if '%u' in app.lower():
+					app=app.replace("%u","")
+					self.app=app.replace("%U","").split(" ")
+				if '%f' in app.lower():
+					app=app.replace("%f","")
+					self.app=app.replace("%F","").split(" ")
 			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
 			retval=[p_pid.pid,tmp_file]
@@ -153,6 +167,8 @@ class appRun():
 				xephyr_cmd=["Xephyr",
 				"-br",
 				"-ac",
+				"-nocursor",
+				"-softCursor",
 				"-screen",
 				"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
 				"%s"%display]
