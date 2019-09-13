@@ -248,7 +248,7 @@ class appRun():
 
 	def get_default_config(self):
 		data={}
-		data=self.config.get_config('system')
+		data=self.config.getConfig('system')
 		if 'config' not in data['system'].keys():
 			data['system']['config']='user'
 		self.level=data['system']['config']
@@ -258,7 +258,7 @@ class appRun():
 
 	def get_config(self,level):
 		data={}
-		data=self.config.get_config(level)
+		data=self.config.getConfig(level)
 		self._debug("Read level from config: %s"%level)
 		return (data)
 	#def get_config(self,level):
@@ -276,7 +276,7 @@ class appRun():
 		if self.level=='system':
 			data=sysconfig.copy()
 		else:
-			data=self.config.get_config(self.level)
+			data=self.config.getConfig(self.level)
 
 		self._debug("Read Data: %s"%data)
 		level=self.level
@@ -297,20 +297,6 @@ class appRun():
 				apps['close']=data[level].get('close')
 				apps['startup']=data[level].get('startup')
 
-					#		for confFile,section in data.items():
-#			self._debug("Read file %s"%confFile)
-#			if confFile=='default':
-#				default=data[confFile]
-#				continue
-
-#			if categories==[] and load_categories:
-#				apps['categories']=data[confFile].get('categories')
-#				apps['desktops']=data[confFile].get('desktops')
-#				apps['hidden']=data[confFile].get('hidden')
-#				apps['keybinds']=data[confFile].get('keybinds')
-#				apps['password']=data[confFile].get('password')
-#				apps['close']=data[confFile].get('close')
-#				apps['startup']=data[confFile].get('startup')
 			self._debug("Readed %s"%apps)
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:

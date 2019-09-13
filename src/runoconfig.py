@@ -12,5 +12,6 @@ config.setBanner('banner.png')
 config.setBackgroundImage('background.png')
 config.setConfig(confDirs={'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']},confFile="runomatic.conf")
 config.Show()
+config.setFixedSize(config.width(),config.height())
 
 app.exec_()

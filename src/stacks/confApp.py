@@ -11,6 +11,8 @@ _ = gettext.gettext
 
 class confApp(confStack):
 	def __init_stack__(self):
+		self.dbg=True
+		self._debug("confApp Load")
 		self.menu_description=(_("Choose the app behaviour"))
 		self.description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
@@ -41,7 +43,8 @@ class confApp(confStack):
 		self.cmb_level.addItem("System")
 		self.cmb_level.addItem("N4d")
 		self.cmb_level.activated.connect(_change_osh)
-		box.addWidget(self.cmb_level)
+		self.cmb_level.setFixedWidth(100)
+		box.addWidget(self.cmb_level,Qt.AlignRight)
 		lbl_help=QLabel(_(""))
 		_change_osh()
 		box.addWidget(lbl_help)

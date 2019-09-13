@@ -117,6 +117,7 @@ class confLaunchers(confStack):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
 	def __init_stack__(self,app=None):
 		self.dbg=True
+		self._debug("confLaunchers Load")
 		self.parm="app"
 		self.app=None
 		(self.columns,self.width,self.height)=(3,800,600)
@@ -124,6 +125,7 @@ class confLaunchers(confStack):
 		self.runner=appRun()
 		self.tbl_app=dropTable(self,1,2)
 		self.tbl_app.drop.connect(self._tbl_DropEvent)
+		self.menu_cat=QMenu()
 		self.btn_grid={}
 		self.btn_drag=None
 		self.visible_categories=[]
@@ -174,6 +176,7 @@ class confLaunchers(confStack):
 			else:
 				self.visible_categories.append(cat)
 			apps=self.runner.get_apps(self.visible_categories,False)
+			apps['desktops'].extend(desktop_apps)
 			self.update_apps(apps)
 		
 		def _update_desktops():
@@ -185,11 +188,12 @@ class confLaunchers(confStack):
 			if (fdia.exec_()):
 				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
+				apps=self._get_table_apps()
 				apps['desktops'].append(fchoosed)
+				desktop_apps.append(fchoosed)
 				self.update_apps(apps)
 
-		b=QGridLayout()
-		b.addWidget(self.tbl_app)
+		desktop_apps=[]
 		self.tbl_app.clear()
 		apps=self._update_apps_data()
 		sigmap_catSelect=QSignalMapper(self)
@@ -197,22 +201,25 @@ class confLaunchers(confStack):
 		box=QVBoxLayout()
 		btnBox=QHBoxLayout()
 		btn_cat=QPushButton(_("Categories"))
-		menu_cat=QMenu()
+		btn_cat.setFixedWidth(150)
 		for cat in self._get_all_categories():
-			act=QAction(cat,menu_cat)
+			if not cat:
+				continue
+			act=QAction(cat,self.menu_cat)
 			act.setCheckable(True)
 			if cat in self.visible_categories:
 				act.setChecked(True)
-			menu_cat.addAction(act)
+			self.menu_cat.addAction(act)
 			sigmap_catSelect.setMapping(act,cat)
 			act.triggered.connect(sigmap_catSelect.map)
-		btn_cat.setMenu(menu_cat)
+		btn_cat.setMenu(self.menu_cat)
 		btn_add=QPushButton(_("Add launcher"))
 		btn_add.setToolTip(_("Add Launcher"))
+		btn_add.setFixedWidth(150)
 		btn_add.clicked.connect(_update_desktops)
-		btnBox.addWidget(btn_cat)
-		btnBox.addWidget(btn_add)
-		box.addLayout(btnBox)
+		btnBox.addWidget(btn_cat,Qt.AlignLeft)
+		btnBox.addWidget(btn_add,Qt.AlignLeft)
+		box.addLayout(btnBox,Qt.AlignLeft)
 		tabScroll=QWidget()
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
@@ -221,6 +228,7 @@ class confLaunchers(confStack):
 		scrollArea.setWidget(self.tbl_app)
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
+		self.tbl_app.setFixedWidth((self.columns+int(self.columns*0.5)+1)*BTN_SIZE)
 		box.addWidget(self.tbl_app)
 		self.setLayout(box)
 	#def load_screen
@@ -287,6 +295,11 @@ class confLaunchers(confStack):
 		_add_desktop(apps['desktops'])
 		_add_desktop(apps['hidden'],"hidden")
 		self.tbl_app.resizeColumnsToContents()
+		for act in self.menu_cat.actions():
+			if act.text() in self.visible_categories:
+				act.setChecked(True)
+			else:
+				act.setChecked(False)
 	#def update_apps
 
 	def _changeBtnState(self,apps,state='show'):
@@ -360,7 +373,7 @@ class confLaunchers(confStack):
 	#def writeConfig(self):
 
 	def _get_table_apps(self):
-		apps={'desktops':[],'hidden':[]}
+		apps={'desktops':[],'hidden':[].'extra_desktops':[]}
 		for row in range(0,self.tbl_app.rowCount()):
 			for col in range(0,self.tbl_app.columnCount()):
 				btn=self.tbl_app.cellWidget(row,col)

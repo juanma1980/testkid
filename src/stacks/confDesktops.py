@@ -13,6 +13,7 @@ _ = gettext.gettext
 class confDesktops(confStack):
 	def __init_stack__(self):
 		self.dbg=True
+		self._debug("confDesktops Load")
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
 		self.menu.desktoppath="%s/.local/share/applications/"%home
