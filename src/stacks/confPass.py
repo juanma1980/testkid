@@ -13,9 +13,11 @@ class confPass(confStack):
 	def __init_stack__(self):
 		self.dbg=True
 		self.txt_pass=QLineEdit()
+		self.txt_pass.setEchoMode(QLineEdit.Password)
 		self.txt_pass.setPlaceholderText(_("Password"))
 		self.txt_pass2=QLineEdit()
 		self.txt_pass2.setPlaceholderText(_("Repeat password"))
+		self.txt_pass2.setEchoMode(QLineEdit.Password)
 		self.menu_description=(_("Set a master password"))
 		self.description=(_("Set master password"))
 		self.icon=('dialog-password')
@@ -33,9 +35,9 @@ class confPass(confStack):
 		box=QVBoxLayout()
 		lbl_txt=QLabel(_("If a master password is set then the app will prompt for it to exit"))
 		lbl_txt.setAlignment(Qt.AlignTop)
-		box.addWidget(lbl_txt)
-		box.addWidget(self.txt_pass)
-		box.addWidget(self.txt_pass2)
+		box.addWidget(lbl_txt,1)
+		box.addWidget(self.txt_pass,1,Qt.AlignBottom)
+		box.addWidget(self.txt_pass2,2,Qt.AlignTop)
 		self.setLayout(box)
 	
 	def writeConfig(self):

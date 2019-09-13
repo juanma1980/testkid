@@ -217,8 +217,8 @@ class confLaunchers(confStack):
 		btn_add.setToolTip(_("Add Launcher"))
 		btn_add.setFixedWidth(150)
 		btn_add.clicked.connect(_update_desktops)
-		btnBox.addWidget(btn_cat,Qt.AlignLeft)
-		btnBox.addWidget(btn_add,Qt.AlignLeft)
+		btnBox.addWidget(btn_cat,1,Qt.AlignLeft)
+		btnBox.addWidget(btn_add,2,Qt.AlignLeft)
 		box.addLayout(btnBox,Qt.AlignLeft)
 		tabScroll=QWidget()
 		tabScroll.setFocusPolicy(Qt.NoFocus)
@@ -373,7 +373,7 @@ class confLaunchers(confStack):
 	#def writeConfig(self):
 
 	def _get_table_apps(self):
-		apps={'desktops':[],'hidden':[].'extra_desktops':[]}
+		apps={'desktops':[],'hidden':[],'extra_desktops':[]}
 		for row in range(0,self.tbl_app.rowCount()):
 			for col in range(0,self.tbl_app.columnCount()):
 				btn=self.tbl_app.cellWidget(row,col)
