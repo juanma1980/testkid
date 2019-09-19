@@ -82,7 +82,11 @@ class confApp(confStack):
 		sw_ko=False
 		level=self.level
 		configLevel=self.cmb_level.currentText().lower()
-		if self.saveChanges('config',configLevel,'system'):
+		if configLevel!=level:
+			if not self.saveChanges('config',configLevel,'system'):
+				self.saveChanges('config',level,'system')
+				sw_ko=True
+		if sw_ko==False:
 			startup=self.chk_startup.isChecked()
 			if self.saveChanges('startup',startup):
 				close=self.chk_close.isChecked()
@@ -92,8 +96,5 @@ class confApp(confStack):
 				sw_ko=True
 		else:
 			sw_ko=True
-		if sw_ko:
-			configLevel=level
-			self.saveChanges('config',configLevel,'system')
 	#def writeConfig
 
