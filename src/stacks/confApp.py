@@ -22,7 +22,6 @@ class confApp(confStack):
 		self.level='user'
 		self.close=None
 		self.startup=None
-#		self._load_screen()
 	#def __init__
 	
 	def _load_screen(self):
