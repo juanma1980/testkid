@@ -301,7 +301,8 @@ class appRun():
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
-		elif 'categories' in apps.keys():
+		categories=apps.get('categories',None)
+		if categories:
 			for category in apps['categories']:
 				cat_apps=self.get_category_desktops(category.lower())
 				for app in cat_apps:
