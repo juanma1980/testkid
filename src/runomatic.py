@@ -133,6 +133,9 @@ class runomatic(QWidget):
 		self.close_on_exit=data.get('close',False)
 
 	def _render_gui(self):
+		def launchConf():
+			if self.close():
+				os.execv("runoconfig.py",["1"])
 		self.show()
 		self.box=QGridLayout()
 		self.tabBar=self._tabBar()
@@ -143,6 +146,17 @@ class runomatic(QWidget):
 		if self.focusWidgets:
 			self._debug("Focus to %s"%self.focusWidgets[0])
 			self.focusWidgets[0].setFocus()
+		else:
+			wdg=QWidget()
+			lyt=QVBoxLayout()
+			wdg.setLayout(lyt)
+			lbl=QLabel(_("There's no launchers to show.\nDid you run the configure app?"))
+			lyt.addWidget(lbl)
+			btn=QPushButton(_("Launch configuration app"))
+			btn.clicked.connect(launchConf)
+			lyt.addWidget(btn)
+			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
+
 	#def _render_gui
 
 	def closeEvent(self,event):
@@ -178,7 +192,9 @@ class runomatic(QWidget):
 	
 	def keyReleaseEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
-		confKey=self.keybinds.get('conf',None)
+		confKey=''
+		if self.keybinds:
+			confKey=self.keybinds.get('conf',None)
 		if key!='Tab':
 			if key=='F4' and self.grab:
 				self.closeKey=True

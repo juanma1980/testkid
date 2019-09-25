@@ -196,7 +196,8 @@ class appRun():
 		sig={'kill':signal.SIGKILL,'term':signal.SIGTERM,'stop':signal.SIGSTOP,'cont':signal.SIGCONT}
 		if thread in self.threads_pid.keys():			
 			try:
-				os.kill(self.threads_pid[thread],sig[s_signal])
+				if self.threads_pid[thread]:
+					os.kill(self.threads_pid[thread],sig[s_signal])
 				retval=True
 			except:
 				self._debug("%s failed on thread %s with pid %s"%(s_signal,thread,self.threads_pid[thread]))
@@ -214,6 +215,9 @@ class appRun():
 
 	def launch(self,app,display=":13"):
 		def _get_th_pid(pid_info):
+			if pid_info[0]==False:
+				errMsg=("Error running")
+				self._run_cmd_on_display(["kdialog","--icon","error","--title","Error","--sorry","%s %s"%(errMsg,app)],display)
 			self.threads_pid[th_run]=pid_info[0]
 			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
@@ -224,7 +228,10 @@ class appRun():
 				f.write("exec wmname LG3D\n")
 				f.write("set border 0\n")
 				f.write("startup message off\n")
-				f.write("xsetbg /home/lliurex/git/testkid/rsrc/background.png\n")
+				f.write("set bgcolor white\n")
+				f.write("set fgcolor white\n")
+				f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
+#				f.write("xsetbg /home/lliurex/git/testkid/rsrc/background.png\n")
 		th_run=th_runApp("ratpoison",display)
 		th_run.start()
 		th_run=th_runApp(app,display)
