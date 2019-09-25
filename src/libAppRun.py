@@ -123,8 +123,6 @@ class appRun():
 	#def _debug
 
 	def __init__config(self):
-#		defaultConfig={"categories":["lliurex-infantil","education","lliurex-author-tools","lliurex-educacion-especial"],"desktops":["/usr/share/applications/lliurex-tuxpaint-fullscreen.desktop"]}
-#		self.config.set_defaultConfig(defaultConfig)
 		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
 		self.config.set_configFile(self.confFile)
 
@@ -219,7 +217,7 @@ class appRun():
 		def _get_th_pid(pid_info):
 			if pid_info[0]==False:
 				errMsg=("Error running")
-				self._run_cmd_on_display(["kdialog","--icon","error","--title","Error","--sorry","%s %s"%(errMsg,app)],display)
+				self._run_cmd_on_display(["notify-send","Error","%s %s"%(errMsg,app)],display)
 			self.threads_pid[th_run]=pid_info[0]
 			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
@@ -234,7 +232,6 @@ class appRun():
 				f.write("set fgcolor white\n")
 				f.write("exec xsetroot -cursor_name left_ptr\n")
 				f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
-#				f.write("xsetbg /home/lliurex/git/testkid/rsrc/background.png\n")
 		th_run=th_runApp("ratpoison",display)
 		th_run.start()
 		th_run=th_runApp(app,display)
