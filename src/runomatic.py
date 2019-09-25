@@ -77,6 +77,8 @@ class runomatic(QWidget):
 		self.firstLaunch=True
 		self.currentTab=0
 		self.currentBtn=0
+		self.closeKey=False
+		self.confKey=False
 		self.keymap={}
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
@@ -128,7 +130,7 @@ class runomatic(QWidget):
 		self.desktops=data.get('desktops')
 		self.keybinds=data.get('keybinds',{})
 		self.password=data.get('password')
-		self.close_on_exit=data.get('close',None)
+		self.close_on_exit=data.get('close',False)
 
 	def _render_gui(self):
 		self.show()
@@ -145,7 +147,10 @@ class runomatic(QWidget):
 
 	def closeEvent(self,event):
 		if self.password:
-			pwd,resp=QInputDialog.getText(self,_("Master Password"),_("Insert the password"))
+			text=_("Insert the password")
+			if self.close_on_exit==True:
+				text=_("Insert the password. Current session will also be closed.")
+			pwd,resp=QInputDialog.getText(self,_("Master Password"),text)
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
@@ -161,27 +166,33 @@ class runomatic(QWidget):
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
-		if self.close_on_exit:
-			if self.close_on_exit:
-				subprocess.run(["loginctl","terminate-user","%s"%self.username])
+		if self.close_on_exit==True:
+			subprocess.run(["loginctl","terminate-user","%s"%self.username])
 
 	def keyPressEvent(self,event):
-#		key=self.keymap.get(event.key(),event.text())
+		key=self.keymap.get(event.key(),event.text())
+		if key=="Alt":
+			self.grab=True
 		self.grabKeyboard()
 	#def eventFilter
 	
 	def keyReleaseEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
 		confKey=self.keybinds.get('conf',None)
-		print("ConfKey: %s"%confKey)
 		if key!='Tab':
-			self.grab=''
-			self.releaseKeyboard()
-			if key=='F4':
-				self.close()
+			if key=='F4' and self.grab:
+				self.closeKey=True
 			if key==confKey:
 				if self.close():
 					os.execv("runoconfig.py",["1"])
+		if key=='Alt':
+			self.releaseKeyboard()
+			self.grab=False
+			if self.closeKey:
+				self.closeKey=False
+				self.close()
+			if self.confKey:
+				self.confKey=False
 	#def eventFilter
 
 	def _set_focus(self,key):
