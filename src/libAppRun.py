@@ -67,7 +67,9 @@ class th_runApp(QThread):
 			os.environ['DISPLAY']=self.display
 			if "/usr/bin/resources-launcher.sh" in self.app:
 				self._run_resource()
-			if 'firefox' in self.app:
+			elif 'pysycache' in self.app:
+				self.app.append("-nf")
+			elif 'firefox' in self.app:
 				self._run_firefox()
 			elif (('chromium' in self.app) or ('chrome' in self.app)):
 				self._run_chromium()
@@ -167,8 +169,8 @@ class appRun():
 				xephyr_cmd=["Xephyr",
 				"-br",
 				"-ac",
-				"-nocursor",
-				"-softCursor",
+#				"-nocursor",
+#				"-softCursor",
 				"-screen",
 				"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
 				"%s"%display]
@@ -230,6 +232,7 @@ class appRun():
 				f.write("startup message off\n")
 				f.write("set bgcolor white\n")
 				f.write("set fgcolor white\n")
+				f.write("exec xsetroot -cursor_name left_ptr\n")
 				f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
 #				f.write("xsetbg /home/lliurex/git/testkid/rsrc/background.png\n")
 		th_run=th_runApp("ratpoison",display)
