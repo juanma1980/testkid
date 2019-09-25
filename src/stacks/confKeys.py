@@ -48,6 +48,7 @@ class confKeys(confStack):
 			self.btn_conf.setText(keypress)
 			if keypress!=self.keytext:
 				self.changes=True
+				self.setChanged(self.btn_conf)
 		self.installEventFilter(self)
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can define the keybindings"))

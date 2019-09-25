@@ -20,8 +20,6 @@ class confApp(confStack):
 		self.index=1
 		self.enabled=True
 		self.level='user'
-		self.close=None
-		self.startup=None
 	#def __init__
 	
 	def _load_screen(self):
@@ -67,14 +65,20 @@ class confApp(confStack):
 				idx=2
 			self.cmb_level.setCurrentIndex(idx)
 			self.cmb_level.activated.emit(idx)
-		self.chk_close.setChecked(False)
-		if self.close:
-			if self.close=='true':
-				self.chk_close.setChecked(True)
-		self.chk_startup.setChecked(False)
-		if self.startup:
-			if self.startup=='true':
-				self.chk_startup.setChecked(True)
+		close=config[self.level].get('close',False)
+		if close:
+			if close.lower()=='true':
+				close=True
+			else:
+				close=False
+		self.chk_close.setChecked(close)
+		startup=config[self.level].get('startup',False)
+		if startup:
+			if startup.lower()=='true':
+				startup=True
+			else:
+				startup=False
+		self.chk_startup.setChecked(startup)
 	#def _udpate_screen
 	
 	def writeConfig(self):
