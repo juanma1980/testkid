@@ -13,7 +13,8 @@ QString=type("")
 
 
 class th_runApp(QThread):
-	signal=pyqtSignal("PyQt_PyObject")
+	processRun=pyqtSignal("PyQt_PyObject")
+	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self,app,display,parent=None):
 		QThread.__init__(self,parent)
 		self.display=display
@@ -60,6 +61,7 @@ class th_runApp(QThread):
 
 	def run(self):
 		retval=[False,None]
+		p_pid=''
 		tmp_file=""
 		self._debug("Launching thread...")
 		try:
@@ -89,16 +91,17 @@ class th_runApp(QThread):
 					self.app=app.replace("%F","").split(" ")
 			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
-			retval=[p_pid.pid,tmp_file]
+			retval=[p_pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
-		self.signal.emit(retval)
+		self.processRun.emit(retval)
+		print("PROCESS FINISHED")
 	#def run
 #class th_runApp
 
 
 class appRun():
-	signal=pyqtSignal("PyQt_PyObject")
+	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
@@ -115,6 +118,7 @@ class appRun():
 		self.threads_tmp={}
 		self.level='system'
 		self.menu=App2Menu.app2menu()
+		self.ratpoisonConf=''
 	#def __init__
 
 	def _debug(self,msg):
@@ -125,6 +129,7 @@ class appRun():
 	def __init__config(self):
 		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
 		self.config.set_configFile(self.confFile)
+	#def __init__config
 
 	def set_topBarHeight(self,h):
 		self.topBarHeight=h+20
@@ -209,47 +214,57 @@ class appRun():
 					os.kill(thread,sig[s_signal])
 					retval=True
 				except:
-					self._debug("%s failed on pid %s"%(s_signal,self.threads_pid[thread]))
+					self._debug("%s failed on pid %s"%(s_signal,thread))
 
 		return(retval)
+	#def send_signal_to_thread
 
 	def launch(self,app,display=":13"):
 		def _get_th_pid(pid_info):
-			if pid_info[0]==False:
-				errMsg=("Error running")
-				self._run_cmd_on_display(["notify-send","Error","%s %s"%(errMsg,app)],display)
-			self.threads_pid[th_run]=pid_info[0]
+			if pid_info[0].pid==False:
+				#Thread failed
+				pass
+			self.threads_pid[th_run]=pid_info[0].pid
 			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
-		#Generate ratposionrc if don't exist
-		if not os.path.isfile("%s/.ratpoisonrc"%os.environ["HOME"]):
-			with open("%s/.ratpoisonrc"%os.environ["HOME"],'w') as f:
-				f.write("exec wmname LG3D\n")
-				f.write("set border 0\n")
-				f.write("startup message off\n")
-				f.write("set bgcolor white\n")
-				f.write("set fgcolor white\n")
-				f.write("exec xsetroot -cursor_name left_ptr\n")
-				f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
-		th_run=th_runApp("ratpoison",display)
+		#Generate ratposionrc
+		if self.ratpoisonConf=='':
+			self.ratpoisonConf=tempfile.mkstemp()[-1]
+		with open(self.ratpoisonConf,'w') as f:
+			f.write("exec wmname LG3D\n")
+			f.write("set border 0\n")
+			f.write("startup message off\n")
+			f.write("set bgcolor white\n")
+			f.write("set fgcolor white\n")
+			f.write("exec xsetroot -cursor_name left_ptr\n")
+			f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
+		th_run=th_runApp("ratpoison -f %s"%self.ratpoisonConf,display)
 		th_run.start()
 		th_run=th_runApp(app,display)
 		th_run.start()
-		th_run.signal.connect(_get_th_pid)
+		th_run.processRun.connect(_get_th_pid)
+		th_run.finished.connect(lambda:self._end_process(th_run))
 		return(th_run)
 	#def launch
 	
+	def _end_process(self,th_run):
+		self.processEnd.emit()
+		print("End %s"%th_run)
+
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))
 		self._debug("Search %s"%count)
-		while(os.path.isfile('/tmp/.X%s-lock'%count)):
-				count+=1
-		try:
+		ret=subprocess.run(["xdpyinfo","-display",display]).returncode
+		while (ret!=1):
+			count+=1
+			try:
 				display=":%s"%count
-		except Exception as e:
-			print ("Err: %s"%e)
-			display=":-1"
+				ret=subprocess.run(["xdpyinfo","-display",display]).returncode
+			except Exception as e:
+				print ("Err: %s"%e)
+				display=":-1"
+				break
 		return("%s"%display)
 	#def _find_free_display
 

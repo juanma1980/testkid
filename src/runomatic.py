@@ -17,7 +17,7 @@ QString=type("")
 QInt=type(0)
 TAB_BTN_SIZE=96
 BTN_SIZE=128
-gettext.textdomain('testConfig')
+gettext.textdomain('runomatic')
 _ = gettext.gettext
 
 class navButton(QPushButton):
@@ -36,7 +36,16 @@ class navButton(QPushButton):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
+	#def __init__
+
+	def enterEvent(self,event):
+		self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+		self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	
+	def leaveEvent(self,event):
+		self.resize(QSize(BTN_SIZE,BTN_SIZE))
+		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+
 	def keyPressEvent(self,event):
 		sw_mod=False
 		keypressed=[]
@@ -59,12 +68,13 @@ class navButton(QPushButton):
 			event.setAccepted(False)
 	#def eventFilter
 
-
 class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
 		self.dbg=True
+		cursor=QtGui.QCursor(Qt.PointingHandCursor)
+		self.setCursor(cursor)
 		self.username=getpass.getuser()
 		self.categories={}
 		self.desktops={}
@@ -107,7 +117,6 @@ class runomatic(QWidget):
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-#		self.setWindowIcon(QtGui.QIcon("/usr/share/icons/hicolor/48x48/apps/x-appimage.png"))
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -131,6 +140,7 @@ class runomatic(QWidget):
 		self.keybinds=data.get('keybinds',{})
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
+	#def _read_config(self):
 
 	def _render_gui(self):
 		def launchConf():
@@ -145,7 +155,8 @@ class runomatic(QWidget):
 		self.tabBar.setFocusPolicy(Qt.NoFocus)
 		if self.focusWidgets:
 			self._debug("Focus to %s"%self.focusWidgets[0])
-			self.focusWidgets[0].setFocus()
+#			self.focusWidgets[0].setFocus()
+			self._set_focus("")
 		else:
 			wdg=QWidget()
 			lyt=QVBoxLayout()
@@ -156,7 +167,6 @@ class runomatic(QWidget):
 			btn.clicked.connect(launchConf)
 			lyt.addWidget(btn)
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
-
 	#def _render_gui
 
 	def closeEvent(self,event):
@@ -182,6 +192,7 @@ class runomatic(QWidget):
 					os.remove(xlockFile)
 		if self.close_on_exit==True:
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
+	#def closeEvent
 
 	def keyPressEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
@@ -224,6 +235,8 @@ class runomatic(QWidget):
 			return(True)
 
 		else:
+			self.focusWidgets[self.currentBtn].resize(QSize(BTN_SIZE,BTN_SIZE))
+			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 			if key=="Right":
 				self.currentBtn+=1
 				if self.currentBtn>=len(self.focusWidgets):
@@ -245,6 +258,9 @@ class runomatic(QWidget):
 					currentBtn=self.currentBtn
 				self.currentBtn=currentBtn
 			self.focusWidgets[self.currentBtn].setFocus()
+			self.focusWidgets[self.currentBtn].resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+	#def _set_focus(self,key):
 
 	def _tabBar(self):
 		row=0
@@ -293,9 +309,6 @@ class runomatic(QWidget):
 		h=scr.size().height()-(2*BTN_SIZE)
 		self.maxCol=int(w/BTN_SIZE)-3
 		self._debug("Size: %s\nCols: %s"%(self.width(),self.maxCol))
-#		for category in self.categories:
-#			apps=self._get_category_apps(category)
-#			_add_widgets()
 		for desktop in self.desktops:
 			apps=self._get_desktop_apps(desktop)
 			_add_widgets()
@@ -388,31 +401,50 @@ class runomatic(QWidget):
 		box=QVBoxLayout()
 		wid=self.runner.get_wid("Xephyr on",self.display)
 		self._debug("W: %s"%wid)
-		subZone=QtGui.QWindow.fromWinId(int(wid))
-		zone=QWidget.createWindowContainer(subZone)
-		zone.setParent(self)
-		box.addWidget(zone)
-		zone.setFocusPolicy(Qt.NoFocus)
-		tabContent.setLayout(box)
-		icn=QtGui.QIcon.fromTheme(self.app_icons[app])
-		btn=QPushButton()
-		btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		btn.setIcon(icn)
-		self.id+=1
-		self._debug("New Tab id %s"%self.id)
-		self.sigmap_tabSelect.setMapping(btn,self.id)
-		btn.clicked.connect(self.sigmap_tabSelect.map)
-		btn_close=QPushButton()
-		btn_close.setIcon(self.closeIcon)
-		btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.sigmap_tabRemove.setMapping(btn_close,self.id)
-		btn_close.clicked.connect(self.sigmap_tabRemove.map)
-		self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
-		self.tabBar.addTab(tabContent,"")
-		return(tabContent)
+		if wid:
+			try:
+				subZone=QtGui.QWindow.fromWinId(int(wid))
+			except:
+				self._debug("Xephyr failed to launch")
+				tabContent.destroy()
+				wid=None
+			zone=QWidget.createWindowContainer(subZone)
+			zone.setParent(self)
+			box.addWidget(zone)
+			zone.setFocusPolicy(Qt.NoFocus)
+			tabContent.setLayout(box)
+			icn=QtGui.QIcon.fromTheme(self.app_icons[app])
+			btn=QPushButton()
+			btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+			btn.setIcon(icn)
+			self.id+=1
+			self._debug("New Tab id %s"%self.id)
+			self.sigmap_tabSelect.setMapping(btn,self.id)
+			btn.clicked.connect(self.sigmap_tabSelect.map)
+			btn_close=QPushButton()
+			btn_close.setIcon(self.closeIcon)
+			btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+			self.sigmap_tabRemove.setMapping(btn_close,self.id)
+			btn_close.clicked.connect(self.sigmap_tabRemove.map)
+			self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
+			self.tabBar.addTab(tabContent,"")
+		else:
+			self._debug("Xephyr failed to launch")
+			tabContent.destroy()
+			wid=None
+		return(wid)
 	#def _launchZone
 
+	def _end_process(self,*args):
+		print("**********")
+		print("**********")
+		print("**********")
+		print("**********")
+
 	def _launch(self,app):
+		cursor=QtGui.QCursor(Qt.WaitCursor)
+		self.setCursor(cursor)
+		self.grabMouse()
 		self.tabBar.setTabIcon(0,self.previousIcon)
 		self._debug("Tabs: %s"%self.tabBar.count())
 		#Tabs BEFORE new tab is added
@@ -420,9 +452,17 @@ class runomatic(QWidget):
 		os.environ["HOME"]="/home/%s"%self.username
 		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
-		tabRun=self._launchZone(app)
-		self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
-		self.tab_id[self.id]['xephyr']=x_pid
+		if self._launchZone(app):
+			self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
+			self.tab_id[self.id]['xephyr']=x_pid
+			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
+		else:
+			if self.pid:
+				self.runner.send_signal_to_thread("kill",self.pid)
+			cursor=QtGui.QCursor(Qt.PointingHandCursor)
+			self.setCursor(cursor)
+			self.releaseMouse()
+			return
 		#For some reason on first launch the tab doesn't loads the content until there's a tab switch
 		#This is a quick and dirty fix...
 		if self.firstLaunch:
@@ -436,6 +476,9 @@ class runomatic(QWidget):
 			self.tabBar.blockSignals(False)
 		else:
 			self.tabBar.setCurrentIndex(tabCount)
+		cursor=QtGui.QCursor(Qt.PointingHandCursor)
+		self.setCursor(cursor)
+		self.releaseMouse()
 	#def _launch
 
 	def _get_tabId_from_index(self,index):
@@ -463,19 +506,18 @@ def _define_css():
 		font: 14px Roboto;
 		color:black;
 		background:none;
-	}
+	
 	QPushButton:focus{
 		border:2px solid grey;
 		border-radius:25px;
+	}
 	}
 	"""
 	return(css)
 	#def _define_css
 
 
-#_debug("Init %s"%sys.argv)
 app=QApplication(["Run-O-Matic"])
-signal.signal(signal.SIGINT, lambda *a: app.quit())
 runomaticLauncher=runomatic()
 app.instance().setStyleSheet(_define_css())
 app.exec_()
