@@ -101,7 +101,6 @@ class th_runApp(QThread):
 
 
 class appRun():
-	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
@@ -226,6 +225,7 @@ class appRun():
 				pass
 			self.threads_pid[th_run]=pid_info[0].pid
 			self.threads_tmp[th_run]=pid_info[1]
+			self.threads_tmp[th_run]=pid_info[1]
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
 		#Generate ratposionrc
@@ -249,7 +249,7 @@ class appRun():
 	#def launch
 	
 	def _end_process(self,th_run):
-		self.processEnd.emit()
+		#self.processEnd.emit()
 		print("End %s"%th_run)
 
 	def _find_free_display(self,display=":13"):

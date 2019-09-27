@@ -11,6 +11,7 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 import gettext
 import subprocess
 import signal
+import psutil
 from passlib.hash import pbkdf2_sha256 as hashpwd
 from libAppRun import appRun
 QString=type("")
@@ -19,6 +20,32 @@ TAB_BTN_SIZE=96
 BTN_SIZE=128
 gettext.textdomain('runomatic')
 _ = gettext.gettext
+
+class processMonitor(QThread):
+	processEnd=pyqtSignal("PyQt_PyObject")
+	def __init__(self,parent=None):
+		QThread.__init__(self,parent)
+		self.process=[]
+		self.stop=True
+
+	def addProcess(self,pid):
+		self.process.append(pid)
+
+	def stopMonitor(self,status):
+		self.stop=status
+	
+	def run(self):
+		while self.stop:
+			process=self.process
+			for proc in process:
+				try:
+					psutil.Process(proc)
+				except:
+					self.processEnd.emit(proc)
+					#process is dead
+			process=self.process
+			time.sleep(2)
+
 
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
@@ -90,6 +117,8 @@ class runomatic(QWidget):
 		self.closeKey=False
 		self.confKey=False
 		self.keymap={}
+		self.procMon=processMonitor()
+		procMon.processEnd.connect(self._process_end)
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
 				self.keymap[value]=key.partition('_')[2]
@@ -127,7 +156,10 @@ class runomatic(QWidget):
 		self._read_config()
 		self._render_gui()
 	#def init
-	
+
+	def _process_end(self,pid)
+		print("Ending %s"%pid)
+
 	def _debug(self,msg):
 		if self.dbg:
 			print("%s"%msg)
