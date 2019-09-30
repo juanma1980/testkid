@@ -11,16 +11,41 @@ from appconfig.appConfig import appConfig
 from app2menu import App2Menu
 QString=type("")
 
+class th_procMon(QThread):
+#	processEnd=pyqtSignal("PyQt_PyObject")
+	def __init__(self,pid,parent=None):
+		QThread.__init__(self,parent)
+		print("MONITORING %s"%pid)
+		self.pid=pid
+		self.monitor=True
+		self.timer=2
+		time.sleep(2)
+
+	def run(self):
+		while self.monitor and self.pid:
+			try:
+				os.kill(self.pid,0)
+				print("%s ALIVE!!!!!!!"%self.pid)
+			except ProcessLookupError:
+				print("DEAD!!!!!!!")
+				self.pid=None
+				self.processEnd.emit(pid)
+				break
+			except Exception as e:
+				print("%s SOMETHNG %s!!!!!!!"%(self.pid,e))
+				pass
+			time.sleep(self.timer)
+#class th_procMon
 
 class th_runApp(QThread):
 	processRun=pyqtSignal("PyQt_PyObject")
-	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self,app,display,parent=None):
 		QThread.__init__(self,parent)
 		self.display=display
 		self.app=app.split(" ")
 		self.menu=App2Menu.app2menu()
 		self.dbg=False
+		self.pid=''
 	#def __init__
 
 	def _debug(self,msg):
@@ -29,6 +54,8 @@ class th_runApp(QThread):
 	#def _debug(self,msg):
 
 	def __del__(self):
+		if self.pid:
+			self.pid.communicate()
 		self.wait()
 	#def __del__
 
@@ -89,21 +116,23 @@ class th_runApp(QThread):
 				if '%f' in app.lower():
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
-			p_pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
+			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
 			os.environ['DISPLAY']=dsp
-			retval=[p_pid,tmp_file]
+			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
 		self.processRun.emit(retval)
-		print("PROCESS FINISHED")
+		self._debug("PROCESS FINISHED")
 	#def run
-#class th_runApp
 
+#class th_runApp
 
 class appRun():
 	def __init__(self):
 		self.dbg=True
 		self.pid=0
+		self.procMons=[]
+		self.deadProcesses=[]
 		self.confFile="runomatic.conf"
 		self.config=appConfig()
 		self.__init__config()
@@ -202,9 +231,12 @@ class appRun():
 			try:
 				if self.threads_pid[thread]:
 					os.kill(self.threads_pid[thread],sig[s_signal])
+				if (s_signal=='kill' or s_signal=='term'):
+					thread.wait()
 				retval=True
 			except:
 				self._debug("%s failed on thread %s with pid %s"%(s_signal,thread,self.threads_pid[thread]))
+				thread.wait()
 
 		elif (s_signal=='kill' or s_signal=='term'):
 			if (type(thread)==type(0)):
@@ -220,12 +252,18 @@ class appRun():
 
 	def launch(self,app,display=":13"):
 		def _get_th_pid(pid_info):
-			if pid_info[0].pid==False:
+			if isinstance(pid_info[0],bool):
 				#Thread failed
-				pass
-			self.threads_pid[th_run]=pid_info[0].pid
-			self.threads_tmp[th_run]=pid_info[1]
-			self.threads_tmp[th_run]=pid_info[1]
+				self._end_process(th_run)
+			else:
+				self.threads_pid[th_run]=pid_info[0].pid
+				self.threads_tmp[th_run]=pid_info[1]
+				self.threads_tmp[th_run]=pid_info[1]
+				print("Add %s to procMon"%pid_info[0].pid)
+				procMon=th_procMon(pid_info[0].pid)
+				procMon.start()
+				self.procMons.append(procMon)
+				procMon.finished.connect(lambda:self._end_process(th_run))
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
 		#Generate ratposionrc
@@ -239,18 +277,24 @@ class appRun():
 			f.write("set fgcolor white\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
 			f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
-		th_run=th_runApp("ratpoison -f %s"%self.ratpoisonConf,display)
-		th_run.start()
+		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
 		th_run=th_runApp(app,display)
 		th_run.start()
 		th_run.processRun.connect(_get_th_pid)
-		th_run.finished.connect(lambda:self._end_process(th_run))
+#		th_run.finished.connect(lambda:self._end_process(th_run))
 		return(th_run)
 	#def launch
 	
 	def _end_process(self,th_run):
+		print("Ending process %s"%th_run)
 		#self.processEnd.emit()
-		print("End %s"%th_run)
+		self.deadProcesses.append(th_run)
+		os.kill(os.getpid(),signal.SIGUSR1)
+
+	def getDeadProcesses(self):
+		deads=self.deadProcesses
+		self.deadProcesses=[]
+		return(deads)
 
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))

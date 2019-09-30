@@ -21,32 +21,6 @@ BTN_SIZE=128
 gettext.textdomain('runomatic')
 _ = gettext.gettext
 
-class processMonitor(QThread):
-	processEnd=pyqtSignal("PyQt_PyObject")
-	def __init__(self,parent=None):
-		QThread.__init__(self,parent)
-		self.process=[]
-		self.stop=True
-
-	def addProcess(self,pid):
-		self.process.append(pid)
-
-	def stopMonitor(self,status):
-		self.stop=status
-	
-	def run(self):
-		while self.stop:
-			process=self.process
-			for proc in process:
-				try:
-					psutil.Process(proc)
-				except:
-					self.processEnd.emit(proc)
-					#process is dead
-			process=self.process
-			time.sleep(2)
-
-
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
@@ -99,7 +73,9 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
+		signal.signal(signal.SIGUSR1,self._end_process)
 		self.dbg=True
+		self.procMon=[]
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
 		self.username=getpass.getuser()
@@ -117,8 +93,6 @@ class runomatic(QWidget):
 		self.closeKey=False
 		self.confKey=False
 		self.keymap={}
-		self.procMon=processMonitor()
-		procMon.processEnd.connect(self._process_end)
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
 				self.keymap[value]=key.partition('_')[2]
@@ -146,10 +120,10 @@ class runomatic(QWidget):
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-		self.setWindowFlags(Qt.FramelessWindowHint)
-		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.setWindowModality(Qt.WindowModal)
+#		self.setWindowFlags(Qt.FramelessWindowHint)
+#		self.setWindowState(Qt.WindowFullScreen)
+#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+#		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
 		self.grab=False
 		self.runner=appRun()
@@ -157,8 +131,11 @@ class runomatic(QWidget):
 		self._render_gui()
 	#def init
 
-	def _process_end(self,pid)
-		print("Ending %s"%pid)
+	def _end_process(self,*args):
+		for thread in self.runner.getDeadProcesses():
+			idx=self._get_tabId_from_thread(thread)
+			self._on_tabRemove(idx)
+			self.tabBar.setCurrentIndex(0)
 
 	def _debug(self,msg):
 		if self.dbg:
@@ -467,12 +444,6 @@ class runomatic(QWidget):
 		return(wid)
 	#def _launchZone
 
-	def _end_process(self,*args):
-		print("**********")
-		print("**********")
-		print("**********")
-		print("**********")
-
 	def _launch(self,app):
 		cursor=QtGui.QCursor(Qt.WaitCursor)
 		self.setCursor(cursor)
@@ -487,7 +458,7 @@ class runomatic(QWidget):
 		if self._launchZone(app):
 			self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 			self.tab_id[self.id]['xephyr']=x_pid
-			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
+#			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
 		else:
 			if self.pid:
 				self.runner.send_signal_to_thread("kill",self.pid)
@@ -525,6 +496,19 @@ class runomatic(QWidget):
 		self._debug("Find idx: %s For index: %s"%(idx,index))
 		return idx
 	#def _get_tabId_from_index
+	
+	def _get_tabId_from_thread(self,thread):
+		idx=-1
+		self._debug("Search id for thread: %s"%(thread))
+		self._debug("%s"%(self.tab_id))
+		for key,data in self.tab_id.items():
+			if 'thread' in data.keys():
+				if thread==data['thread']:
+					idx=key
+					break
+		self._debug("Find idx: %s For thread: %s"%(idx,thread))
+		return idx
+	#def _get_tabId_from_thread
 #class runomatic
 
 def _define_css():
