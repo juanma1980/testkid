@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
+from edupals.ui import QAnimatedStatusBar
 import gettext
 import subprocess
 import signal
@@ -74,6 +75,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		signal.signal(signal.SIGUSR1,self._end_process)
+		signal.signal(signal.SIGUSR2,self._fail_process)
 		self.dbg=True
 		self.procMon=[]
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
@@ -120,10 +122,10 @@ class runomatic(QWidget):
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-#		self.setWindowFlags(Qt.FramelessWindowHint)
-#		self.setWindowState(Qt.WindowFullScreen)
-#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-#		self.setWindowModality(Qt.WindowModal)
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
 		self.grab=False
 		self.runner=appRun()
@@ -131,12 +133,15 @@ class runomatic(QWidget):
 		self._render_gui()
 	#def init
 
+	def _fail_process(self,*args):
+		self.showMessage(_(":( :( :( App failed to start"))
+
 	def _end_process(self,*args):
 		for thread in self.runner.getDeadProcesses():
 			idx=self._get_tabId_from_thread(thread)
 			if idx and idx>0:
 				self._on_tabRemove(idx)
-#			self.tabBar.setCurrentIndex(0)
+	#def _end_process
 
 	def _debug(self,msg):
 		if self.dbg:
@@ -158,6 +163,10 @@ class runomatic(QWidget):
 				os.execv("runoconfig.py",["1"])
 		self.show()
 		self.box=QGridLayout()
+		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
+		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:128px;height:256px")
+		self.statusBar.height_=152
+		self.box.addWidget(self.statusBar,0,0,1,2)
 		self.tabBar=self._tabBar()
 		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged(False))
 		self.box.addWidget(self.tabBar,0,0,1,1)
@@ -230,7 +239,7 @@ class runomatic(QWidget):
 				self.close()
 			if self.confKey:
 				self.confKey=False
-	#def eventFilter
+	#def keyReleaseEvent
 
 	def _set_focus(self,key):
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
@@ -461,6 +470,7 @@ class runomatic(QWidget):
 			self.tab_id[self.id]['xephyr']=x_pid
 #			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
 		else:
+			print("ERROR!!!!!!!!!!!!!!!!!!!!!!!!!")
 			if self.pid:
 				self.runner.send_signal_to_thread("kill",self.pid)
 			cursor=QtGui.QCursor(Qt.PointingHandCursor)
@@ -510,6 +520,14 @@ class runomatic(QWidget):
 		self._debug("Find idx: %s For thread: %s"%(idx,thread))
 		return idx
 	#def _get_tabId_from_thread
+	
+	def showMessage(self,msg,status="error"):
+		self.statusBar.setText(msg)
+		if status:
+			self.statusBar.show(status)
+		else:
+			self.statusBar.show()
+	#def _show_message
 #class runomatic
 
 def _define_css():

@@ -20,9 +20,7 @@ class th_procMon(QThread):
 		self.timer=2
 
 	def run(self):
-		print("MONITORING %s"%self.pid)
 		self.pid.wait()
-#		self.processEnd.emit()
 #class th_procMon
 
 class th_runApp(QThread):
@@ -107,6 +105,7 @@ class th_runApp(QThread):
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
+			os.kill(os.getpid(),signal.SIGUSR2)
 		self.processRun.emit(retval)
 		self._debug("PROCESS FINISHED")
 	#def run
@@ -245,7 +244,7 @@ class appRun():
 				self.threads_pid[th_run]=pid_info[0].pid
 				self.threads_tmp[th_run]=pid_info[1]
 				self.threads_tmp[th_run]=pid_info[1]
-				print("Add %s to procMon"%pid_info[0].pid)
+				self._debug("Add %s to procMon"%pid_info[0].pid)
 				procMon=th_procMon(pid_info[0])
 				procMon.start()
 				procMon.finished.connect(lambda:self._end_process(th_run))
@@ -267,12 +266,11 @@ class appRun():
 		th_run=th_runApp(app,display)
 		th_run.start()
 		th_run.processRun.connect(_get_th_pid)
-#		th_run.finished.connect(lambda:self._end_process(th_run))
 		return(th_run)
 	#def launch
 	
 	def _end_process(self,th_run):
-		print("Ending process %s"%th_run)
+		self._debug("Ending process %s"%th_run)
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
 		os.kill(os.getpid(),signal.SIGUSR1)
