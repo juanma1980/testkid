@@ -134,8 +134,9 @@ class runomatic(QWidget):
 	def _end_process(self,*args):
 		for thread in self.runner.getDeadProcesses():
 			idx=self._get_tabId_from_thread(thread)
-			self._on_tabRemove(idx)
-			self.tabBar.setCurrentIndex(0)
+			if idx and idx>0:
+				self._on_tabRemove(idx)
+#			self.tabBar.setCurrentIndex(0)
 
 	def _debug(self,msg):
 		if self.dbg:

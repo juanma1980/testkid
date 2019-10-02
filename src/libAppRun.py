@@ -15,26 +15,14 @@ class th_procMon(QThread):
 #	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self,pid,parent=None):
 		QThread.__init__(self,parent)
-		print("MONITORING %s"%pid)
 		self.pid=pid
 		self.monitor=True
 		self.timer=2
-		time.sleep(2)
 
 	def run(self):
-		while self.monitor and self.pid:
-			try:
-				os.kill(self.pid,0)
-				print("%s ALIVE!!!!!!!"%self.pid)
-			except ProcessLookupError:
-				print("DEAD!!!!!!!")
-				self.pid=None
-				self.processEnd.emit(pid)
-				break
-			except Exception as e:
-				print("%s SOMETHNG %s!!!!!!!"%(self.pid,e))
-				pass
-			time.sleep(self.timer)
+		print("MONITORING %s"%self.pid)
+		self.pid.wait()
+#		self.processEnd.emit()
 #class th_procMon
 
 class th_runApp(QThread):
@@ -54,8 +42,6 @@ class th_runApp(QThread):
 	#def _debug(self,msg):
 
 	def __del__(self):
-		if self.pid:
-			self.pid.communicate()
 		self.wait()
 	#def __del__
 
@@ -260,10 +246,10 @@ class appRun():
 				self.threads_tmp[th_run]=pid_info[1]
 				self.threads_tmp[th_run]=pid_info[1]
 				print("Add %s to procMon"%pid_info[0].pid)
-				procMon=th_procMon(pid_info[0].pid)
+				procMon=th_procMon(pid_info[0])
 				procMon.start()
-				self.procMons.append(procMon)
 				procMon.finished.connect(lambda:self._end_process(th_run))
+				self.procMons.append(procMon)
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
 		#Generate ratposionrc
