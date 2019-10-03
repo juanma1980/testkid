@@ -10,6 +10,6 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --with zero,python3,i18n 
+	dh $@ --with llxsrc,zero,python3,i18n 
 
 	
