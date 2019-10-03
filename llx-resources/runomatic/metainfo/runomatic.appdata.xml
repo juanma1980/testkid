@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+<id>runomatic</id>
+<metadata_license>CC0-1.0</metadata_license>
+<name>Run-o-Matic</name>
+<summary>Activity launcher for parental control</summary>
+<summary xml:lang="es">Lanzador de aplicaciones para control parental</summary>
+<summary xml:lang="ca">Llançador d'aplicacions per a control parental</summary>
+<description>
+<p>Activity launcher for parental control</p>
+<p xml:lang="es">Lanzador de aplicaciones para control parental</p>
+<p xml:lang="ca">Llançador d'aplicacions per a control parental</p>
+</description>
+<categories>
+<category>System</category>
+<category>Utilities</category>
+</categories>
+<icon type="stock">runomatic</icon>
+<provides><binary>/usr/bin/runomatic</binary></provides>
+<keywords>
+<keyword>runomatic</keyword>
+<keyword>Run-o-Matic</keyword>
+
+</keywords>
+</component>
