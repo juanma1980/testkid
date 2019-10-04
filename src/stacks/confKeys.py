@@ -12,7 +12,7 @@ class confKeys(confStack):
 	keybind_signal=pyqtSignal("PyQt_PyObject")
 
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confKeys Load")
 		self.keymap={}
 		for key,value in vars(Qt).items():
