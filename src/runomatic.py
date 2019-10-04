@@ -74,6 +74,10 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
+		exePath=sys.argv[0]
+		if os.path.islink(sys.argv[0]):
+			exePath=os.path.realpath(sys.argv[0])
+		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		signal.signal(signal.SIGUSR1,self._end_process)
 		signal.signal(signal.SIGUSR2,self._fail_process)
 		self.dbg=True
@@ -112,20 +116,22 @@ class runomatic(QWidget):
 		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
 		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
 		btnPrevious=QPushButton()
+		btnPrevious.setObjectName("PushButton")
 		btnPrevious.setIcon(self.previousIcon)
 		btnPrevious.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.sigmap_tabSelect.setMapping(btnPrevious,0)
 		btnPrevious.clicked.connect(self.sigmap_tabSelect.map)
 		self.homeIcon=QtGui.QIcon.fromTheme("go-home")
 		btnHome=QPushButton()
+		btnHome.setObjectName("PushButton")
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-		self.setWindowFlags(Qt.FramelessWindowHint)
-		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.setWindowModality(Qt.WindowModal)
+#		self.setWindowFlags(Qt.FramelessWindowHint)
+#		self.setWindowState(Qt.WindowFullScreen)
+#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+#		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
 		self.grab=False
 		self.runner=appRun()
@@ -159,12 +165,20 @@ class runomatic(QWidget):
 
 	def _render_gui(self):
 		def launchConf():
-			if self.close():
-				os.execv("runoconfig.py",["1"])
+				#			if self.close():
+				try:
+					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
+						print("Launching")
+						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+					else:
+						self.showMessage(_("runoconfig not found"),"error2",20)
+				except:
+					print(_("runoconfig not found"))
 		self.show()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
 		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:128px;height:256px")
+		self.statusBar.setStateCss("error2","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:12px;height:20px")
 		self.statusBar.height_=152
 		self.box.addWidget(self.statusBar,0,0,1,2)
 		self.tabBar=self._tabBar()
@@ -434,6 +448,7 @@ class runomatic(QWidget):
 			tabContent.setLayout(box)
 			icn=QtGui.QIcon.fromTheme(self.app_icons[app])
 			btn=QPushButton()
+			btn.setObjectName("PushButton")
 			btn.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 			btn.setIcon(icn)
 			self.id+=1
@@ -441,6 +456,7 @@ class runomatic(QWidget):
 			self.sigmap_tabSelect.setMapping(btn,self.id)
 			btn.clicked.connect(self.sigmap_tabSelect.map)
 			btn_close=QPushButton()
+			btn_close.setObjectName("PushButton")
 			btn_close.setIcon(self.closeIcon)
 			btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 			self.sigmap_tabRemove.setMapping(btn_close,self.id)
@@ -470,7 +486,6 @@ class runomatic(QWidget):
 			self.tab_id[self.id]['xephyr']=x_pid
 #			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
 		else:
-			print("ERROR!!!!!!!!!!!!!!!!!!!!!!!!!")
 			if self.pid:
 				self.runner.send_signal_to_thread("kill",self.pid)
 			cursor=QtGui.QCursor(Qt.PointingHandCursor)
@@ -521,7 +536,8 @@ class runomatic(QWidget):
 		return idx
 	#def _get_tabId_from_thread
 	
-	def showMessage(self,msg,status="error"):
+	def showMessage(self,msg,status="error",height=252):
+		self.statusBar.height_=height
 		self.statusBar.setText(msg)
 		if status:
 			self.statusBar.show(status)
@@ -532,17 +548,17 @@ class runomatic(QWidget):
 
 def _define_css():
 	css="""
-	QPushButton{
+	#PushButton{
 		padding:10px;
 		margin:0px;
 		border:0px;
 	}
-	QPushButton:active{
+	#PushButton:active{
 		font: 14px Roboto;
 		color:black;
 		background:none;
 	
-	QPushButton:focus{
+	#PushButton:focus{
 		border:2px solid grey;
 		border-radius:25px;
 	}
