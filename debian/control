@@ -10,6 +10,6 @@ Homepage: http://lliurex.net
 
 Package: runomatic
 Architecture: all
-Depends: ${python3:Depends}, python3-appconfig, python3-app2menu 
+Depends: ${python3:Depends}, python3-appconfig, python3-app2menu, python3-qanimatedstatusbar, python3-pyqt5
 Description: Activity launcher 
 
