@@ -116,7 +116,7 @@ class dropButton(QPushButton):
 class confLaunchers(confStack):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
 	def __init_stack__(self,app=None):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confLaunchers Load")
 		self.parm="app"
 		self.app=None

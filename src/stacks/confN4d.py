@@ -10,7 +10,7 @@ _ = gettext.gettext
 
 class confN4d(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self.menu_description=(_("Configure N4d server"))
 		self.description=(_("Configure n4d settings"))
 		self.icon=('dialog-password')

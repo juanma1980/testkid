@@ -115,6 +115,10 @@ class th_runApp(QThread):
 class appRun():
 	def __init__(self):
 		self.dbg=True
+		exePath=sys.argv[0]
+		if os.path.islink(sys.argv[0]):
+			exePath=os.path.realpath(sys.argv[0])
+		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		self.pid=0
 		self.procMons=[]
 		self.deadProcesses=[]
@@ -261,7 +265,7 @@ class appRun():
 			f.write("set bgcolor white\n")
 			f.write("set fgcolor white\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
-			f.write("exec xloadimage -fullscreen -onroot /home/lliurex/git/testkid/rsrc/background.jpg\n")
+			f.write("exec xloadimage -fullscreen -onroot %s/rsrc/background.jpg\n"%self.baseDir)
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
 		th_run=th_runApp(app,display)
 		th_run.start()
