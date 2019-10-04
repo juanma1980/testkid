@@ -1,3 +1,3 @@
-src/ /usr/share/runomatic
-rsrc/ /usr/share/runomatic/rsrc
+src/* /usr/share/runomatic
+rsrc/ /usr/share/runomatic
 
