@@ -11,7 +11,7 @@ _ = gettext.gettext
 
 class confPass(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self.txt_pass=QLineEdit()
 		self.txt_pass.setEchoMode(QLineEdit.Password)
 		self.txt_pass.setPlaceholderText(_("Password"))

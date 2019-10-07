@@ -80,7 +80,7 @@ class runomatic(QWidget):
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		signal.signal(signal.SIGUSR1,self._end_process)
 		signal.signal(signal.SIGUSR2,self._fail_process)
-		self.dbg=True
+		self.dbg=False
 		self.procMon=[]
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
@@ -128,10 +128,10 @@ class runomatic(QWidget):
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-#		self.setWindowFlags(Qt.FramelessWindowHint)
-#		self.setWindowState(Qt.WindowFullScreen)
-#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-#		self.setWindowModality(Qt.WindowModal)
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowModality(Qt.WindowModal)
 		self.display=os.environ['DISPLAY']
 		self.grab=False
 		self.runner=appRun()

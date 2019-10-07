@@ -11,7 +11,7 @@ _ = gettext.gettext
 
 class confApp(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confApp Load")
 		self.menu_description=(_("Choose the app behaviour"))
 		self.description=(_("Set app behaviour"))
