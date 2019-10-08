@@ -1,3 +1,9 @@
+runomatic (0.2) bionic; urgency=medium
+
+  * Fix n4d default server name
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Tue, 08 Oct 2019 11:30:16 +0200
+
 runomatic (0.1) bionic; urgency=medium
 
   * Initial release. 
