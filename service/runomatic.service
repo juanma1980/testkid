@@ -4,13 +4,8 @@ After=n4d.service
 Requires=n4d.service
 
 [Service]
-Type=onsehot
+Type=oneshot
 ExecStart=/usr/share/runomatic/runoservice.py
-Restart=always
-RestartSec=2
-RestartPreventExitStatus=0
-StartLimitInterval=200
-StartLimitBurst=9
 
 [Install]
 WantedBy=multi-user.target
