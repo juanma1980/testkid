@@ -63,7 +63,7 @@ class navButton(QPushButton):
 				keypressed.append(key)
 			if sw_mod==False:
 				key=("+".join(keypressed))
-		if key!="Alt":
+		if key!="Alt" and key!="Control":
 			self.keypress.emit(key)
 		else:
 			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
@@ -245,14 +245,15 @@ class runomatic(QWidget):
 			if key==confKey:
 				if self.close():
 					os.execv("runoconfig.py",["1"])
-		if key=='Alt':
+		if key=='Alt' or key=='Control':
 			self.releaseKeyboard()
 			self.grab=False
-			if self.closeKey:
-				self.closeKey=False
-				self.close()
-			if self.confKey:
-				self.confKey=False
+			if key=='Alt':
+				if self.closeKey:
+					self.closeKey=False
+					self.close()
+				if self.confKey:
+					self.confKey=False
 	#def keyReleaseEvent
 
 	def _set_focus(self,key):
