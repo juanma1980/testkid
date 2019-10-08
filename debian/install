@@ -1,3 +1,4 @@
 src/* /usr/share/runomatic
 rsrc/ /usr/share/runomatic
+service/* /lib/systemd/system/
 
