@@ -20,7 +20,7 @@ if n4d:
 	data=conf['n4d'].copy()
 
 startup=data.get('startup','')
-if startup.lower()=='true':
+if str(startup).lower()=='true':
 	with open ("/etc/xdg/autostart/runomatic.desktop","w") as f:
 		f.write("[Desktop Entry]\n")
 		f.write("Encoding=UTF-8\n")
