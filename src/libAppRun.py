@@ -304,7 +304,10 @@ class appRun():
 		data={}
 		data=self.config.getConfig('system')
 		if 'config' not in data['system'].keys():
-			data['system']['config']='user'
+			if os.path.isfile('%s/.config/%s'%(os.environ['HOME'],self.confFile)):
+				data['system']['config']='user'
+			else:
+				data['system']['config']='n4d'
 		self.level=data['system']['config']
 		self._debug("Read level from config: %s"%self.level)
 		return (data)
