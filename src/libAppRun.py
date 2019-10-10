@@ -346,9 +346,9 @@ class appRun():
 		if level:
 			self._debug("Read file %s"%level)
 			if categories==[] and load_categories:
-				apps['categories']=data[level].get('categories')
-				apps['desktops']=data[level].get('desktops')
-				apps['hidden']=data[level].get('hidden')
+				apps['categories']=data[level].get('categories',[])
+				apps['desktops']=data[level].get('desktops',[])
+				apps['hidden']=data[level].get('hidden',[])
 				apps['keybinds']=data[level].get('keybinds')
 				apps['password']=data[level].get('password')
 				apps['close']=data[level].get('close')
