@@ -1,3 +1,9 @@
+runomatic (0.3.1) bionic; urgency=medium
+
+  * Fix default values for get in libAppRun
+
+ -- lliurex <lliurex@lliurexStandardPCi440FXPIIX1996>  Thu, 10 Oct 2019 15:24:23 +0100
+
 runomatic (0.3) bionic; urgency=medium
 
   * Add systemd service
