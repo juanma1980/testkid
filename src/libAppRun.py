@@ -265,7 +265,7 @@ class appRun():
 			f.write("set bgcolor white\n")
 			f.write("set fgcolor white\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
-			f.write("exec xloadimage -fullscreen -onroot %s/rsrc/background.jpg\n"%self.baseDir)
+			f.write("exec xloadimage -shrink -fullscreen -onroot %s/rsrc/background.jpg\n"%self.baseDir)
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
 		th_run=th_runApp(app,display)
 		th_run.start()
