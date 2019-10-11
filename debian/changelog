@@ -1,3 +1,9 @@
+runomatic (0.3.2) bionic; urgency=medium
+
+  * Fix rsrc paths
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Fri, 11 Oct 2019 13:03:42 +0200
+
 runomatic (0.3.1) bionic; urgency=medium
 
   * Fix default values for get in libAppRun
