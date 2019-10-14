@@ -1,3 +1,9 @@
+runomatic (0.4) bionic; urgency=medium
+
+  * Replace systemd service by autostart script
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Mon, 14 Oct 2019 09:23:19 +0200
+
 runomatic (0.3.2) bionic; urgency=medium
 
   * Fix rsrc paths
