@@ -9,15 +9,16 @@ config.set_baseDirs({'system':'/usr/share/runomatic'})
 n4d=True
 data={}
 if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
-	conf=config.getConfig('config')
+	conf=config.getConfig('system')
 	level=conf['system'].get("config",None)
-	if level!='n4d':
-		n4d=False
+	if level=='n4d':
+		conf=config.getConfig('n4d')
+		data=conf['n4d'].copy()
+	elif level=='user';
+		conf=config.getConfig('user')
+		data=conf['n4d'].copy()
+	else:
 		data=conf['system'].copy()
-
-if n4d:
-	conf=config.getConfig('n4d')
-	data=conf['n4d'].copy()
 
 startup=data.get('startup','')
 if str(startup).lower()=='true':
