@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/python3
 import getpass
 import sys
 import os
@@ -214,7 +214,6 @@ class runomatic(QWidget):
 					return(False)
 			else:
 				event.ignore()
-				return
 				return(False)
 		for index in self.tab_id.keys():
 			if index:
@@ -243,8 +242,12 @@ class runomatic(QWidget):
 			if key=='F4' and self.grab:
 				self.closeKey=True
 			if key==confKey:
-				if self.close():
-					os.execv("runoconfig.py",["1"])
+				if os.path.isfile("/usr/share/runomatic/runoconfg.py"):
+					if self.close():
+							os.execv("/usr/share/runomatic/runoconfig.py",["1"])
+				else:
+					event.ignore()
+					self.showMessage(_("runoconfig not found"),"error2",20)
 		if key=='Alt' or key=='Control':
 			self.releaseKeyboard()
 			self.grab=False
@@ -348,8 +351,8 @@ class runomatic(QWidget):
 			_add_widgets()
 
 		tabContent.setLayout(vbox)
-		tabContent.setObjectName("launcher")
 		scrollArea.setWidget(tabContent)
+		scrollArea.setObjectName("launcher")
 		scrollArea.alignment()
 		tabBar.addTab(tabScroll,"")
 		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['show'])
@@ -559,14 +562,15 @@ def _define_css():
 		font: 14px Roboto;
 		color:black;
 		background:none;
-	
+	}	
 	#PushButton:focus{
 		border:2px solid grey;
 		border-radius:25px;
 	}
 	#launcher{
-		background:black;
-	}
+		background-image:url("../rsrc/background2.jpg");
+		background-repeat:no-repeat;
+		background-position:center;
 	}
 	"""
 	return(css)
