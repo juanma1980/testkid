@@ -31,6 +31,7 @@ class confApp(confStack):
 				lbl_help.setText(_("The config will be applied to all users"))
 			elif txt=='N4d':
 				lbl_help.setText(_("The config will be applied to all users and clients"))
+			self.fakeUpdate()
 		box=QVBoxLayout()
 		lbl_txt=QLabel(_("Choose the config level that should use the app"))
 		lbl_txt.setAlignment(Qt.AlignTop)
@@ -54,6 +55,30 @@ class confApp(confStack):
 		self.updateScreen()
 		return(self)
 	#def _load_screen
+
+	def fakeUpdate(self):
+		level=self.cmb_level.currentText().lower()
+		config=self.getConfig(level)
+		close=config[level].get('close',False)
+		if close:
+			if str(close).lower()=='true':
+				close=True
+			else:
+				close=False
+		try:
+			self.chk_close.setChecked(close)
+		except:
+			pass
+		startup=config[level].get('startup',False)
+		if startup:
+			if str(startup).lower()=='true':
+				startup=True
+			else:
+				startup=False
+		try:
+			self.chk_startup.setChecked(startup)
+		except:
+			pass
 
 	def updateScreen(self):
 		config=self.getConfig()
