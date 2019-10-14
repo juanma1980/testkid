@@ -30,6 +30,6 @@ if str(startup).lower()=='true':
 		f.write("Exec=/usr/bin/runomatic\n")
 		f.write("Terminal=false\n")
 		f.write("Type=Application\n")
-elseif os.path.isfile("/etc/xdg/autostart/runomatic.desktop"):
+elif os.path.isfile("/etc/xdg/autostart/runomatic.desktop"):
 	os.remove("/etc/xdg/autostart/runomatic.desktop")
 		
