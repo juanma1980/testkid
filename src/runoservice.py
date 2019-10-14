@@ -9,7 +9,7 @@ config.set_baseDirs({'system':'/usr/share/runomatic'})
 n4d=True
 data={}
 if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
-	conf=config.getConfig('config')
+	conf=config.getConfig('system')
 	level=conf['system'].get("config",None)
 	if level!='n4d':
 		n4d=False
