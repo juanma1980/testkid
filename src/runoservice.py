@@ -14,7 +14,7 @@ if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 	if level=='n4d':
 		conf=config.getConfig('n4d')
 		data=conf['n4d'].copy()
-	elif level=='user';
+elif level=='user':
 		conf=config.getConfig('user')
 		data=conf['n4d'].copy()
 	else:
