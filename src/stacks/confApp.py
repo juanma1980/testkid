@@ -67,14 +67,14 @@ class confApp(confStack):
 			self.cmb_level.activated.emit(idx)
 		close=config[self.level].get('close',False)
 		if close:
-			if close.lower()=='true':
+			if str(close).lower()=='true':
 				close=True
 			else:
 				close=False
 		self.chk_close.setChecked(close)
 		startup=config[self.level].get('startup',False)
 		if startup:
-			if startup.lower()=='true':
+			if str(startup).lower()=='true':
 				startup=True
 			else:
 				startup=False

@@ -348,6 +348,7 @@ class runomatic(QWidget):
 			_add_widgets()
 
 		tabContent.setLayout(vbox)
+		tabContent.setObjectName("launcher")
 		scrollArea.setWidget(tabContent)
 		scrollArea.alignment()
 		tabBar.addTab(tabScroll,"")
@@ -562,6 +563,9 @@ def _define_css():
 	#PushButton:focus{
 		border:2px solid grey;
 		border-radius:25px;
+	}
+	#launcher{
+		background:black;
 	}
 	}
 	"""
