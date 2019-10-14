@@ -1,11 +1,12 @@
-#!/usr/bin/env python3
+#! /usr/bin/python3
 import os
 from appconfig.appConfig import appConfig
 
 #First check system config
 config=appConfig()
 config.set_configFile("runomatic.conf")
-config.set_baseDirs({'system':'/usr/share/runomatic'})
+baseDirs={'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']}
+config.set_baseDirs(baseDirs)
 data={}
 if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 	conf=config.getConfig('system')
@@ -21,4 +22,4 @@ if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 
 startup=data.get('startup','')
 if str(startup).lower()=='true':
-	os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+	os.execv("%s/runomatic.py"%baseDirs['system'],["1"])
