@@ -14,7 +14,7 @@ if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 	if level=='n4d':
 		conf=config.getConfig('n4d')
 		data=conf['n4d'].copy()
-elif level=='user':
+	elif level=='user':
 		conf=config.getConfig('user')
 		data=conf['n4d'].copy()
 	else:
@@ -30,7 +30,6 @@ if str(startup).lower()=='true':
 		f.write("Exec=/usr/bin/runomatic\n")
 		f.write("Terminal=false\n")
 		f.write("Type=Application\n")
-else:
-	if os.path.isfile("/etc/xdg/autostart/runomatic.desktop"):
-		os.remove("/etc/xdg/autostart/runomatic.desktop")
+elseif os.path.isfile("/etc/xdg/autostart/runomatic.desktop"):
+	os.remove("/etc/xdg/autostart/runomatic.desktop")
 		
