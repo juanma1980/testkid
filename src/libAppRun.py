@@ -119,6 +119,7 @@ class appRun():
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
+		self.runoapps="/usr/share/runomatic/applications"
 		self.pid=0
 		self.procMons=[]
 		self.deadProcesses=[]
@@ -370,34 +371,34 @@ class appRun():
 	def get_category_desktops(self,category):
 		apps=[]
 		tmp_apps=[]
-		self.menu.set_desktop_system()
-		applist=self.menu.get_apps_from_category(category)
-		for app,data in applist.items():
-			if data['exe'] not in tmp_apps and app not in tmp_apps:
-				apps.append("%s/%s"%(self.menu.desktoppath,app))
-				tmp_apps.append(data['exe'])
-				tmp_apps.append(app)
-		self.menu.set_desktop_user()
-		applist=(self.menu.get_apps_from_category(category))
-		for app,data in applist.items():
-			if data['exe'] not in tmp_apps and app not in tmp_apps:
-				apps.append("%s/%s"%(self.menu.desktoppath,app))
-				tmp_apps.append(data['exe'])
-				tmp_apps.append(app)
-		self.menu.set_desktop_system()
+		if category=="run-o-matic":
+			if os.path.isdir(self.runoapps):
+				for f in os.listdir(self.runoapps):
+					if f not in apps:
+						apps.append(f)
+		else:
+			self.menu.set_desktop_system()
+			applist=self.menu.get_apps_from_category(category)
+			for app,data in applist.items():
+				if data['exe'] not in tmp_apps and app not in tmp_apps:
+					apps.append("%s/%s"%(self.menu.desktoppath,app))
+					tmp_apps.append(data['exe'])
+					tmp_apps.append(app)
 		return(apps)
 
 	def get_category_apps(self,category):
 		apps={}
-		self.menu.set_desktop_system()
-		applist=self.menu.get_apps_from_category(category)
-		self.menu.set_desktop_user()
-		applist.extend(self.menu.get_apps_from_category(category))
-		for key,app in applist.items():
-			if 'xdg-open' in app['exe']:
-				app['exe']=app['exe'].replace("xdg-open",self.menu.get_default_app_for_file(app['exe'].split(" ")[-1]))
-			apps[app['exe']]=app['icon']
-		self.menu.set_desktop_system()
+		if category=="run-o-matic":
+			if os.path.isdir(self.runoapps):
+				for f in os.listdir(self.runoapps):
+					for key,value in self.get_desktop_app(f).items():
+						apps[key]=value
+		else:
+			applist=self.menu.get_apps_from_category(category)
+			for key,app in applist.items():
+				if 'xdg-open' in app['exe']:
+					app['exe']=app['exe'].replace("xdg-open",self.menu.get_default_app_for_file(app['exe'].split(" ")[-1]))
+				apps[app['exe']]=app['icon']
 		return (apps)
 	#def get_category_apps
 
