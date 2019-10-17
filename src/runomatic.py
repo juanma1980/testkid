@@ -99,21 +99,7 @@ class runomatic(QWidget):
 		self.closeKey=False
 		self.confKey=False
 		self.keymap={}
-		for key,value in vars(Qt).items():
-			if isinstance(value, Qt.Key):
-				self.keymap[value]=key.partition('_')[2]
-		self.modmap={
-					Qt.ControlModifier: self.keymap[Qt.Key_Control],
-					Qt.AltModifier: self.keymap[Qt.Key_Alt],
-					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
-					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
-					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
-					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
-					}
-		self.sigmap_tabSelect=QSignalMapper(self)
-		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
-		self.sigmap_tabRemove=QSignalMapper(self)
-		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
+		self._set_keymapping()
 		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
 		btnPrevious=QPushButton()
 		btnPrevious.setObjectName("PushButton")
@@ -128,14 +114,10 @@ class runomatic(QWidget):
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-		self.setWindowFlags(Qt.FramelessWindowHint)
-		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.setWindowModality(Qt.WindowModal)
-		self.display=os.environ['DISPLAY']
 		self.grab=False
 		self.runner=appRun()
 		self._read_config()
+		self.display=os.environ['DISPLAY']
 		self._render_gui()
 	#def init
 
@@ -154,6 +136,24 @@ class runomatic(QWidget):
 			print("%s"%msg)
 	#def _debug
 
+	def _set_keymapping(self):
+		for key,value in vars(Qt).items():
+			if isinstance(value, Qt.Key):
+				self.keymap[value]=key.partition('_')[2]
+		self.modmap={
+					Qt.ControlModifier: self.keymap[Qt.Key_Control],
+					Qt.AltModifier: self.keymap[Qt.Key_Alt],
+					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
+					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
+					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
+					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
+					}
+		self.sigmap_tabSelect=QSignalMapper(self)
+		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
+		self.sigmap_tabRemove=QSignalMapper(self)
+		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
+	#def _set_keymapping
+
 	def _read_config(self):
 		data=self.runner.get_apps()
 		self.categories=data.get('categories')
@@ -164,6 +164,11 @@ class runomatic(QWidget):
 	#def _read_config(self):
 
 	def _render_gui(self):
+		self.setObjectName("window")
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
 				#			if self.close():
 				try:
@@ -568,9 +573,10 @@ def _define_css():
 		border-radius:25px;
 	}
 	#launcher{
-		background-image:url("../rsrc/background2.jpg");
+		background-image:url("/usr/share/runomatic/rsrc/background2.png");
 		background-repeat:no-repeat;
 		background-position:center;
+		background-color:transparent;
 	}
 	"""
 	return(css)

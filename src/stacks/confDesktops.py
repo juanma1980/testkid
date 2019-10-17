@@ -17,6 +17,7 @@ class confDesktops(confStack):
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
 		self.menu.desktoppath="%s/.local/share/applications/"%home
+		self.menu.desktoppath="/usr/share/runomatic/applications"
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))

@@ -79,6 +79,7 @@ class confApp(confStack):
 			self.chk_startup.setChecked(startup)
 		except:
 			pass
+	#def fakeUpdate
 
 	def updateScreen(self):
 		config=self.getConfig()
