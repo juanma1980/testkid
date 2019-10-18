@@ -24,6 +24,7 @@ _ = gettext.gettext
 
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
+	focusIn=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
 		super (navButton,self).__init__("",parent)
 		self.keymap={}
@@ -43,11 +44,13 @@ class navButton(QPushButton):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
-		self.setObjectName("Widget")
+		self.setObjectName("PushButton")
 	#def __init__
 
 	def enterEvent(self,event):
 		if self.isEnabled():
+			self.setFocus()
+			self.focusIn.emit(self)
 			self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 			self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	
@@ -285,6 +288,12 @@ class runomatic(QWidget):
 	#def keyReleaseEvent
 
 	def _set_focus(self,key):
+		cursor=QtGui.QCursor(Qt.PointingHandCursor)
+		self.setCursor(cursor)
+		self.grabMouse()
+		cursor.setPos(50,50)
+		self.releaseMouse()
+		print(cursor.pos())
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
 			self.focusWidgets[self.currentBtn].clicked.emit()
 		elif key=="Tab":
@@ -324,6 +333,10 @@ class runomatic(QWidget):
 			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	#def _set_focus(self,key):
 
+	def _get_focus(self,widget):
+		self.currentBtn=self.focusWidgets.index(widget)
+	#def _get_focus(self,widget)
+
 	def _tabBar(self):
 		row=0
 		col=0
@@ -350,6 +363,7 @@ class runomatic(QWidget):
 				btnApp.setToolTip(appName)
 				btnApp.setFocusPolicy(Qt.NoFocus)
 				btnApp.keypress.connect(self._set_focus)
+				btnApp.focusIn.connect(self._get_focus)
 				self.focusWidgets.append(btnApp)
 				self.appsWidgets.append(appName)
 				sigmap_run.setMapping(btnApp,appName)
@@ -591,6 +605,7 @@ def _define_css():
 		padding:10px;
 		margin:0px;
 		border:0px;
+		background-color:transparent;
 	}
 	#PushButton:active{
 		font: 14px Roboto;
@@ -598,7 +613,7 @@ def _define_css():
 		background:none;
 	}	
 	#PushButton:focus{
-		border:2px solid grey;
+		background:qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 silver,stop:1 white);
 		border-radius:25px;
 	}
 	#launcher{
