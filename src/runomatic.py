@@ -88,7 +88,8 @@ class navButton(QPushButton):
 #			self.statusBar.show(status,hide=False)
 #		else:
 #			self.statusBar.show(hide=False)
-		self.setEnabled(False)
+#		self.setEnabled(False)
+		pass
 	#def _show_message
 
 class runomatic(QWidget):
@@ -291,7 +292,7 @@ class runomatic(QWidget):
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
 		self.grabMouse()
-		cursor.setPos(50,50)
+		#cursor.setPos(50,50)
 		self.releaseMouse()
 		print(cursor.pos())
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
