@@ -235,7 +235,7 @@ class runomatic(QWidget):
 			text=_("Insert the password")
 			if self.close_on_exit==True:
 				text=_("Insert the password. Current session will also be closed.")
-			pwd,resp=QInputDialog.getText(self,_("Master Password"),text)
+			pwd,resp=QInputDialog.getText(self,_("Confirm close"),text,QLineEdit.Password)
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
