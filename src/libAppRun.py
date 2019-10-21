@@ -18,9 +18,11 @@ class th_procMon(QThread):
 		self.pid=pid
 		self.monitor=True
 		self.timer=2
+		self.retCode=0
 
 	def run(self):
-		self.pid.wait()
+		self.retCode=self.pid.wait()
+
 #class th_procMon
 
 class th_runApp(QThread):
@@ -252,7 +254,7 @@ class appRun():
 				self._debug("Add %s to procMon"%pid_info[0].pid)
 				procMon=th_procMon(pid_info[0])
 				procMon.start()
-				procMon.finished.connect(lambda:self._end_process(th_run))
+				procMon.finished.connect(lambda:self._end_process(th_run,procMon.retCode))
 				self.procMons.append(procMon)
 		#launch wm
 		self._debug("Launching WM for display %s"%display)
@@ -274,16 +276,22 @@ class appRun():
 		return(th_run)
 	#def launch
 	
-	def _end_process(self,th_run):
+	def _end_process(self,th_run,retCode=0):
 		self._debug("Ending process %s"%th_run)
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
-		os.kill(os.getpid(),signal.SIGUSR1)
+		if retCode:
+			os.kill(os.getpid(),signal.SIGUSR2)
+			os.kill(os.getpid(),signal.SIGUSR1)
+		else:
+			os.kill(os.getpid(),signal.SIGUSR1)
+	#def _end_process
 
 	def getDeadProcesses(self):
 		deads=self.deadProcesses
 		self.deadProcesses=[]
 		return(deads)
+	#def getDeadProcesses
 
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))

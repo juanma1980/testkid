@@ -24,9 +24,15 @@ _ = gettext.gettext
 
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
+	focusIn=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
 		super (navButton,self).__init__("",parent)
 		self.keymap={}
+		a=QGridLayout()
+		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
+		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(0,0,0,1), stop:1 rgba(0,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:14px;height:256px")
+		a.addWidget(self.statusBar,0,0,1,1)
+		self.setLayout(a)
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
 				self.keymap[value]=key.partition('_')[2]
@@ -38,15 +44,20 @@ class navButton(QPushButton):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
+		self.setObjectName("PushButton")
 	#def __init__
 
 	def enterEvent(self,event):
-		self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
-		self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+		if self.isEnabled():
+			self.setFocus()
+			self.focusIn.emit(self)
+			self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+			self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	
 	def leaveEvent(self,event):
-		self.resize(QSize(BTN_SIZE,BTN_SIZE))
-		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+		if self.isEnabled():
+			self.resize(QSize(BTN_SIZE,BTN_SIZE))
+			self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 
 	def keyPressEvent(self,event):
 		sw_mod=False
@@ -69,6 +80,17 @@ class navButton(QPushButton):
 			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
 			event.setAccepted(False)
 	#def eventFilter
+	
+	def showMessage(self,msg,status="error",height=BTN_SIZE):
+#		self.statusBar.height_=height
+#		self.statusBar.setText(msg)
+#		if status:
+#			self.statusBar.show(status,hide=False)
+#		else:
+#			self.statusBar.show(hide=False)
+#		self.setEnabled(False)
+		pass
+	#def _show_message
 
 class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
@@ -92,6 +114,7 @@ class runomatic(QWidget):
 		self.tab_icons={}
 		self.tab_id={}
 		self.focusWidgets=[]
+		self.appsWidgets=[]
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -122,7 +145,9 @@ class runomatic(QWidget):
 	#def init
 
 	def _fail_process(self,*args):
-		self.showMessage(_(":( :( :( App failed to start"))
+#		self.showMessage(_(":( :( :( App failed to start"),"error2",height=32)
+		self.focusWidgets[self.currentBtn].showMessage(":(")
+		self._set_focus("Right")
 
 	def _end_process(self,*args):
 		for thread in self.runner.getDeadProcesses():
@@ -170,11 +195,10 @@ class runomatic(QWidget):
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
-				#			if self.close():
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-						print("Launching")
-						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+						if self.close():
+							os.execv("%s/runoconfig.py"%self.baseDir,["1"])
 					else:
 						self.showMessage(_("runoconfig not found"),"error2",20)
 				except:
@@ -212,7 +236,7 @@ class runomatic(QWidget):
 			text=_("Insert the password")
 			if self.close_on_exit==True:
 				text=_("Insert the password. Current session will also be closed.")
-			pwd,resp=QInputDialog.getText(self,_("Master Password"),text)
+			pwd,resp=QInputDialog.getText(self,_("Confirm close"),text,QLineEdit.Password)
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
@@ -265,6 +289,12 @@ class runomatic(QWidget):
 	#def keyReleaseEvent
 
 	def _set_focus(self,key):
+		cursor=QtGui.QCursor(Qt.PointingHandCursor)
+		self.setCursor(cursor)
+		self.grabMouse()
+		#cursor.setPos(50,50)
+		self.releaseMouse()
+		print(cursor.pos())
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
 			self.focusWidgets[self.currentBtn].clicked.emit()
 		elif key=="Tab":
@@ -304,6 +334,10 @@ class runomatic(QWidget):
 			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	#def _set_focus(self,key):
 
+	def _get_focus(self,widget):
+		self.currentBtn=self.focusWidgets.index(widget)
+	#def _get_focus(self,widget)
+
 	def _tabBar(self):
 		row=0
 		col=0
@@ -330,7 +364,9 @@ class runomatic(QWidget):
 				btnApp.setToolTip(appName)
 				btnApp.setFocusPolicy(Qt.NoFocus)
 				btnApp.keypress.connect(self._set_focus)
+				btnApp.focusIn.connect(self._get_focus)
 				self.focusWidgets.append(btnApp)
+				self.appsWidgets.append(appName)
 				sigmap_run.setMapping(btnApp,appName)
 				btnApp.clicked.connect(sigmap_run.map)
 				vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
@@ -488,6 +524,14 @@ class runomatic(QWidget):
 		self._debug("Tabs: %s"%self.tabBar.count())
 		#Tabs BEFORE new tab is added
 		tabCount=self.tabBar.count()
+		btn=None
+		try:
+			btn=self.appsWidgets.index(app)	
+		except:
+			btn=None
+		if btn:
+			self.currentBtn=btn
+
 		os.environ["HOME"]="/home/%s"%self.username
 		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
@@ -562,6 +606,7 @@ def _define_css():
 		padding:10px;
 		margin:0px;
 		border:0px;
+		background-color:transparent;
 	}
 	#PushButton:active{
 		font: 14px Roboto;
@@ -569,7 +614,7 @@ def _define_css():
 		background:none;
 	}	
 	#PushButton:focus{
-		border:2px solid grey;
+		background:qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 silver,stop:1 white);
 		border-radius:25px;
 	}
 	#launcher{
