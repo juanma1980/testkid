@@ -192,8 +192,8 @@ class runomatic(QWidget):
 		self.setObjectName("window")
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.setWindowModality(Qt.WindowModal)
+#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+#		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
