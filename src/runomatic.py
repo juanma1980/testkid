@@ -200,7 +200,7 @@ class runomatic(QWidget):
 						if self.close():
 							os.execv("%s/runoconfig.py"%self.baseDir,["1"])
 					else:
-						self.showMessage(_("runoconfig not found"),"error2",20)
+						self.showMessage(_("runoconfig not found"%self.baseDir),"error2",20)
 				except:
 					print(_("runoconfig not found"))
 		self.show()
@@ -271,9 +271,9 @@ class runomatic(QWidget):
 			if key=='F4' and self.grab:
 				self.closeKey=True
 			if key==confKey:
-				if os.path.isfile("/usr/share/runomatic/runoconfg.py"):
+				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 					if self.close():
-							os.execv("/usr/share/runomatic/runoconfig.py",["1"])
+						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
 				else:
 					event.ignore()
 					self.showMessage(_("runoconfig not found"),"error2",20)
