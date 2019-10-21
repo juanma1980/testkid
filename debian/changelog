@@ -1,3 +1,9 @@
+runomatic (0.4.1) bionic; urgency=medium
+
+  * Dumb update
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Mon, 21 Oct 2019 09:39:46 +0200
+
 runomatic (0.4) bionic; urgency=medium
 
   * Replace systemd service by autostart script
