@@ -83,7 +83,8 @@ class th_runApp(QThread):
 			if "/usr/bin/resources-launcher.sh" in self.app:
 				self._run_resource()
 			elif 'pysycache' in self.app:
-				self.app.append("-nf")
+				self.app.append("-fs")
+#				subprocess.run(["xrandr","--output","default","--mode","1884x1200"])
 			elif 'childsplay' in self.app:
 				self.app.append("--fullscreen")
 			elif 'firefox' in self.app:
@@ -123,6 +124,7 @@ class appRun():
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
+		self.baseDir="/usr/share/runomatic/"
 		self.runoapps="/usr/share/runomatic/applications"
 		self.pid=0
 		self.procMons=[]
@@ -198,6 +200,9 @@ class appRun():
 #				"-softCursor",
 				"-screen",
 				"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
+#				"800x600",
+				"-resizeable",
+				"-fullscreen",
 				"%s"%display]
 				p_pid=subprocess.Popen(xephyr_cmd)
 				self.xephyr_servers[display]=p_pid.pid
