@@ -35,24 +35,6 @@ class confDesktops(confStack):
 	#def _debug
 
 	def _load_screen(self):
-		def _save_desktop():
-			if not os.path.isdir(self.menu.desktoppath):
-				os.makedirs(self.menu.desktoppath)
-			categories=[]
-			desktop={}
-			desktop['Name']=self.inp_name.text()
-			desktop['Exec']=self.inp_exec.text()
-			desktop['Categories']='run-o-matic;'
-			desktop['Icon']=self.app_icon
-			desktop['Comment']=self.inp_desc.text()
-			desktop['NoDisplay']='True'
-			self._debug("Saving %s"%desktop)
-			try:
-				self.menu.write_custom_desktop(desktop,self.menu.desktoppath)
-			except Exception as e:
-				self._debug(e)
-		#def _save_desktop
-
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can add Launchers"))
 		box.addWidget(lbl_txt)
@@ -136,7 +118,7 @@ class confDesktops(confStack):
 		desktop['NoDisplay']='True'
 		self._debug("Saving %s"%desktop)
 		try:
-			self.menu.write_custom_desktop(desktop,self.menu.desktoppath)
+			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],self.filename])
 		except Exception as e:
 			self._debug(e)
 	#def writeChanges
