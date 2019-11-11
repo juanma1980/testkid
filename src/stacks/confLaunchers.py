@@ -96,7 +96,9 @@ class dropButton(QPushButton):
 				bg_pixmap=QtGui.QPixmap.fromImage(image)
 				self.icon=QtGui.QIcon(bg_pixmap)
 		else:
+			print("Setting Icon: %s"%self.img)
 			if os.path.isfile(self.img):
+				print("find: %s"%self.img)
 				self.icon=QtGui.QIcon(self.img)
 			else:
 				return None

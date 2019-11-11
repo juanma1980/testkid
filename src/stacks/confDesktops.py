@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import os
+import subprocess
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
-import gettext
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
@@ -12,7 +12,7 @@ _ = gettext.gettext
 
 class confDesktops(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confDesktops Load")
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
@@ -106,8 +106,8 @@ class confDesktops(confStack):
 	#def updateScreen
 
 	def writeConfig(self):
-		if not os.path.isdir(self.menu.desktoppath):
-			os.makedirs(self.menu.desktoppath)
+#		if not os.path.isdir(self.menu.desktoppath):
+#			os.makedirs(self.menu.desktoppath)
 		categories=[]
 		desktop={}
 		desktop['Name']=self.inp_name.text()
@@ -116,9 +116,11 @@ class confDesktops(confStack):
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
 		desktop['NoDisplay']='True'
+		filename=os.path.join(self.menu.desktoppath,"%s.desktop"%self.inp_name.text().lower().replace(" ","_"))
+		self._debug("File %s"%filename)
 		self._debug("Saving %s"%desktop)
 		try:
-			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],self.filename])
+			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
 		except Exception as e:
 			self._debug(e)
 	#def writeChanges
