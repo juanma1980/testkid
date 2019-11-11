@@ -22,6 +22,26 @@ BTN_SIZE=128
 gettext.textdomain('runomatic')
 _ = gettext.gettext
 
+class appZone(QWidget):
+	def __init__(self,parent):
+		super (appZone,self).__init__(parent)
+		self.setObjectName("appzone")
+
+	def createZone(self,wid):
+		zone=None
+		try:
+			subZone=QtGui.QWindow.fromWinId(int(wid))
+		except:
+			pass
+		zone=self.createWindowContainer(subZone,self,Qt.FramelessWindowHint)
+		zone.setParent(self)
+		zone.setFocusPolicy(Qt.NoFocus)
+		zone.hide()
+		zone.setGeometry(1,1,10,10)
+		zone.show()
+		return(zone)
+
+
 class navButton(QPushButton):
 	keypress=pyqtSignal("PyQt_PyObject")
 	focusIn=pyqtSignal("PyQt_PyObject")
@@ -192,8 +212,8 @@ class runomatic(QWidget):
 		self.setObjectName("window")
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
-#		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-#		self.setWindowModality(Qt.WindowModal)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
@@ -480,15 +500,16 @@ class runomatic(QWidget):
 		box=QVBoxLayout()
 		wid=self.runner.get_wid("Xephyr on",self.display)
 		self._debug("W: %s"%wid)
+		zone=None
 		if wid:
-			try:
-				subZone=QtGui.QWindow.fromWinId(int(wid))
-			except:
-				self._debug("Xephyr failed to launch")
-				tabContent.destroy()
-				wid=None
-			zone=QWidget.createWindowContainer(subZone)
-			zone.setParent(self)
+			zone=appZone(tabContent).createZone(wid)
+			zone.setObjectName("appzone")
+
+		if not zone or not wid:
+			self._debug("Xephyr failed to launch")
+			tabContent.destroy()
+			wid=None
+		else:
 			box.addWidget(zone)
 			zone.setFocusPolicy(Qt.NoFocus)
 			tabContent.setLayout(box)
@@ -509,10 +530,10 @@ class runomatic(QWidget):
 			btn_close.clicked.connect(self.sigmap_tabRemove.map)
 			self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
 			self.tabBar.addTab(tabContent,"")
-		else:
-			self._debug("Xephyr failed to launch")
-			tabContent.destroy()
-			wid=None
+#		else:
+#			self._debug("Xephyr failed to launch")
+#			tabContent.destroy()
+#			wid=None
 		return(wid)
 	#def _launchZone
 
@@ -622,6 +643,10 @@ def _define_css():
 		background-repeat:no-repeat;
 		background-position:center;
 		background-color:transparent;
+	}
+	#appzone{
+		background-color:red;
+		border:10px solid red;
 	}
 	"""
 	return(css)
