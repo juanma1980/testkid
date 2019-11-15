@@ -140,6 +140,7 @@ class confLaunchers(confStack):
 		self.index=2
 		self.enabled=True
 		self.setStyleSheet(self._define_css())
+		self.runoapps="/usr/share/runomatic/applications"
 	#def __init__
 
 	def _debug(self,msg):
@@ -264,6 +265,10 @@ class confLaunchers(confStack):
 			nonlocal row
 			nonlocal col
 			for desktop in desktops:
+				#Check if desktop is from run-o-matic
+				if "run-o-matic" in self.visible_categories:
+					if desktop in os.listdir(self.runoapps):
+						desktop=os.path.join(self.runoapps,desktop)
 				deskInfo=self.runner.get_desktop_app(desktop)
 				for appName,appIcon in deskInfo.items():
 					btn_desktop=dropButton(desktop,self.tbl_app)

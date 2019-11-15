@@ -119,8 +119,13 @@ class confDesktops(confStack):
 		filename=os.path.join(self.menu.desktoppath,"%s.desktop"%self.inp_name.text().lower().replace(" ","_"))
 		self._debug("File %s"%filename)
 		self._debug("Saving %s"%desktop)
+		self.changes=False
 		try:
 			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
+			self.btn_ok.setEnabled(False)
+			self.btn_cancel.setEnabled(False)
+			self.refresh=True
+			retval=True
 		except Exception as e:
 			self._debug(e)
 	#def writeChanges
