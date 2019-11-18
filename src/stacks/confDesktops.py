@@ -7,6 +7,9 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
+from urllib.request import Request,urlopen,urlretrieve
+from bs4 import BeautifulSoup
+import re
 import gettext
 _ = gettext.gettext
 
@@ -68,6 +71,7 @@ class confDesktops(confStack):
 		lbl_exec=QLabel(_("Executable: "))
 		box.addWidget(lbl_exec,3,0,1,2)
 		self.inp_exec=QLineEdit()
+		self.inp_exec.editingFinished.connect(self._get_icon)
 		self.inp_exec.setPlaceholderText(_("Executable path"))
 		self.inp_exec.setToolTip(_("Insert path to the executable"))
 		box.addWidget(self.inp_exec,4,0,1,1,Qt.Alignment(0))
@@ -108,6 +112,44 @@ class confDesktops(confStack):
 			self.btn_cancel.setEnabled(True)
 			return(fchoosed)
 	#def _file_chooser
+
+	def _get_icon(self):
+		exeLine=self.inp_exec.text().split(' ')
+		if 'firefox' not in exeLine and 'chromium' not in exeLine and 'chrome' not in exeLine:
+			return
+		path=exeLine[-1]
+		path=path.split(" ")[0]
+		splitPath=path.split("/")
+		if "://" in path:
+			path=("%s//%s"%(splitPath[0],splitPath[1]))
+		else:
+			path=("http://%s"%(splitPath[0]))
+		try:
+			req=Request(path)
+		except:
+			pass
+		ico=""
+		try:
+			content=urlopen(req).read()
+			soup=BeautifulSoup(content,'html.parser')
+			favicon=soup.head
+			for link in favicon.find_all(href=re.compile("favicon")):
+				fname=link
+				if "favicon" in str(fname):
+					splitName=str(fname).split(" ")
+					for splitWord in splitName:
+						if splitWord.startswith("href="):
+							ico=splitWord.split("\"")[1].split("?")[0]
+							if ico.endswith("ico"):
+								outputIco="/tmp/%s.ico"%splitPath[0]
+								urlretrieve(ico,outputIco)
+								self.app_icon=ico
+								icn=QtGui.QIcon(outputIco)
+								self.btn_icon.setIcon(icn)
+		except:
+			self._debug("Couldn't open %s"%url)
+	#def _get_icon
+
 
 	def updateScreen(self):
 		self.inp_name.setText(self.defaultName)

@@ -10,6 +10,8 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 from libAppRun import appRun
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
+import tempfile
+from urllib.request import urlretrieve
 import gettext
 _ = gettext.gettext
 
@@ -90,18 +92,21 @@ class dropButton(QPushButton):
 		self.img=img
 		if QtGui.QIcon.hasThemeIcon(self.img):
 			self.icon=QtGui.QIcon.fromTheme(self.img)
-			if state!='show':
-				pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
-				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Grayscale8)
-				bg_pixmap=QtGui.QPixmap.fromImage(image)
-				self.icon=QtGui.QIcon(bg_pixmap)
-		else:
-			print("Setting Icon: %s"%self.img)
-			if os.path.isfile(self.img):
+		elif os.path.isfile(self.img):
+				print("Setting Icon: %s"%self.img)
 				print("find: %s"%self.img)
 				self.icon=QtGui.QIcon(self.img)
-			else:
-				return None
+		elif self.img.startswith("http"):
+				tmpfile=tempfile.mkstemp(suffix=".ico")[1]
+				urlretrieve(self.img,tmpfile)
+				self.icon=QtGui.QIcon(tmpfile)
+		else:
+			return None
+		if state!='show':
+			pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
+			image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Grayscale8)
+			bg_pixmap=QtGui.QPixmap.fromImage(image)
+			self.icon=QtGui.QIcon(bg_pixmap)
 		self.setIcon(self.icon)
 		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 		return True

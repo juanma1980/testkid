@@ -14,6 +14,8 @@ import subprocess
 import signal
 import psutil
 from passlib.hash import pbkdf2_sha256 as hashpwd
+import tempfile
+from urllib.request import urlretrieve
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -370,11 +372,14 @@ class runomatic(QWidget):
 			for appName,appIcon in apps.items():
 				if QtGui.QIcon.hasThemeIcon(appIcon):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
-				else:
-					if os.path.isfile(appIcon):
+				elif os.path.isfile(appIcon):
 						icnApp=QtGui.QIcon(appIcon)
-					else:
-						continue
+				elif appIcon.startswith("http"):
+						tmpfile=tempfile.mkstemp(suffix=".ico")[1]
+						urlretrieve(appIcon,tmpfile)
+						icnApp=QtGui.QIcon(tmpfile)
+				else:
+					continue
 				if not appName:
 					continue
 				self.app_icons[appName]=appIcon
