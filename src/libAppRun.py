@@ -83,10 +83,9 @@ class th_runApp(QThread):
 			if "/usr/bin/resources-launcher.sh" in self.app:
 				self._run_resource()
 			elif 'pysycache' in self.app:
-				self.app.append("-fs")
-#				subprocess.run(["xrandr","--output","default","--mode","1884x1200"])
-			elif 'childsplay' in self.app:
-				self.app.append("--fullscreen")
+				self.app.append("-nf")
+#			elif 'childsplay' in self.app:
+#				self.app.append("--fullscreen")
 			elif 'firefox' in self.app:
 				self._run_firefox()
 			elif (('chromium' in self.app) or ('chrome' in self.app)):
