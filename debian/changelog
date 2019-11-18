@@ -1,3 +1,9 @@
+runomatic (0.5) bionic; urgency=medium
+
+  * Add get favicon for url resources
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Mon, 18 Nov 2019 14:58:12 +0100
+
 runomatic (0.4.1) bionic; urgency=medium
 
   * Dumb update
