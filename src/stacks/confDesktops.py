@@ -129,3 +129,6 @@ class confDesktops(confStack):
 		except Exception as e:
 			self._debug(e)
 	#def writeChanges
+
+	def setParms(self,parms):
+		print(parms)

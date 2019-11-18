@@ -264,6 +264,7 @@ class confLaunchers(confStack):
 		def _add_desktop(desktops,state="show"):
 			nonlocal row
 			nonlocal col
+			desktopsFixed=[]
 			for desktop in desktops:
 				#Check if desktop is from run-o-matic
 				if "run-o-matic" in self.visible_categories:
@@ -277,11 +278,14 @@ class confLaunchers(confStack):
 						btn_desktop.deleteLater()
 						continue
 					btnMenu=QMenu()
-					action=_("Show button")
+					h_action=_("Show button")
+					e_action=_("Edit button")
 					if state=="show":
-						action=_("Hide button")
-					btnMenu.addAction(action)
-					btnMenu.triggered.connect(lambda:self._changeBtnState(apps,state))
+						h_action=_("Hide button")
+					show=btnMenu.addAction(h_action)
+					edit=btnMenu.addAction(e_action)
+					show.triggered.connect(lambda:self._changeBtnState(apps,state))
+					edit.triggered.connect(lambda:self._editBtn(apps))
 					btn_desktop.setToolTip(desktop)
 					btn_desktop.setMenu(btnMenu)
 					btn_desktop.setObjectName("confBtn")
@@ -295,6 +299,8 @@ class confLaunchers(confStack):
 						row+=1
 						self.tbl_app.insertRow(row)
 						self._debug("Insert row %s"%self.tbl_app.rowCount())
+					desktopsFixed.append(desktop)
+			desktops=desktopsFixed
 
 		self.tbl_app.clear()
 		self.tbl_app.setRowCount(1)
@@ -324,6 +330,12 @@ class confLaunchers(confStack):
 		self.btn_grid['state']=state
 		self.update_apps(apps)
 	#def _changeBtnState
+
+	def _editBtn(self,apps):
+		row=self.tbl_app.currentRow()
+		col=self.tbl_app.currentColumn()
+		btn=self.tbl_app.cellWidget(row,col)
+		self.stack.gotoStack(idx=4,parms=btn.title)
 
 	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
