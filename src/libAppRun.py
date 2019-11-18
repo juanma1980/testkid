@@ -340,8 +340,8 @@ class appRun():
 		#First read system config
 		sysconfig=self.get_default_config()
 		self._debug("Getting apps for level %s"%self.level)
-		apps={'categories':[],'desktops':[],'hidden':[]}
-		default={'categories':[],'desktops':[],'hidden':[]}
+		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
+		default={'categories':[],'desktops':[],'hidden':[],'banned':[]}
 		
 		if categories:
 			apps['categories']=categories
@@ -365,6 +365,7 @@ class appRun():
 				apps['categories']=data[level].get('categories',[])
 				apps['desktops']=data[level].get('desktops',[])
 				apps['hidden']=data[level].get('hidden',[])
+				apps['banned']=data[level].get('banned',[])
 				apps['keybinds']=data[level].get('keybinds')
 				apps['password']=data[level].get('password')
 				apps['close']=data[level].get('close')
@@ -379,8 +380,12 @@ class appRun():
 			for category in apps['categories']:
 				cat_apps=self.get_category_desktops(category.lower())
 				for app in cat_apps:
-					if ((app not in apps['desktops']) and (app not in apps['hidden'])):
+					if ((app not in apps['desktops']) and (app not in apps['banned'])):
 						apps['desktops'].append(app)
+					elif 'runomatic' in app and app not in apps['desktops']:
+						apps['desktops'].append(app)
+					if app in apps['hidden'] and app in apps['desktops']:
+						apps['desktops'].remove(app)
 		return(apps)
 
 	def get_category_desktops(self,category):
@@ -390,7 +395,7 @@ class appRun():
 			if os.path.isdir(self.runoapps):
 				for f in os.listdir(self.runoapps):
 					if f not in apps:
-						apps.append(f)
+						apps.append("%s"%os.path.join(self.runoapps,f))
 		else:
 			self.menu.set_desktop_system()
 			applist=self.menu.get_apps_from_category(category)

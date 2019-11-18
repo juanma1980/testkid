@@ -24,6 +24,9 @@ class confDesktops(confStack):
 		self.description=(_("Add custom launcher"))
 		self.icon=('org.kde.plasma.quicklaunch')
 		self.tooltip=(_("From here you can add a custom launcher"))
+		self.defaultName=""
+		self.defaultExec=""
+		self.defaultDesc=""
 		self.index=3
 		self.enabled=True
 		self.level='user'
@@ -33,6 +36,14 @@ class confDesktops(confStack):
 		if self.dbg:
 			print("ConfDesktops: %s"%msg)
 	#def _debug
+
+	def initScreen(self):
+		self.default_icon='shell'
+		self.defaultName=""
+		self.defaultExec=""
+		self.defaultDesc=""
+	#def initScreen
+
 
 	def _load_screen(self):
 		box=QGridLayout()
@@ -93,29 +104,29 @@ class confDesktops(confStack):
 					widget.setIcon(icn)
 				else:
 					widget.setText(fchoosed)
+			self.btn_ok.setEnabled(True)
+			self.btn_cancel.setEnabled(True)
 			return(fchoosed)
 	#def _file_chooser
 
 	def updateScreen(self):
-		self.inp_name.setText("")
-		self.inp_exec.setText("")
-		self.inp_desc.setText("")
+		self.inp_name.setText(self.defaultName)
+		self.inp_exec.setText(self.defaultExec)
+		self.inp_desc.setText(self.defaultDesc)
 		self.app_icon=self.default_icon
 		icn=QtGui.QIcon.fromTheme(self.app_icon)
 		self.btn_icon.setIcon(icn)
 	#def updateScreen
 
 	def writeConfig(self):
-#		if not os.path.isdir(self.menu.desktoppath):
-#			os.makedirs(self.menu.desktoppath)
 		categories=[]
 		desktop={}
+		desktop['Categories']='run-o-matic;'
+		desktop['NoDisplay']='True'
 		desktop['Name']=self.inp_name.text()
 		desktop['Exec']=self.inp_exec.text()
-		desktop['Categories']='run-o-matic;'
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
-		desktop['NoDisplay']='True'
 		filename=os.path.join(self.menu.desktoppath,"%s.desktop"%self.inp_name.text().lower().replace(" ","_"))
 		self._debug("File %s"%filename)
 		self._debug("Saving %s"%desktop)
@@ -126,9 +137,36 @@ class confDesktops(confStack):
 			self.btn_cancel.setEnabled(False)
 			self.refresh=True
 			retval=True
+			if self.editBtn:
+				self.editBtn=False
+				self.default_icon='shell'
+				self.defaultName=""
+				self.defaultExec=""
+				self.defaultDesc=""
+				self.stack.gotoStack(idx=2,parms=self.editBtn)
 		except Exception as e:
 			self._debug(e)
+
 	#def writeChanges
 
 	def setParms(self,parms):
-		print(parms)
+		self._debug("Loading %s"%parms)
+		desktop=self.menu.get_desktop_info(parms)
+		self.defaultName=desktop['Name']
+		self.defaultExec=desktop['Exec']
+		self.defaultDesc=desktop['Comment']
+		self.default_icon=desktop['Icon']
+
+		self.inp_name.setText(desktop['Name'])
+		self.inp_exec.setText(desktop['Exec'])
+		self.inp_desc.setText(desktop['Comment'])
+		self.app_icon=desktop['Icon']
+		if os.path.isfile(desktop['Icon']):
+			icn=QtGui.QIcon(desktop['Icon'])
+			pass
+		else:
+			icn=QtGui.QIcon.fromTheme(desktop['Icon'])
+		self.btn_icon.setIcon(icn)
+		self.btn_ok.setEnabled(False)
+		self.btn_cancel.setEnabled(False)
+		self.editBtn=parms

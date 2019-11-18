@@ -267,7 +267,8 @@ class confLaunchers(confStack):
 			desktopsFixed=[]
 			for desktop in desktops:
 				#Check if desktop is from run-o-matic
-				if "run-o-matic" in self.visible_categories:
+#				if "run-o-matic" in self.visible_categories:
+				if os.path.isdir(self.runoapps):
 					if desktop in os.listdir(self.runoapps):
 						desktop=os.path.join(self.runoapps,desktop)
 				deskInfo=self.runner.get_desktop_app(desktop)
@@ -329,6 +330,10 @@ class confLaunchers(confStack):
 			apps['hidden'].remove(btn.title)
 		self.btn_grid['state']=state
 		self.update_apps(apps)
+		self.btn_ok.setEnabled(True)
+		self.btn_cancel.setEnabled(True)
+		self.refresh=True
+		retval=True
 	#def _changeBtnState
 
 	def _editBtn(self,apps):
@@ -405,6 +410,13 @@ class confLaunchers(confStack):
 		return apps
 	#def _get_table_apps
 
+	def setParms(self,parms):
+		apps=self._update_apps_data()
+		if parms not in apps['banned'] and 'run-o-matic' not in parms:
+			apps['banned'].append(parms)
+		for key,data in apps.items():
+			self.saveChanges(key,data)
+		self.updateScreen()
 
 	def _define_css(self):
 		css="""
