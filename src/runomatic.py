@@ -14,6 +14,8 @@ import subprocess
 import signal
 import psutil
 from passlib.hash import pbkdf2_sha256 as hashpwd
+import tempfile
+from urllib.request import urlretrieve
 from libAppRun import appRun
 QString=type("")
 QInt=type(0)
@@ -122,6 +124,7 @@ class runomatic(QWidget):
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		signal.signal(signal.SIGUSR1,self._end_process)
 		signal.signal(signal.SIGUSR2,self._fail_process)
+		self.runoapps="/usr/share/runomatic/applications"
 		self.dbg=False
 		self.procMon=[]
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
@@ -210,9 +213,9 @@ class runomatic(QWidget):
 
 	def _render_gui(self):
 		self.setObjectName("window")
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
 				try:
@@ -369,11 +372,14 @@ class runomatic(QWidget):
 			for appName,appIcon in apps.items():
 				if QtGui.QIcon.hasThemeIcon(appIcon):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
-				else:
-					if os.path.isfile(appIcon):
+				elif os.path.isfile(appIcon):
 						icnApp=QtGui.QIcon(appIcon)
-					else:
-						continue
+				elif appIcon.startswith("http"):
+						tmpfile=tempfile.mkstemp(suffix=".ico")[1]
+						urlretrieve(appIcon,tmpfile)
+						icnApp=QtGui.QIcon(tmpfile)
+				else:
+					continue
 				if not appName:
 					continue
 				self.app_icons[appName]=appIcon
@@ -491,6 +497,10 @@ class runomatic(QWidget):
 	#def _get_category_apps
 	
 	def _get_desktop_apps(self,desktop):
+		#Check if desktop is from run-o-matic
+		if "run-o-matic" in self.categories:
+			if desktop in os.listdir(self.runoapps):
+				desktop=os.path.join(self.runoapps,desktop)
 		apps=self.runner.get_desktop_app(desktop)
 		return (apps)
 	#def _get_category_apps

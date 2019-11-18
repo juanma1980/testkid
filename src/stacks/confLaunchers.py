@@ -10,6 +10,8 @@ from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTi
 from libAppRun import appRun
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
+import tempfile
+from urllib.request import urlretrieve
 import gettext
 _ = gettext.gettext
 
@@ -90,16 +92,21 @@ class dropButton(QPushButton):
 		self.img=img
 		if QtGui.QIcon.hasThemeIcon(self.img):
 			self.icon=QtGui.QIcon.fromTheme(self.img)
-			if state!='show':
-				pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
-				image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Grayscale8)
-				bg_pixmap=QtGui.QPixmap.fromImage(image)
-				self.icon=QtGui.QIcon(bg_pixmap)
-		else:
-			if os.path.isfile(self.img):
+		elif os.path.isfile(self.img):
+				print("Setting Icon: %s"%self.img)
+				print("find: %s"%self.img)
 				self.icon=QtGui.QIcon(self.img)
-			else:
-				return None
+		elif self.img.startswith("http"):
+				tmpfile=tempfile.mkstemp(suffix=".ico")[1]
+				urlretrieve(self.img,tmpfile)
+				self.icon=QtGui.QIcon(tmpfile)
+		else:
+			return None
+		if state!='show':
+			pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
+			image=pixmap.toImage().convertToFormat(QtGui.QImage.Format_Grayscale8)
+			bg_pixmap=QtGui.QPixmap.fromImage(image)
+			self.icon=QtGui.QIcon(bg_pixmap)
 		self.setIcon(self.icon)
 		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 		return True
@@ -138,6 +145,7 @@ class confLaunchers(confStack):
 		self.index=2
 		self.enabled=True
 		self.setStyleSheet(self._define_css())
+		self.runoapps="/usr/share/runomatic/applications"
 	#def __init__
 
 	def _debug(self,msg):
@@ -261,7 +269,13 @@ class confLaunchers(confStack):
 		def _add_desktop(desktops,state="show"):
 			nonlocal row
 			nonlocal col
+			desktopsFixed=[]
 			for desktop in desktops:
+				#Check if desktop is from run-o-matic
+#				if "run-o-matic" in self.visible_categories:
+				if os.path.isdir(self.runoapps):
+					if desktop in os.listdir(self.runoapps):
+						desktop=os.path.join(self.runoapps,desktop)
 				deskInfo=self.runner.get_desktop_app(desktop)
 				for appName,appIcon in deskInfo.items():
 					btn_desktop=dropButton(desktop,self.tbl_app)
@@ -270,11 +284,14 @@ class confLaunchers(confStack):
 						btn_desktop.deleteLater()
 						continue
 					btnMenu=QMenu()
-					action=_("Show button")
+					h_action=_("Show button")
+					e_action=_("Edit button")
 					if state=="show":
-						action=_("Hide button")
-					btnMenu.addAction(action)
-					btnMenu.triggered.connect(lambda:self._changeBtnState(apps,state))
+						h_action=_("Hide button")
+					show=btnMenu.addAction(h_action)
+					edit=btnMenu.addAction(e_action)
+					show.triggered.connect(lambda:self._changeBtnState(apps,state))
+					edit.triggered.connect(lambda:self._editBtn(apps))
 					btn_desktop.setToolTip(desktop)
 					btn_desktop.setMenu(btnMenu)
 					btn_desktop.setObjectName("confBtn")
@@ -288,6 +305,8 @@ class confLaunchers(confStack):
 						row+=1
 						self.tbl_app.insertRow(row)
 						self._debug("Insert row %s"%self.tbl_app.rowCount())
+					desktopsFixed.append(desktop)
+			desktops=desktopsFixed
 
 		self.tbl_app.clear()
 		self.tbl_app.setRowCount(1)
@@ -316,7 +335,17 @@ class confLaunchers(confStack):
 			apps['hidden'].remove(btn.title)
 		self.btn_grid['state']=state
 		self.update_apps(apps)
+		self.btn_ok.setEnabled(True)
+		self.btn_cancel.setEnabled(True)
+		self.refresh=True
+		retval=True
 	#def _changeBtnState
+
+	def _editBtn(self,apps):
+		row=self.tbl_app.currentRow()
+		col=self.tbl_app.currentColumn()
+		btn=self.tbl_app.cellWidget(row,col)
+		self.stack.gotoStack(idx=4,parms=btn.title)
 
 	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
@@ -386,6 +415,13 @@ class confLaunchers(confStack):
 		return apps
 	#def _get_table_apps
 
+	def setParms(self,parms):
+		apps=self._update_apps_data()
+		if parms not in apps['banned'] and 'run-o-matic' not in parms:
+			apps['banned'].append(parms)
+		for key,data in apps.items():
+			self.saveChanges(key,data)
+		self.updateScreen()
 
 	def _define_css(self):
 		css="""
