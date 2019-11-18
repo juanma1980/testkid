@@ -127,7 +127,7 @@ class confDesktops(confStack):
 		try:
 			req=Request(path)
 		except:
-			pass
+			return
 		ico=""
 		try:
 			content=urlopen(req).read()
@@ -140,12 +140,15 @@ class confDesktops(confStack):
 					for splitWord in splitName:
 						if splitWord.startswith("href="):
 							ico=splitWord.split("\"")[1].split("?")[0]
-							if ico.endswith("ico"):
-								outputIco="/tmp/%s.ico"%splitPath[0]
+							outputIco="/tmp/%s.ico"%splitPath[0]
+							try:
 								urlretrieve(ico,outputIco)
-								self.app_icon=ico
-								icn=QtGui.QIcon(outputIco)
-								self.btn_icon.setIcon(icn)
+							except:
+								return
+							self.app_icon=ico
+							icn=QtGui.QIcon(outputIco)
+							self.btn_icon.setIcon(icn)
+							break
 		except:
 			self._debug("Couldn't open %s"%url)
 	#def _get_icon
