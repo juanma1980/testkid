@@ -1,4 +1,4 @@
-runomatic (0.5) bionic; urgency=medium
+runomatic (0.5.1) bionic; urgency=medium
 
   * Add get favicon for url resources
 
