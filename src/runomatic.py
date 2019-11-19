@@ -164,6 +164,8 @@ class runomatic(QWidget):
 		self.runner=appRun()
 		self._read_config()
 		self.display=os.environ['DISPLAY']
+		home=os.environ['HOME']
+		self.cache="%s/.cache/runomatic/"%home
 		self._render_gui()
 	#def init
 
@@ -375,9 +377,15 @@ class runomatic(QWidget):
 				elif os.path.isfile(appIcon):
 						icnApp=QtGui.QIcon(appIcon)
 				elif appIcon.startswith("http"):
-						tmpfile=tempfile.mkstemp(suffix=".ico")[1]
-						urlretrieve(appIcon,tmpfile)
-						icnApp=QtGui.QIcon(tmpfile)
+					if not os.path.isdir("%s/icons"%self.cache):
+						os.makedirs("%s/icons"%self.cache)
+					tmpfile=os.path.join("%s/icons"%self.cache,appIcon.split("/")[2].split(".")[0])
+					if not os.path.isfile(tmpfile):
+						try:
+							urlretrieve(appIcon,tmpfile)
+						except:
+							tmpfile=QtGui.QIcon.fromTheme("shell")
+					icnApp=QtGui.QIcon(tmpfile)
 				else:
 					continue
 				if not appName:
