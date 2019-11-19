@@ -19,7 +19,7 @@ class confDesktops(confStack):
 		self._debug("confDesktops Load")
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
-		self.menu.desktoppath="%s/.local/share/applications/"%home
+#		self.menu.desktoppath="%s/.local/share/applications/"%home
 		self.menu.desktoppath="/usr/share/runomatic/applications"
 		self.default_icon='shell'
 		self.app_icon='shell'
@@ -45,6 +45,7 @@ class confDesktops(confStack):
 		self.defaultName=""
 		self.defaultExec=""
 		self.defaultDesc=""
+		self.filename=""
 	#def initScreen
 
 
@@ -172,7 +173,10 @@ class confDesktops(confStack):
 		desktop['Exec']=self.inp_exec.text()
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
-		filename=os.path.join(self.menu.desktoppath,"%s.desktop"%self.inp_name.text().lower().replace(" ","_"))
+		if self.filename:
+			filename=os.path.join(self.menu.desktoppath,"%s"%self.filename)
+		else:
+			filename=os.path.join(self.menu.desktoppath,"%s.desktop"%self.inp_name.text().lower().replace(" ","_"))
 		self._debug("File %s"%filename)
 		self._debug("Saving %s"%desktop)
 		self.changes=False
@@ -197,6 +201,7 @@ class confDesktops(confStack):
 	def setParms(self,parms):
 		self._debug("Loading %s"%parms)
 		desktop=self.menu.get_desktop_info(parms)
+		self.filename=os.path.basename(parms)
 		self.defaultName=desktop['Name']
 		self.defaultExec=desktop['Exec']
 		self.defaultDesc=desktop['Comment']

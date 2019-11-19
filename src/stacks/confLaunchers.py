@@ -61,6 +61,8 @@ class dropButton(QPushButton):
 		self.setAcceptDrops(True)
 		self.setMaximumWidth(BTN_SIZE)
 		self.position=0
+		home=os.environ['HOME']
+		self.cache="%s/.cache/runomatic/"%home
 	#def __init__(self,title,parent):
 
 	def dragEnterEvent(self,e):
@@ -88,18 +90,26 @@ class dropButton(QPushButton):
 		self.drop.emit({"drop":self,'path':path})
 	#def dropEvent
 
-	def set_image(self,img,state='show'):
+	def setImage(self,img,state='show'):
 		self.img=img
 		if QtGui.QIcon.hasThemeIcon(self.img):
 			self.icon=QtGui.QIcon.fromTheme(self.img)
 		elif os.path.isfile(self.img):
-				print("Setting Icon: %s"%self.img)
-				print("find: %s"%self.img)
-				self.icon=QtGui.QIcon(self.img)
+				iconPixmap=QtGui.QPixmap(self.img)
+				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE,BTN_SIZE))
+				self.icon=QtGui.QIcon(scaledIcon)
 		elif self.img.startswith("http"):
-				tmpfile=tempfile.mkstemp(suffix=".ico")[1]
-				urlretrieve(self.img,tmpfile)
-				self.icon=QtGui.QIcon(tmpfile)
+				if not os.path.isdir("%s/icons"%self.cache):
+					os.makedirs("%s/icons"%self.cache)
+				tmpfile=os.path.join("%s/icons"%self.cache,self.img.split("/")[2].split(".")[0])
+				if not os.path.isfile(tmpfile):
+					try:
+						urlretrieve(self.img,tmpfile)
+					except:
+						tmpfile=QtGui.QIcon.fromTheme("shell")
+				iconPixmap=QtGui.QPixmap(tmpfile)
+				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE,BTN_SIZE))
+				self.icon=QtGui.QIcon(scaledIcon)
 		else:
 			return None
 		if state!='show':
@@ -110,11 +120,11 @@ class dropButton(QPushButton):
 		self.setIcon(self.icon)
 		self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
 		return True
-	#def set_image
+	#def setImage
 
 	def clone(self):
 		btn=dropButton(self.title,self.parent)
-		btn.set_image(self.img)
+		btn.setImage(self.img)
 		btn.setMenu(self.menu())
 		return(btn)
 	#def clone
@@ -272,14 +282,13 @@ class confLaunchers(confStack):
 			desktopsFixed=[]
 			for desktop in desktops:
 				#Check if desktop is from run-o-matic
-#				if "run-o-matic" in self.visible_categories:
 				if os.path.isdir(self.runoapps):
 					if desktop in os.listdir(self.runoapps):
 						desktop=os.path.join(self.runoapps,desktop)
 				deskInfo=self.runner.get_desktop_app(desktop)
 				for appName,appIcon in deskInfo.items():
 					btn_desktop=dropButton(desktop,self.tbl_app)
-					if not btn_desktop.set_image(appIcon,state):
+					if not btn_desktop.setImage(appIcon,state):
 						self._debug("Discard: %s"%appName)
 						btn_desktop.deleteLater()
 						continue
