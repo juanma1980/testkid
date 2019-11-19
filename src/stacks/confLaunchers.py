@@ -95,7 +95,9 @@ class dropButton(QPushButton):
 		if QtGui.QIcon.hasThemeIcon(self.img):
 			self.icon=QtGui.QIcon.fromTheme(self.img)
 		elif os.path.isfile(self.img):
-				self.icon=QtGui.QIcon(self.img)
+				iconPixmap=QtGui.QPixmap(self.img)
+				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE,BTN_SIZE))
+				self.icon=QtGui.QIcon(scaledIcon)
 		elif self.img.startswith("http"):
 				if not os.path.isdir("%s/icons"%self.cache):
 					os.makedirs("%s/icons"%self.cache)
@@ -105,7 +107,9 @@ class dropButton(QPushButton):
 						urlretrieve(self.img,tmpfile)
 					except:
 						tmpfile=QtGui.QIcon.fromTheme("shell")
-				self.icon=QtGui.QIcon(tmpfile)
+				iconPixmap=QtGui.QPixmap(tmpfile)
+				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE,BTN_SIZE))
+				self.icon=QtGui.QIcon(scaledIcon)
 		else:
 			return None
 		if state!='show':

@@ -375,7 +375,9 @@ class runomatic(QWidget):
 				if QtGui.QIcon.hasThemeIcon(appIcon):
 					icnApp=QtGui.QIcon.fromTheme(appIcon)
 				elif os.path.isfile(appIcon):
-						icnApp=QtGui.QIcon(appIcon)
+						iconPixmap=QtGui.QPixmap(appIcon)
+						scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+						icnApp=QtGui.QIcon(scaledIcon)
 				elif appIcon.startswith("http"):
 					if not os.path.isdir("%s/icons"%self.cache):
 						os.makedirs("%s/icons"%self.cache)
@@ -385,7 +387,9 @@ class runomatic(QWidget):
 							urlretrieve(appIcon,tmpfile)
 						except:
 							tmpfile=QtGui.QIcon.fromTheme("shell")
-					icnApp=QtGui.QIcon(tmpfile)
+					iconPixmap=QtGui.QPixmap(tmpfile)
+					scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+					icnApp=QtGui.QIcon(scaledIcon)
 				else:
 					continue
 				if not appName:
