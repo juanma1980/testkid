@@ -1,3 +1,10 @@
+runomatic (0.6) bionic; urgency=medium
+
+  * Scale smaller icons to proper size 
+  * Created cache for web resources
+
+ -- Juanma Navarro Mañez <juanma1980@gmail.com>  Tue, 19 Nov 2019 12:16:58 +0100
+
 runomatic (0.5.1) bionic; urgency=medium
 
   * Add get favicon for url resources
