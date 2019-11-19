@@ -10,6 +10,6 @@ Homepage: http://lliurex.net
 
 Package: runomatic
 Architecture: all
-Depends: ${python3:Depends}, python3-appconfig, python3-app2menu, python3-qanimatedstatusbar, python3-pyqt5, python3-passlib, ratpoison, xdotool, xloadimage, suckless-tools,python3-passlib
+Depends: ${python3:Depends}, python3-appconfig, python3-app2menu, python3-qanimatedstatusbar, python3-pyqt5, python3-passlib, ratpoison, xdotool, xloadimage, suckless-tools,python3-passlib,python3-xdg,python3-psutil
 Description: Activity launcher 
 
