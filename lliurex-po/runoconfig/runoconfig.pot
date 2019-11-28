@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 10:31+0100\n"
+"POT-Creation-Date: 2019-11-28 12:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,6 +43,26 @@ msgstr ""
 
 #: ../src/stacks/confApp.py:36
 msgid "Choose the config level that should use the app"
+msgstr ""
+
+#: ../src/stacks/confApp.py:40
+msgid "User"
+msgstr ""
+
+#: ../src/stacks/confApp.py:41
+msgid "System"
+msgstr ""
+
+#: ../src/stacks/confApp.py:42
+msgid "N4d"
+msgstr ""
+
+#: ../src/stacks/confApp.py:49
+msgid "Launch at startup"
+msgstr ""
+
+#: ../src/stacks/confApp.py:51
+msgid "Close session when application exits"
 msgstr ""
 
 #: ../src/stacks/confDesktops.py:26
