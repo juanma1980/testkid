@@ -1,0 +1,231 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-28 10:31+0100\n"
+"PO-Revision-Date: 2019-11-28 11:46+0100\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.6\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es_ES\n"
+
+#: ../src/stacks/confApp.py:16
+msgid "Choose the app behaviour"
+msgstr "Comportamiento de la aplicación"
+
+#: ../src/stacks/confApp.py:17
+msgid "Set app behaviour"
+msgstr "Selecciona el comportamiento de la aplicación"
+
+#: ../src/stacks/confApp.py:19
+msgid "From here you can set the behaviour of the app"
+msgstr "Desde aquí puedes seleccionar el comportamiento de la aplicación"
+
+#: ../src/stacks/confApp.py:29
+msgid "The config will be applied per user"
+msgstr "La configuración se aplicará por usuario"
+
+#: ../src/stacks/confApp.py:31
+msgid "The config will be applied to all users"
+msgstr "La configuración se aplicará a todos los usuarios"
+
+#: ../src/stacks/confApp.py:33
+msgid "The config will be applied to all users and clients"
+msgstr "La configuración se aplicará a todos los usuarios y clientes"
+
+#: ../src/stacks/confApp.py:36
+msgid "Choose the config level that should use the app"
+msgstr "Selecciona el nivel de configuración a usar"
+
+#: ../src/stacks/confDesktops.py:26
+msgid "Add new launchers"
+msgstr "Añadir lanzadores"
+
+#: ../src/stacks/confDesktops.py:27
+msgid "Add custom launcher"
+msgstr "Añadir lanzador personalizado"
+
+#: ../src/stacks/confDesktops.py:29
+msgid "From here you can add a custom launcher"
+msgstr "Desde aquí se pueden añadir lanzadores personalizados"
+
+#: ../src/stacks/confDesktops.py:54
+msgid "From here you can add Launchers"
+msgstr "Desde aquí se pueden añadir lanzadores"
+
+#: ../src/stacks/confDesktops.py:56
+msgid "Icon: "
+msgstr "Icono:"
+
+#: ../src/stacks/confDesktops.py:63
+msgid "Push to change icon"
+msgstr "Pulsa para cambiar el icono"
+
+#: ../src/stacks/confDesktops.py:66
+msgid "Name: "
+msgstr "Nombre:"
+
+#: ../src/stacks/confDesktops.py:69
+msgid "Desktop name"
+msgstr "Nombre del lanzador"
+
+#: ../src/stacks/confDesktops.py:70
+msgid "Insert desktop name"
+msgstr "Inserta el nombre del lanzador"
+
+#: ../src/stacks/confDesktops.py:72
+msgid "Executable: "
+msgstr "Ejecutable:"
+
+#: ../src/stacks/confDesktops.py:76
+msgid "Executable path"
+msgstr "Ruta al ejecutable"
+
+#: ../src/stacks/confDesktops.py:77
+msgid "Insert path to the executable"
+msgstr "Inserta la ruta al ejecutable"
+
+#: ../src/stacks/confDesktops.py:81
+msgid "Press button to select an executable"
+msgstr "Pulsa para seleccionar un ejecutable"
+
+#: ../src/stacks/confDesktops.py:84
+msgid "Description: "
+msgstr "Descripción:"
+
+#: ../src/stacks/confDesktops.py:87
+msgid "Description"
+msgstr "Descripción"
+
+#: ../src/stacks/confDesktops.py:88
+msgid "Insert a description for the app"
+msgstr "Inserta la descripción del lanzador"
+
+#: ../src/stacks/confDesktops.py:97
+msgid "images(*.png *.xpm *jpg)"
+msgstr "imagenes(*.png *.xpm *jpg)"
+
+#: ../src/stacks/confDesktops.py:99
+msgid "All files(*.*)"
+msgstr "Todos los ficheros(*.*)"
+
+#: ../src/stacks/confKeys.py:29
+msgid "Set keybindings for launch the configuration from Run-O-Matic"
+msgstr "Establece atajos de teclado para lanzar la configuración desde Run-O-Matic"
+
+#: ../src/stacks/confKeys.py:30
+msgid "Modify keybindings"
+msgstr "Modificar atajos de teclado"
+
+#: ../src/stacks/confKeys.py:32
+msgid "From here you can modify the keybinding"
+msgstr "Desde aquí se pueden modificar los atajos de teclado"
+
+#: ../src/stacks/confKeys.py:54
+msgid "From here you can define the keybindings"
+msgstr "Desde aquí se pueden definir los atajos de teclado"
+
+#: ../src/stacks/confKeys.py:56
+msgid "Launch configuration"
+msgstr "Configurar la aplicación"
+
+#: ../src/stacks/confKeys.py:57
+msgid "Press a key"
+msgstr "Pulsa una tecla"
+
+#: ../src/stacks/confLaunchers.py:151
+msgid "Configure visible launchers"
+msgstr "Configurar los lanzadores "
+
+#: ../src/stacks/confLaunchers.py:152
+msgid "Modify launchers"
+msgstr "Modificar lanzadores"
+
+#: ../src/stacks/confLaunchers.py:154
+msgid "Add custom launcher that will be shown in run-o-matic category"
+msgstr "Añadir un lanzador personalizado (en la categoría run-o-matic)"
+
+#: ../src/stacks/confLaunchers.py:204
+msgid "desktops(*.desktop)"
+msgstr "desktops(*.desktop)"
+
+#: ../src/stacks/confLaunchers.py:221
+msgid "Categories"
+msgstr "Categorías"
+
+#: ../src/stacks/confLaunchers.py:234
+msgid "Add launcher"
+msgstr "Añadir lanzador\t"
+
+#: ../src/stacks/confLaunchers.py:235
+msgid "Add Launcher"
+msgstr "Añadir lanzador\t"
+
+#: ../src/stacks/confLaunchers.py:296
+msgid "Show button"
+msgstr "Mostrar"
+
+#: ../src/stacks/confLaunchers.py:297
+msgid "Edit button"
+msgstr "Editar"
+
+#: ../src/stacks/confLaunchers.py:299
+msgid "Hide button"
+msgstr "Ocultar"
+
+#: ../src/stacks/confN4d.py:14
+msgid "Configure N4d server"
+msgstr "Configurar N4d"
+
+#: ../src/stacks/confN4d.py:15
+msgid "Configure n4d settings"
+msgstr "Ajustes de N4d"
+
+#: ../src/stacks/confN4d.py:17
+msgid "From here you can set the n4d settings"
+msgstr "Aquí se configura el N4d"
+
+#: ../src/stacks/confN4d.py:29
+msgid "Apply n4d policies"
+msgstr "Aplicar ajustes de N4d"
+
+#: ../src/stacks/confPass.py:17
+msgid "Password"
+msgstr "Contraseña"
+
+#: ../src/stacks/confPass.py:19
+msgid "Repeat password"
+msgstr "Repetir contraseña"
+
+#: ../src/stacks/confPass.py:21
+msgid "Set a master password"
+msgstr "Usar una contraseña maestra"
+
+#: ../src/stacks/confPass.py:22
+msgid "Set master password"
+msgstr "Contraseña maestra"
+
+#: ../src/stacks/confPass.py:24
+msgid "From here you can set the master password"
+msgstr "Desde aquí puedes establecer la contraseña maestra"
+
+#: ../src/stacks/confPass.py:36
+msgid "If a master password is set then the app will prompt for it to exit"
+msgstr "Si se establece una contraseña maestra ésta se solicitará para salir del programa"
+
+#: ../src/stacks/confPass.py:51
+msgid "Passwords don't match"
+msgstr "Las contraseñas no coinciden"
+
+#: ../src/stacks/confPass.py:54
+msgid "Password is empty"
+msgstr "La contraseña está vacía"
