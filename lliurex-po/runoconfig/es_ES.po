@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 10:31+0100\n"
-"PO-Revision-Date: 2019-11-28 11:46+0100\n"
+"POT-Creation-Date: 2019-11-28 12:20+0100\n"
+"PO-Revision-Date: 2019-11-28 12:26+0100\n"
+"Last-Translator: \n"
 "Language-Team: \n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.0.6\n"
-"Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: es_ES\n"
 
 #: ../src/stacks/confApp.py:16
 msgid "Choose the app behaviour"
@@ -45,6 +45,26 @@ msgstr "La configuración se aplicará a todos los usuarios y clientes"
 #: ../src/stacks/confApp.py:36
 msgid "Choose the config level that should use the app"
 msgstr "Selecciona el nivel de configuración a usar"
+
+#: ../src/stacks/confApp.py:40
+msgid "User"
+msgstr "Usuario"
+
+#: ../src/stacks/confApp.py:41
+msgid "System"
+msgstr "Sistema"
+
+#: ../src/stacks/confApp.py:42
+msgid "N4d"
+msgstr "N4d"
+
+#: ../src/stacks/confApp.py:49
+msgid "Launch at startup"
+msgstr "Ejecutar al arranque"
+
+#: ../src/stacks/confApp.py:51
+msgid "Close session when application exits"
+msgstr "Cerrar sesión al salir de la aplicación"
 
 #: ../src/stacks/confDesktops.py:26
 msgid "Add new launchers"
@@ -120,7 +140,8 @@ msgstr "Todos los ficheros(*.*)"
 
 #: ../src/stacks/confKeys.py:29
 msgid "Set keybindings for launch the configuration from Run-O-Matic"
-msgstr "Establece atajos de teclado para lanzar la configuración desde Run-O-Matic"
+msgstr ""
+"Establece atajos de teclado para lanzar la configuración desde Run-O-Matic"
 
 #: ../src/stacks/confKeys.py:30
 msgid "Modify keybindings"
@@ -220,7 +241,9 @@ msgstr "Desde aquí puedes establecer la contraseña maestra"
 
 #: ../src/stacks/confPass.py:36
 msgid "If a master password is set then the app will prompt for it to exit"
-msgstr "Si se establece una contraseña maestra ésta se solicitará para salir del programa"
+msgstr ""
+"Si se establece una contraseña maestra ésta se solicitará para salir del "
+"programa"
 
 #: ../src/stacks/confPass.py:51
 msgid "Passwords don't match"

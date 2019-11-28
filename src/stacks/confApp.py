@@ -24,12 +24,12 @@ class confApp(confStack):
 	
 	def _load_screen(self):
 		def _change_osh():
-			txt=self.cmb_level.currentText()
-			if txt=='User':
+			idx=self.cmb_level.currentIndex()
+			if idx==0:
 				lbl_help.setText(_("The config will be applied per user"))
-			elif txt=='System':
+			elif idx==1:
 				lbl_help.setText(_("The config will be applied to all users"))
-			elif txt=='N4d':
+			elif idx==2:
 				lbl_help.setText(_("The config will be applied to all users and clients"))
 			self.fakeUpdate()
 		box=QVBoxLayout()
@@ -37,18 +37,18 @@ class confApp(confStack):
 		lbl_txt.setAlignment(Qt.AlignTop)
 		box.addWidget(lbl_txt,0)
 		self.cmb_level=QComboBox()
-		self.cmb_level.addItem("User")
-		self.cmb_level.addItem("System")
-		self.cmb_level.addItem("N4d")
+		self.cmb_level.addItem(_("User"))
+		self.cmb_level.addItem(_("System"))
+		self.cmb_level.addItem(_("N4d"))
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		box.addWidget(self.cmb_level,1,Qt.AlignLeft)
 		lbl_help=QLabel("")
 		_change_osh()
 		box.addWidget(lbl_help,1,Qt.AlignTop)
-		self.chk_startup=QCheckBox("Launch at startup")
+		self.chk_startup=QCheckBox(_("Launch at startup"))
 		box.addWidget(self.chk_startup,1,Qt.AlignTop)
-		self.chk_close=QCheckBox("Close session when application exits")
+		self.chk_close=QCheckBox(_("Close session when application exits"))
 		box.addWidget(self.chk_close,2,Qt.AlignTop)
 
 		self.setLayout(box)
@@ -110,7 +110,14 @@ class confApp(confStack):
 	def writeConfig(self):
 		sw_ko=False
 		level=self.level
-		configLevel=self.cmb_level.currentText().lower()
+		idx=self.cmb_level.currentText().lower()
+		if idx==0:
+			configLevel='user'
+		elif idx==1:
+			configLevel='system'
+		elif idx==2:
+			configLevel='n4d'
+
 		if configLevel!=level:
 			if not self.saveChanges('config',configLevel,'system'):
 				self.saveChanges('config',level,'system')
