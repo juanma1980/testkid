@@ -43,7 +43,7 @@ class confApp(confStack):
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		box.addWidget(self.cmb_level,1,Qt.AlignLeft)
-		lbl_help=QLabel(_(""))
+		lbl_help=QLabel("")
 		_change_osh()
 		box.addWidget(lbl_help,1,Qt.AlignTop)
 		self.chk_startup=QCheckBox("Launch at startup")
