@@ -13,8 +13,8 @@ class confApp(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self._debug("confApp Load")
-		self.menu_description=(_("Choose the app behaviour"))
-		self.description=(_("Set app behaviour"))
+		self.description=(_("Choose the app behaviour"))
+		self.menu_description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
 		self.tooltip=(_("From here you can set the behaviour of the app"))
 		self.index=1
