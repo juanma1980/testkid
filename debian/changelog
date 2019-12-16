@@ -1,3 +1,10 @@
+runomatic (0.8) bionic; urgency=medium
+
+  * Use n4d config when no user's config
+  * Allow to load custom desktop stack from launchers configuration
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 16 Dec 2019 14:35:33 +0100
+
 runomatic (0.7) bionic; urgency=medium
 
   * Add translations
