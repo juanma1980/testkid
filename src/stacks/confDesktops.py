@@ -32,6 +32,7 @@ class confDesktops(confStack):
 		self.defaultDesc=""
 		self.index=3
 		self.enabled=True
+		self.filename=""
 		self.level='user'
 	#def __init__
 		
@@ -115,19 +116,24 @@ class confDesktops(confStack):
 	#def _file_chooser
 
 	def _get_icon(self):
-		exeLine=self.inp_exec.text().split(' ')
-		if 'firefox' not in exeLine and 'chromium' not in exeLine and 'chrome' not in exeLine:
+		txt=self.inp_exec.text()
+		if txt.startswith("http"):
+			txt="firefox %s"%txt
+		exeLine=txt.split(' ')
+		if 'firefox' not in exeLine and 'chromium' not in exeLine and 'chrome' not in exeLine :
 			return
 		path=exeLine[-1]
 		path=path.split(" ")[0]
 		splitPath=path.split("/")
 		if "://" in path:
-			path=("%s//%s"%(splitPath[0],splitPath[1]))
+			path=("%s//%s"%(splitPath[0],splitPath[2]))
 		else:
 			path=("http://%s"%(splitPath[0]))
 		try:
+			self._debug("Requesting %s"%path)
 			req=Request(path)
-		except:
+		except Exception as e:
+			self._debug("Couldn't build url: %s"%(e))
 			return
 		ico=""
 		try:
@@ -150,8 +156,8 @@ class confDesktops(confStack):
 							icn=QtGui.QIcon(outputIco)
 							self.btn_icon.setIcon(icn)
 							break
-		except:
-			self._debug("Couldn't open %s"%url)
+		except Exception as e:
+				self._debug("Couldn't open %s: %s"%(req,e))
 	#def _get_icon
 
 
@@ -170,7 +176,10 @@ class confDesktops(confStack):
 		desktop['Categories']='run-o-matic;'
 		desktop['NoDisplay']='True'
 		desktop['Name']=self.inp_name.text()
-		desktop['Exec']=self.inp_exec.text()
+		txt=self.inp_exec.text()
+		if txt.startswith("http"):
+			txt="firefox %s"%txt
+		desktop['Exec']=txt
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
 		if self.filename:

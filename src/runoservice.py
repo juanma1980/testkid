@@ -15,8 +15,13 @@ if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 		conf=config.getConfig('n4d')
 		data=conf['n4d'].copy()
 	elif level=='user':
-		conf=config.getConfig('user')
-		data=conf['user'].copy()
+		#If there's no user's config set the n4d config as default
+		if os.path.isfile('%s/runomatic.conf'%baseDirs['user']):
+			conf=config.getConfig('user')
+		else:
+			conf=config.getConfig('n4d')
+			level=conf['n4d'].get("config",None)
+		data=conf[level].copy()
 	else:
 		data=conf['system'].copy()
 
