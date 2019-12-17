@@ -1,3 +1,9 @@
+runomatic (0.8.1) bionic; urgency=medium
+
+  * libAppRun loads n4d config as backup config
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 17 Dec 2019 12:44:27 +0100
+
 runomatic (0.8) bionic; urgency=medium
 
   * Use n4d config when no user's config
