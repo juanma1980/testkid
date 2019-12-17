@@ -323,6 +323,7 @@ class appRun():
 			if os.path.isfile('%s/.config/%s'%(os.environ['HOME'],self.confFile)):
 				data['system']['config']='user'
 			else:
+				self._debug("User config not available. Reading n4d config")
 				data['system']['config']='n4d'
 		self.level=data['system']['config']
 		self._debug("Read level from config: %s"%self.level)
