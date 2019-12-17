@@ -513,8 +513,9 @@ class runomatic(QWidget):
 	def _get_desktop_apps(self,desktop):
 		#Check if desktop is from run-o-matic
 		if "run-o-matic" in self.categories:
-			if desktop in os.listdir(self.runoapps):
-				desktop=os.path.join(self.runoapps,desktop)
+			if os.path.isdir(self.runoapps):
+				if desktop in os.listdir(self.runoapps):
+					desktop=os.path.join(self.runoapps,desktop)
 		apps=self.runner.get_desktop_app(desktop)
 		return (apps)
 	#def _get_category_apps
