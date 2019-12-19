@@ -204,6 +204,7 @@ class runomatic(QWidget):
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
 		self.bg=data.get('background',self.bg)
+		self.runner.setBg(self.bg)
 	#def _read_config(self):
 
 	def _render_gui(self):

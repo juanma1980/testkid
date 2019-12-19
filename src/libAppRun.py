@@ -125,6 +125,7 @@ class appRun():
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		self.baseDir="/usr/share/runomatic/"
 		self.runoapps="/usr/share/runomatic/applications"
+		self.bg="%s/rsrc/background2.png"%self.baseDir
 		self.pid=0
 		self.procMons=[]
 		self.deadProcesses=[]
@@ -148,6 +149,9 @@ class appRun():
 		if self.dbg:
 			print("appRun: %s"%msg)
 	#def _debug
+
+	def setBg(self,bg):
+		self.bg=bg
 
 	def __init__config(self):
 		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
@@ -272,9 +276,10 @@ class appRun():
 			f.write("set border 0\n")
 			f.write("startup message off\n")
 			f.write("set bgcolor white\n")
-			f.write("set fgcolor white\n")
+			f.write("set fgcolor black\n")
+			f.write("startup_message off\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
-			f.write("exec xloadimage -shrink -fullscreen -onroot %s/rsrc/background2.png\n"%self.baseDir)
+			f.write("exec xloadimage -tile -onroot %s\n"%self.bg)
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
 		th_run=th_runApp(app,display)
 		th_run.start()
