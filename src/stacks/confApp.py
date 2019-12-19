@@ -18,6 +18,7 @@ class confApp(confStack):
 		self.icon=('dialog-password')
 		self.tooltip=(_("From here you can set the behaviour of the app"))
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
+		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.index=1
 		self.enabled=True
 		self.level='user'
@@ -45,7 +46,6 @@ class confApp(confStack):
 		self.cmb_level.setFixedWidth(100)
 		box.addWidget(self.cmb_level,1,Qt.AlignLeft)
 		lbl_help=QLabel(_(""))
-		_change_osh()
 		box.addWidget(lbl_help,1,Qt.AlignTop)
 		self.chk_startup=QCheckBox("Launch at startup")
 		box.addWidget(self.chk_startup,1,Qt.AlignTop)
@@ -61,6 +61,7 @@ class confApp(confStack):
 		self.btn_img.setIconSize(QSize(102,76))
 		box.addWidget(self.btn_img,Qt.AlignTop)
 		self.setLayout(box)
+		_change_osh()
 		self.updateScreen()
 		return(self)
 	#def _load_screen
@@ -88,6 +89,11 @@ class confApp(confStack):
 			self.chk_startup.setChecked(startup)
 		except:
 			pass
+		bg=config[level].get('background',self.defaultBg)
+		if bg:
+			if os.path.isfile(bg):
+				icon=QtGui.QIcon(bg)
+				self.btn_img.setIcon(icon)
 	#def fakeUpdate
 
 	def updateScreen(self):
@@ -114,7 +120,7 @@ class confApp(confStack):
 			else:
 				startup=False
 		self.chk_startup.setChecked(startup)
-		bg=config[self.level].get('background',"")
+		bg=config[self.level].get('background',self.defaultBg)
 		if bg:
 			if os.path.isfile(bg):
 				icon=QtGui.QIcon(bg)

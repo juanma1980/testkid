@@ -130,6 +130,7 @@ class runomatic(QWidget):
 		self.focusWidgets=[]
 		self.appsWidgets=[]
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
+		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -203,7 +204,14 @@ class runomatic(QWidget):
 		self.keybinds=data.get('keybinds',{})
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
-		self.bg=data.get('background',self.bg)
+		self.bg=data.get('background',self.defaultBg)
+		if ((self.bg==None) or (not(os.path.isfile(self.bg)))) :
+			self.bg=self.defaultBg
+		print("******************")
+		print("******************")
+		print(self.bg)
+		print("******************")
+		print("******************")
 		self.runner.setBg(self.bg)
 	#def _read_config(self):
 
