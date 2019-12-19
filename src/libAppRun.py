@@ -371,6 +371,7 @@ class appRun():
 				apps['password']=data[level].get('password')
 				apps['close']=data[level].get('close')
 				apps['startup']=data[level].get('startup')
+				apps['background']=data[level].get('background')
 
 			self._debug("Readed %s"%apps)
 

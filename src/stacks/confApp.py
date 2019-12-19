@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QComboBox,QCheckBox
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QComboBox,QCheckBox,QFileDialog
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QSize
 from appconfig.appConfigStack import appConfigStack as confStack
 
 import gettext
@@ -11,12 +11,13 @@ _ = gettext.gettext
 
 class confApp(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confApp Load")
 		self.menu_description=(_("Choose the app behaviour"))
 		self.description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
 		self.tooltip=(_("From here you can set the behaviour of the app"))
+		self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.index=1
 		self.enabled=True
 		self.level='user'
@@ -50,7 +51,15 @@ class confApp(confStack):
 		box.addWidget(self.chk_startup,1,Qt.AlignTop)
 		self.chk_close=QCheckBox("Close session when application exits")
 		box.addWidget(self.chk_close,2,Qt.AlignTop)
-
+		lbl_img=QLabel(_("Choose the background image"))
+		box.addWidget(lbl_img,Qt.AlignTop)
+		icn=QtGui.QIcon(self.bg)
+		self.btn_img=QPushButton()
+		self.btn_img.setStyleSheet("border:1px solid black;")
+		self.btn_img.clicked.connect(self._setBg)
+		self.btn_img.setIcon(icn)
+		self.btn_img.setIconSize(QSize(102,76))
+		box.addWidget(self.btn_img,Qt.AlignTop)
 		self.setLayout(box)
 		self.updateScreen()
 		return(self)
@@ -105,25 +114,39 @@ class confApp(confStack):
 			else:
 				startup=False
 		self.chk_startup.setChecked(startup)
+		bg=config[self.level].get('background',"")
+		if bg:
+			if os.path.isfile(bg):
+				icon=QtGui.QIcon(bg)
+				self.btn_img.setIcon(icon)
 	#def _udpate_screen
+
+	def _setBg(self):
+		self._debug("Changing background")
+		fdia=QFileDialog()
+		fchoosed=''
+		fdia.setFileMode(QFileDialog.AnyFile)
+		fdia.setNameFilter(_("images(*.png *.svg *jpg *bmp)"))
+		if (fdia.exec_()):
+			fchoosed=fdia.selectedFiles()[0]
+			self.bg=fdia.selectedFiles()[0]
+			icn=QtGui.QIcon(self.bg)
+			self.btn_img.setIcon(icn)
+			return(fchoosed)
+	#def _setBg(self)
 	
 	def writeConfig(self):
-		sw_ko=False
 		level=self.level
 		configLevel=self.cmb_level.currentText().lower()
 		if configLevel!=level:
 			if not self.saveChanges('config',configLevel,'system'):
 				self.saveChanges('config',level,'system')
-				sw_ko=True
-		if sw_ko==False:
-			startup=self.chk_startup.isChecked()
-			if self.saveChanges('startup',startup):
-				close=self.chk_close.isChecked()
-				if not self.saveChanges('close',close):
-					sw_ko=True
 			else:
-				sw_ko=True
-		else:
-			sw_ko=True
+				return()
+		startup=self.chk_startup.isChecked()
+		self.saveChanges('startup',startup)
+		close=self.chk_close.isChecked()
+		self.saveChanges('close',close)
+		self.saveChanges('background',self.bg)
 	#def writeConfig
 

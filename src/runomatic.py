@@ -42,6 +42,7 @@ class appZone(QWidget):
 		zone.setGeometry(1,1,10,10)
 		zone.show()
 		return(zone)
+#class appZone
 
 
 class navButton(QPushButton):
@@ -102,17 +103,7 @@ class navButton(QPushButton):
 			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
 			event.setAccepted(False)
 	#def eventFilter
-	
-	def showMessage(self,msg,status="error",height=BTN_SIZE):
-#		self.statusBar.height_=height
-#		self.statusBar.setText(msg)
-#		if status:
-#			self.statusBar.show(status,hide=False)
-#		else:
-#			self.statusBar.show(hide=False)
-#		self.setEnabled(False)
-		pass
-	#def _show_message
+#class navButton
 
 class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
@@ -138,6 +129,7 @@ class runomatic(QWidget):
 		self.tab_id={}
 		self.focusWidgets=[]
 		self.appsWidgets=[]
+		self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -166,13 +158,13 @@ class runomatic(QWidget):
 		self.display=os.environ['DISPLAY']
 		home=os.environ['HOME']
 		self.cache="%s/.cache/runomatic/"%home
+		self.setStyleSheet(self._define_css())
 		self._render_gui()
 	#def init
 
 	def _fail_process(self,*args):
-#		self.showMessage(_(":( :( :( App failed to start"),"error2",height=32)
-		self.focusWidgets[self.currentBtn].showMessage(":(")
 		self._set_focus("Right")
+	#def _fail_process
 
 	def _end_process(self,*args):
 		for thread in self.runner.getDeadProcesses():
@@ -211,10 +203,14 @@ class runomatic(QWidget):
 		self.keybinds=data.get('keybinds',{})
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
+		self.bg=data.get('background',self.bg)
 	#def _read_config(self):
 
 	def _render_gui(self):
-		self.setObjectName("window")
+		#Enable transparent window
+#		self.setStyleSheet('background:transparent')
+#		self.setAttribute(Qt.WA_TranslucentBackground)
+		####
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowState(Qt.WindowFullScreen)
@@ -238,13 +234,13 @@ class runomatic(QWidget):
 		self.statusBar.height_=152
 		self.box.addWidget(self.statusBar,0,0,1,2)
 		self.tabBar=self._tabBar()
+		self.setObjectName("tabbar")
+#		self.tabBar.setAttribute(Qt.WA_TranslucentBackground)
 		self.tabBar.currentChanged.connect(lambda:self._on_tabChanged(False))
 		self.box.addWidget(self.tabBar,0,0,1,1)
 		self.setLayout(self.box)
 		self.tabBar.setFocusPolicy(Qt.NoFocus)
 		if self.focusWidgets:
-			self._debug("Focus to %s"%self.focusWidgets[0])
-#			self.focusWidgets[0].setFocus()
 			self._set_focus("")
 		else:
 			wdg=QWidget()
@@ -321,7 +317,6 @@ class runomatic(QWidget):
 		self.grabMouse()
 		#cursor.setPos(50,50)
 		self.releaseMouse()
-		print(cursor.pos())
 		if key=="Space" or key=="NumLock+Enter" or key=="Return":
 			self.focusWidgets[self.currentBtn].clicked.emit()
 		elif key=="Tab":
@@ -357,6 +352,7 @@ class runomatic(QWidget):
 					currentBtn=self.currentBtn
 				self.currentBtn=currentBtn
 			self.focusWidgets[self.currentBtn].setFocus()
+			self._debug("Focus to %s"%self.focusWidgets[self.currentBtn])
 			self.focusWidgets[self.currentBtn].resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 	#def _set_focus(self,key):
@@ -417,6 +413,8 @@ class runomatic(QWidget):
 
 		tabBar=QTabWidget()
 		tabScroll=QWidget()
+		tabScroll.setObjectName("scroll")
+		tabScroll.setStyleSheet("#scroll{background-image:url('%s');}"%self.bg)
 		tabScroll.setFocusPolicy(Qt.NoFocus)
 		scrollArea=QScrollArea(tabScroll)
 		scrollArea.setFocusPolicy(Qt.NoFocus)
@@ -439,6 +437,7 @@ class runomatic(QWidget):
 		tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['show'])
 		tabBar.tabBar().tabButton(0,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		scrollArea.setGeometry(QRect(0,0,w,h))
+		tabBar.setObjectName("tabbar")
 		return (tabBar)
 	#def _tabBar
 
@@ -451,7 +450,7 @@ class runomatic(QWidget):
 			index=0
 			key='close'
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
-		self._debug("BTN1: %s"%self.tab_id[index][key])
+		self._debug("Pressed: %s"%self.tab_id[index][key])
 		try:
 			self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		except:
@@ -466,7 +465,7 @@ class runomatic(QWidget):
 			key='show'
 		self._debug("New Tab Index: %s"%self.tab_id[index])
 		self._debug("New index: %s"%index)
-		self._debug("BTN: %s"%self.tab_id[index][key])
+		self._debug("Btn: %s"%self.tab_id[index][key])
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
@@ -490,7 +489,7 @@ class runomatic(QWidget):
 			os.remove(xlockFile)
 		for idx in range(index+1,len(self.tab_id)):
 			if idx in self.tab_id.keys():
-				self._debug("%s"%self.tab_id)
+				self._debug("Tab Array: %s"%self.tab_id)
 				if 'index' in self.tab_id[idx].keys():
 					self._debug("Reasign %s"%(self.tab_id[idx]['index']))
 					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
@@ -498,7 +497,7 @@ class runomatic(QWidget):
 		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		index=self.currentTab
-		self._debug("NEW TAB: %s"%self.currentTab)
+		self._debug("New tab: %s"%self.currentTab)
 		self._on_tabChanged()
 		self.tabBar.blockSignals(False)
 		self.tabBar.setCurrentIndex(index)
@@ -524,7 +523,7 @@ class runomatic(QWidget):
 		tabContent=QWidget()
 		box=QVBoxLayout()
 		wid=self.runner.get_wid("Xephyr on",self.display)
-		self._debug("W: %s"%wid)
+		self._debug("Window Wid: %s"%wid)
 		zone=None
 		if wid:
 			zone=appZone(tabContent).createZone(wid)
@@ -555,10 +554,6 @@ class runomatic(QWidget):
 			btn_close.clicked.connect(self.sigmap_tabRemove.map)
 			self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
 			self.tabBar.addTab(tabContent,"")
-#		else:
-#			self._debug("Xephyr failed to launch")
-#			tabContent.destroy()
-#			wid=None
 		return(wid)
 	#def _launchZone
 
@@ -567,7 +562,7 @@ class runomatic(QWidget):
 		self.setCursor(cursor)
 		self.grabMouse()
 		self.tabBar.setTabIcon(0,self.previousIcon)
-		self._debug("Tabs: %s"%self.tabBar.count())
+		self._debug("Tab count: %s"%self.tabBar.count())
 		#Tabs BEFORE new tab is added
 		tabCount=self.tabBar.count()
 		btn=None
@@ -584,7 +579,6 @@ class runomatic(QWidget):
 		if self._launchZone(app):
 			self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
 			self.tab_id[self.id]['xephyr']=x_pid
-#			self.tab_id[self.id]['thread'].processEnd.connect(self._end_process)
 		else:
 			if self.pid:
 				self.runner.send_signal_to_thread("kill",self.pid)
@@ -613,26 +607,26 @@ class runomatic(QWidget):
 	def _get_tabId_from_index(self,index):
 		idx=index
 		self._debug("Search id for display: %s"%(index))
-		self._debug("%s"%(self.tab_id))
+		self._debug("Current id: %s"%(self.tab_id))
 		for key,data in self.tab_id.items():
 			if 'index' in data.keys():
 				if index==data['index']:
 					idx=key
 					break
-		self._debug("Find idx: %s For index: %s"%(idx,index))
+		self._debug("Found tab idx: %s For selected index: %s"%(idx,index))
 		return idx
 	#def _get_tabId_from_index
 	
 	def _get_tabId_from_thread(self,thread):
 		idx=-1
 		self._debug("Search id for thread: %s"%(thread))
-		self._debug("%s"%(self.tab_id))
+		self._debug("Current id: %s"%(self.tab_id))
 		for key,data in self.tab_id.items():
 			if 'thread' in data.keys():
 				if thread==data['thread']:
 					idx=key
 					break
-		self._debug("Find idx: %s For thread: %s"%(idx,thread))
+		self._debug("Found idx: %s For thread: %s"%(idx,thread))
 		return idx
 	#def _get_tabId_from_thread
 	
@@ -644,42 +638,42 @@ class runomatic(QWidget):
 		else:
 			self.statusBar.show()
 	#def _show_message
+
+	def _define_css(self):
+		css="""
+		#PushButton{
+			padding:10px;
+			margin:0px;
+			border:0px;
+			background-color:transparent;
+		}
+		#PushButton:active{
+			font: 14px Roboto;
+			color:black;
+			background:none;
+			background-color:transparent;
+		}	
+		#PushButton:focus{
+			background:qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 silver,stop:1 white);
+			border-radius:25px;
+		}
+		#launcher{
+			background-repeat:no-repeat;
+			background-position:center;
+			border:0px solid red;
+
+		}
+		#appzone{
+			background-color:transparent;
+			border:10px solid red;
+		}
+		"""
+		self._debug("Setting background: %s"%self.bg)
+		return(css)
+		#def _define_css
 #class runomatic
-
-def _define_css():
-	css="""
-	#PushButton{
-		padding:10px;
-		margin:0px;
-		border:0px;
-		background-color:transparent;
-	}
-	#PushButton:active{
-		font: 14px Roboto;
-		color:black;
-		background:none;
-	}	
-	#PushButton:focus{
-		background:qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 silver,stop:1 white);
-		border-radius:25px;
-	}
-	#launcher{
-		background-image:url("/usr/share/runomatic/rsrc/background2.png");
-		background-repeat:no-repeat;
-		background-position:center;
-		background-color:transparent;
-	}
-	#appzone{
-		background-color:red;
-		border:10px solid red;
-	}
-	"""
-	return(css)
-	#def _define_css
-
 
 app=QApplication(["Run-O-Matic"])
 runomaticLauncher=runomatic()
-app.instance().setStyleSheet(_define_css())
 app.exec_()
 
