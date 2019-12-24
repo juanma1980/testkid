@@ -386,7 +386,6 @@ class appRun():
 		runomatic={}
 		if 'run-o-matic' not in categories:
 			for runoapp in self.get_category_desktops("run-o-matic"):
-				print("Appemd: %s"%runoapp)
 				runomatic[(os.path.basename(runoapp))]=runoapp
 		if categories:
 			for category in apps['categories']:
@@ -402,8 +401,9 @@ class appRun():
 						if runomatic.get(os.path.basename(app),False):
 							idx=apps['desktops'].index(app)
 							apps['banned'].append(app)
-							apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
-							print("INSERT: %s"%runomatic[os.path.basename(app)])
+							if (runomatic[os.path.basename(app)] not in apps['desktops']):
+								apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
+								print("INSERT: %s"%runomatic[os.path.basename(app)])
 						apps['desktops'].remove(app)
 		self._debug("Banned; %s"%apps['banned'])
 		return(apps)

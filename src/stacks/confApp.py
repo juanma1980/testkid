@@ -21,7 +21,7 @@ class confApp(confStack):
 		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.index=1
 		self.enabled=True
-		self.level='user'
+		self.level=''
 	#def __init__
 	
 	def _load_screen(self):
@@ -73,8 +73,14 @@ class confApp(confStack):
 
 	def fakeUpdate(self):
 		level=self.cmb_level.currentText().lower()
+		print("*****")
+		print(level)
 		config=self.getConfig(level)
-		close=config[level].get('close',False)
+		print(config)
+		print("*****")
+		close=False
+		if level in config.keys():
+			close=config[level].get('close',False)
 		if close:
 			if str(close).lower()=='true':
 				close=True
@@ -102,7 +108,10 @@ class confApp(confStack):
 	#def fakeUpdate
 
 	def updateScreen(self):
+		print(self.level)
 		config=self.getConfig()
+		print("++++++++++++++++++")
+		print(self.level)
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
