@@ -196,11 +196,21 @@ class confDesktops(confStack):
 			self.refresh=True
 			retval=True
 			if self.editBtn:
-				self.editBtn=False
+				if "runomatic" not in self.editBtn:
+					hidden=self.config[self.level].get("hidden",[])
+					hidden.append(self.editBtn)
+					self.saveChanges('hidden',hidden)
+					desktops=self.config[self.level].get("desktops",[])
+					if self.editBtn in desktops:
+						idx=desktops.index(self.editBtn)
+						desktops.remove(self.editBtn)
+						desktops.insert(idx,filename)
+						self.saveChanges('desktops',desktops)
 				self.default_icon='shell'
 				self.defaultName=""
 				self.defaultExec=""
 				self.defaultDesc=""
+				self.editBtn=False
 				self.stack.gotoStack(idx=2,parms=self.editBtn)
 		except Exception as e:
 			self._debug(e)

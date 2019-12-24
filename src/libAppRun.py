@@ -367,11 +367,11 @@ class appRun():
 
 		if level:
 			self._debug("Read file %s"%level)
+			apps['hidden']=data[level].get('hidden',[])
+			apps['banned']=data[level].get('banned',[])
 			if categories==[] and load_categories:
 				apps['categories']=data[level].get('categories',[])
 				apps['desktops']=data[level].get('desktops',[])
-				apps['hidden']=data[level].get('hidden',[])
-				apps['banned']=data[level].get('banned',[])
 				apps['keybinds']=data[level].get('keybinds')
 				apps['password']=data[level].get('password')
 				apps['close']=data[level].get('close')
@@ -382,17 +382,30 @@ class appRun():
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
-		categories=apps.get('categories',None)
+		categories=apps.get('categories',[])
+		runomatic={}
+		if 'run-o-matic' not in categories:
+			for runoapp in self.get_category_desktops("run-o-matic"):
+				print("Appemd: %s"%runoapp)
+				runomatic[(os.path.basename(runoapp))]=runoapp
 		if categories:
 			for category in apps['categories']:
 				cat_apps=self.get_category_desktops(category.lower())
 				for app in cat_apps:
 					if ((app not in apps['desktops']) and (app not in apps['banned'])):
 						apps['desktops'].append(app)
-					elif 'runomatic' in app and app not in apps['desktops']:
-						apps['desktops'].append(app)
+					#elif 'runomatic' in app: 
+					#	if app in apps['desktops']:
+					#		apps['desktops'].remove(app)
+					#		apps['desktops'].append(app)
 					if app in apps['hidden'] and app in apps['desktops']:
+						if runomatic.get(os.path.basename(app),False):
+							idx=apps['desktops'].index(app)
+							apps['banned'].append(app)
+							apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
+							print("INSERT: %s"%runomatic[os.path.basename(app)])
 						apps['desktops'].remove(app)
+		self._debug("Banned; %s"%apps['banned'])
 		return(apps)
 
 	def get_category_desktops(self,category):

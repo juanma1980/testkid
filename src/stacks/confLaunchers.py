@@ -293,10 +293,10 @@ class confLaunchers(confStack):
 						btn_desktop.deleteLater()
 						continue
 					btnMenu=QMenu()
-					h_action=_("Show button")
+					h_action=_("Hide button")
 					e_action=_("Edit button")
-					if state=="show":
-						h_action=_("Hide button")
+					if state!="show":
+						h_action=_("Show button")
 					show=btnMenu.addAction(h_action)
 					edit=btnMenu.addAction(e_action)
 					show.triggered.connect(lambda:self._changeBtnState(apps,state))
@@ -354,7 +354,7 @@ class confLaunchers(confStack):
 		row=self.tbl_app.currentRow()
 		col=self.tbl_app.currentColumn()
 		btn=self.tbl_app.cellWidget(row,col)
-		self.stack.gotoStack(idx=4,parms=btn.title)
+		self.stack.gotoStack(idx=3,parms=btn.title)
 
 	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
