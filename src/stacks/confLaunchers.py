@@ -21,6 +21,70 @@ BTN_SIZE_FULL=128
 BTN_SIZE=32
 
 
+class desktopChooser(QDialog):
+	def __init__(self,parent):
+		super (desktopChooser,self).__init__(parent)
+		self.parent=parent
+		self.menu=App2Menu.app2menu()
+		self.setWindowTitle(_("Launcher select"))
+		self.setModal(False)
+		self.desktopList=QListWidget()
+		self.desktopList.setDragEnabled(True)
+		self.desktopList.setAcceptDrops(True)
+		self.desktopList.setSpacing(3)
+		self.desktopList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.desktopList.itemDoubleClicked.connect(self._dblClick)
+		self.desktopList.itemSelectionChanged.connect(self._loadMime)
+		self.data={}
+		self._renderGui()
+	
+	def _renderGui(self):
+		box=QVBoxLayout()
+		#Load available desktops
+		categories=self.menu.get_categories()
+		for category in categories:
+			desktops=self.menu.get_apps_from_category(category)
+			for desktop in desktops:
+				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
+				if desktopInfo.get("NoDisplay",False):
+					continue
+#				desktopWidget=QPushButton()
+				listWidget=QListWidgetItem()
+				desktopLayout=QGridLayout()
+				ficon=desktopInfo.get("Icon","shell")
+				icon=QtGui.QIcon.fromTheme(ficon)
+				name=desktopInfo.get("Name","shell")
+				comment=desktopInfo.get("Comment","shell")
+				listWidget.setIcon(icon)
+				listWidget.setText(name)
+				self.desktopList.addItem(listWidget)
+				self.data['listWidget']="%s/%s"%(self.menu.desktoppath,desktop)
+#				self.desktopList.setItemWidget(listWidget,desktopWidget)
+		box.addWidget(self.desktopList)
+		self.setLayout(box)
+
+	def _dblClick(self):
+		print("Click")
+	
+	def _loadMime(self,):
+			#		self.drop.emit({"drag":self})
+#		self.position=e.pos()
+		mimedata=QMimeData()
+		drag=QtGui.QDrag(self)
+		drag.setMimeData(mimedata)
+#		pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
+#		drag.setPixmap(pixmap)
+		dropAction=drag.exec_(Qt.MoveAction)
+	#def mousePressEvent
+				
+	def dropEvent(self,e):
+		lstWdg=self.desktopList.currentItem()
+		path=None
+		e.setDropAction(Qt.MoveAction)
+		e.accept()
+		path=self.data[lstWdg]
+		self.drop.emit(path)
+
 class dropTable(QTableWidget):
 	drop=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent,row,col):
@@ -198,12 +262,14 @@ class confLaunchers(confStack):
 			self.update_apps(apps)
 		
 		def _update_desktops():
-			fdia=QFileDialog()
+#			fdia=QFileDialog()
+			fdia=desktopChooser(self)
 			fchoosed=''
-			fdia.setFileMode(QFileDialog.AnyFile)
-			fdia.setNameFilter(_("desktops(*.desktop)"))
-			fdia.setDirectory("/usr/share/applications")
-			if (fdia.exec_()):
+#			fdia.setFileMode(QFileDialog.AnyFile)
+#			fdia.setNameFilter(_("desktops(*.desktop)"))
+#			fdia.setDirectory("/usr/share/applications")
+#			if (fdia.exec_()):
+			if (fdia.show()):
 				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
 				apps=self._get_table_apps()
