@@ -22,6 +22,7 @@ BTN_SIZE=32
 
 
 class desktopChooser(QDialog):
+	drop=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
 		super (desktopChooser,self).__init__(parent)
 		self.parent=parent
@@ -34,7 +35,7 @@ class desktopChooser(QDialog):
 		self.desktopList.setSpacing(3)
 		self.desktopList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.desktopList.itemDoubleClicked.connect(self._dblClick)
-		self.desktopList.itemSelectionChanged.connect(self._loadMime)
+#		self.desktopList.itemSelectionChanged.connect(self._loadMime)
 		self.data={}
 		self._renderGui()
 	
@@ -48,7 +49,6 @@ class desktopChooser(QDialog):
 				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
 				if desktopInfo.get("NoDisplay",False):
 					continue
-#				desktopWidget=QPushButton()
 				listWidget=QListWidgetItem()
 				desktopLayout=QGridLayout()
 				ficon=desktopInfo.get("Icon","shell")
@@ -59,16 +59,13 @@ class desktopChooser(QDialog):
 				listWidget.setText(name)
 				self.desktopList.addItem(listWidget)
 				self.data['listWidget']="%s/%s"%(self.menu.desktoppath,desktop)
-#				self.desktopList.setItemWidget(listWidget,desktopWidget)
 		box.addWidget(self.desktopList)
 		self.setLayout(box)
 
 	def _dblClick(self):
 		print("Click")
 	
-	def _loadMime(self,):
-			#		self.drop.emit({"drag":self})
-#		self.position=e.pos()
+	def _loadMime(self):
 		mimedata=QMimeData()
 		drag=QtGui.QDrag(self)
 		drag.setMimeData(mimedata)
@@ -76,8 +73,19 @@ class desktopChooser(QDialog):
 #		drag.setPixmap(pixmap)
 		dropAction=drag.exec_(Qt.MoveAction)
 	#def mousePressEvent
+	
+	def dragMoveEvent(self,e):
+		print("DRAGM")
+		e.accept()
+	#def dragEnterEvent
+	
+	def dragEnterEvent(self,e):
+		print("DRAGW")
+		e.accept()
+	#def dragEnterEvent
 				
 	def dropEvent(self,e):
+		print("(FGWFWEFWEFWEFWEF")
 		lstWdg=self.desktopList.currentItem()
 		path=None
 		e.setDropAction(Qt.MoveAction)
@@ -262,13 +270,12 @@ class confLaunchers(confStack):
 			self.update_apps(apps)
 		
 		def _update_desktops():
-#			fdia=QFileDialog()
+			cursor=QtGui.QCursor(Qt.WaitCursor)
+			self.setCursor(cursor)
 			fdia=desktopChooser(self)
+			cursor=QtGui.QCursor(Qt.PointingHandCursor)
+			self.setCursor(cursor)
 			fchoosed=''
-#			fdia.setFileMode(QFileDialog.AnyFile)
-#			fdia.setNameFilter(_("desktops(*.desktop)"))
-#			fdia.setDirectory("/usr/share/applications")
-#			if (fdia.exec_()):
 			if (fdia.show()):
 				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
@@ -325,11 +332,12 @@ class confLaunchers(confStack):
 	#def _get_all_categories(self):
 	
 	def _tbl_DropEvent(self,path):
-		if path.endswith('desktop'):
-			if os.path.isfile(path):
-				apps=self._get_table_apps()
-				apps['desktops'].append(path)
-				self.update_apps(apps)
+		if type(path)==type(""):
+			if path.endswith('desktop'):
+				if os.path.isfile(path):
+					apps=self._get_table_apps()
+					apps['desktops'].append(path)
+					self.update_apps(apps)
 	#def _tbl_DropEvent
 
 	def _update_apps_data(self):

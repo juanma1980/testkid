@@ -72,22 +72,8 @@ class confApp(confStack):
 	#def _load_screen
 
 	def fakeUpdate(self):
-<<<<<<< HEAD
-		idx=self.cmb_level.currentIndex()
-		if idx==0:
-			level='user'
-		elif idx==1:
-			level='system'
-		elif idx==2:
-			level='n4d'
-=======
 		level=self.cmb_level.currentText().lower()
-		print("*****")
-		print(level)
->>>>>>> devel
 		config=self.getConfig(level)
-		print(config)
-		print("*****")
 		close=False
 		if level in config.keys():
 			close=config[level].get('close',False)
@@ -118,10 +104,7 @@ class confApp(confStack):
 	#def fakeUpdate
 
 	def updateScreen(self):
-		print(self.level)
 		config=self.getConfig()
-		print("++++++++++++++++++")
-		print(self.level)
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
