@@ -22,7 +22,7 @@ BTN_SIZE=32
 
 
 class desktopChooser(QDialog):
-	drop=pyqtSignal("PyQt_PyObject")
+	dblClicked=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
 		super (desktopChooser,self).__init__(parent)
 		self.parent=parent
@@ -35,7 +35,7 @@ class desktopChooser(QDialog):
 		self.desktopList.setSpacing(3)
 		self.desktopList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.desktopList.itemDoubleClicked.connect(self._dblClick)
-#		self.desktopList.itemSelectionChanged.connect(self._loadMime)
+		self.desktopList.itemSelectionChanged.connect(self._loadMime)
 		self.data={}
 		self._renderGui()
 	
@@ -58,40 +58,31 @@ class desktopChooser(QDialog):
 				listWidget.setIcon(icon)
 				listWidget.setText(name)
 				self.desktopList.addItem(listWidget)
-				self.data['listWidget']="%s/%s"%(self.menu.desktoppath,desktop)
+				self.data[self.desktopList.count()-1]="%s/%s"%(self.menu.desktoppath,desktop)
 		box.addWidget(self.desktopList)
 		self.setLayout(box)
 
 	def _dblClick(self):
-		print("Click")
+		listWidget=self.desktopList.currentRow()
+		path=self.data[listWidget]
+		self.dblClicked.emit(path)
 	
 	def _loadMime(self):
+		listWidget=self.desktopList.currentRow()
 		mimedata=QMimeData()
+		mimedata.setText(self.data[listWidget])
 		drag=QtGui.QDrag(self)
 		drag.setMimeData(mimedata)
-#		pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
-#		drag.setPixmap(pixmap)
 		dropAction=drag.exec_(Qt.MoveAction)
 	#def mousePressEvent
 	
 	def dragMoveEvent(self,e):
-		print("DRAGM")
 		e.accept()
 	#def dragEnterEvent
 	
 	def dragEnterEvent(self,e):
-		print("DRAGW")
 		e.accept()
 	#def dragEnterEvent
-				
-	def dropEvent(self,e):
-		print("(FGWFWEFWEFWEFWEF")
-		lstWdg=self.desktopList.currentItem()
-		path=None
-		e.setDropAction(Qt.MoveAction)
-		e.accept()
-		path=self.data[lstWdg]
-		self.drop.emit(path)
 
 class dropTable(QTableWidget):
 	drop=pyqtSignal("PyQt_PyObject")
@@ -120,6 +111,8 @@ class dropTable(QTableWidget):
 		e.accept()
 		if e.mimeData().hasUrls():
 			path=e.mimeData().urls()[0].path()
+		elif e.mimeData().hasText():
+			path=e.mimeData().text()
 		self.drop.emit(path)
 
 class dropButton(QPushButton):
@@ -273,6 +266,7 @@ class confLaunchers(confStack):
 			cursor=QtGui.QCursor(Qt.WaitCursor)
 			self.setCursor(cursor)
 			fdia=desktopChooser(self)
+			fdia.dblClicked.connect(self._tbl_DropEvent)
 			cursor=QtGui.QCursor(Qt.PointingHandCursor)
 			self.setCursor(cursor)
 			fchoosed=''
