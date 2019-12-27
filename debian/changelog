@@ -1,3 +1,9 @@
+runomatic (0.8.2) bionic; urgency=medium
+
+  * Test build
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 27 Dec 2019 08:57:04 +0100
+
 runomatic (0.8.1) bionic; urgency=medium
 
   * libAppRun loads n4d config as backup config
