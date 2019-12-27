@@ -125,6 +125,7 @@ class appRun():
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		self.baseDir="/usr/share/runomatic/"
 		self.runoapps="/usr/share/runomatic/applications"
+		self.bg="%s/rsrc/background2.png"%self.baseDir
 		self.pid=0
 		self.procMons=[]
 		self.deadProcesses=[]
@@ -148,6 +149,9 @@ class appRun():
 		if self.dbg:
 			print("appRun: %s"%msg)
 	#def _debug
+
+	def setBg(self,bg):
+		self.bg=bg
 
 	def __init__config(self):
 		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
@@ -272,9 +276,10 @@ class appRun():
 			f.write("set border 0\n")
 			f.write("startup message off\n")
 			f.write("set bgcolor white\n")
-			f.write("set fgcolor white\n")
+			f.write("set fgcolor black\n")
+			f.write("startup_message off\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
-			f.write("exec xloadimage -shrink -fullscreen -onroot %s/rsrc/background2.png\n"%self.baseDir)
+			f.write("exec xloadimage -tile -onroot %s\n"%self.bg)
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
 		th_run=th_runApp(app,display)
 		th_run.start()
@@ -362,31 +367,45 @@ class appRun():
 
 		if level:
 			self._debug("Read file %s"%level)
+			apps['hidden']=data[level].get('hidden',[])
+			apps['banned']=data[level].get('banned',[])
 			if categories==[] and load_categories:
 				apps['categories']=data[level].get('categories',[])
 				apps['desktops']=data[level].get('desktops',[])
-				apps['hidden']=data[level].get('hidden',[])
-				apps['banned']=data[level].get('banned',[])
 				apps['keybinds']=data[level].get('keybinds')
 				apps['password']=data[level].get('password')
 				apps['close']=data[level].get('close')
 				apps['startup']=data[level].get('startup')
+				apps['background']=data[level].get('background')
 
 			self._debug("Readed %s"%apps)
 
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
-		categories=apps.get('categories',None)
+		categories=apps.get('categories',[])
+		runomatic={}
+		if 'run-o-matic' not in categories:
+			for runoapp in self.get_category_desktops("run-o-matic"):
+				runomatic[(os.path.basename(runoapp))]=runoapp
 		if categories:
 			for category in apps['categories']:
 				cat_apps=self.get_category_desktops(category.lower())
 				for app in cat_apps:
 					if ((app not in apps['desktops']) and (app not in apps['banned'])):
 						apps['desktops'].append(app)
-					elif 'runomatic' in app and app not in apps['desktops']:
-						apps['desktops'].append(app)
+					#elif 'runomatic' in app: 
+					#	if app in apps['desktops']:
+					#		apps['desktops'].remove(app)
+					#		apps['desktops'].append(app)
 					if app in apps['hidden'] and app in apps['desktops']:
+						if runomatic.get(os.path.basename(app),False):
+							idx=apps['desktops'].index(app)
+							apps['banned'].append(app)
+							if (runomatic[os.path.basename(app)] not in apps['desktops']):
+								apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
+								print("INSERT: %s"%runomatic[os.path.basename(app)])
 						apps['desktops'].remove(app)
+		self._debug("Banned; %s"%apps['banned'])
 		return(apps)
 
 	def get_category_desktops(self,category):

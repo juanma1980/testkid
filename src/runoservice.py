@@ -3,12 +3,13 @@ import os
 from appconfig.appConfig import appConfig
 
 #First check system config
-config=appConfig()
-config.set_configFile("runomatic.conf")
+confFile="runomatic.conf"
 baseDirs={'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']}
+config=appConfig()
+config.set_configFile(confFile)
 config.set_baseDirs(baseDirs)
 data={}
-if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
+if os.path.isfile("%s/%s"%(baseDirs['system'],confFile)):
 	conf=config.getConfig('system')
 	level=conf['system'].get("config",None)
 	if level=='n4d':
@@ -16,7 +17,7 @@ if os.path.isfile('/usr/share/runomatic/runomatic.conf'):
 		data=conf['n4d'].copy()
 	elif level=='user':
 		#If there's no user's config set the n4d config as default
-		if os.path.isfile('%s/runomatic.conf'%baseDirs['user']):
+		if os.path.isfile('%s/%s'%(baseDirs['user'],confFile)):
 			conf=config.getConfig('user')
 		else:
 			conf=config.getConfig('n4d')

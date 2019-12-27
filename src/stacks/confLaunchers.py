@@ -21,6 +21,78 @@ BTN_SIZE_FULL=128
 BTN_SIZE=32
 
 
+class desktopChooser(QDialog):
+	drop=pyqtSignal("PyQt_PyObject")
+	def __init__(self,parent):
+		super (desktopChooser,self).__init__(parent)
+		self.parent=parent
+		self.menu=App2Menu.app2menu()
+		self.setWindowTitle(_("Launcher select"))
+		self.setModal(False)
+		self.desktopList=QListWidget()
+		self.desktopList.setDragEnabled(True)
+		self.desktopList.setAcceptDrops(True)
+		self.desktopList.setSpacing(3)
+		self.desktopList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.desktopList.itemDoubleClicked.connect(self._dblClick)
+#		self.desktopList.itemSelectionChanged.connect(self._loadMime)
+		self.data={}
+		self._renderGui()
+	
+	def _renderGui(self):
+		box=QVBoxLayout()
+		#Load available desktops
+		categories=self.menu.get_categories()
+		for category in categories:
+			desktops=self.menu.get_apps_from_category(category)
+			for desktop in desktops:
+				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
+				if desktopInfo.get("NoDisplay",False):
+					continue
+				listWidget=QListWidgetItem()
+				desktopLayout=QGridLayout()
+				ficon=desktopInfo.get("Icon","shell")
+				icon=QtGui.QIcon.fromTheme(ficon)
+				name=desktopInfo.get("Name","shell")
+				comment=desktopInfo.get("Comment","shell")
+				listWidget.setIcon(icon)
+				listWidget.setText(name)
+				self.desktopList.addItem(listWidget)
+				self.data['listWidget']="%s/%s"%(self.menu.desktoppath,desktop)
+		box.addWidget(self.desktopList)
+		self.setLayout(box)
+
+	def _dblClick(self):
+		print("Click")
+	
+	def _loadMime(self):
+		mimedata=QMimeData()
+		drag=QtGui.QDrag(self)
+		drag.setMimeData(mimedata)
+#		pixmap=self.icon.pixmap(QSize(BTN_SIZE,BTN_SIZE))
+#		drag.setPixmap(pixmap)
+		dropAction=drag.exec_(Qt.MoveAction)
+	#def mousePressEvent
+	
+	def dragMoveEvent(self,e):
+		print("DRAGM")
+		e.accept()
+	#def dragEnterEvent
+	
+	def dragEnterEvent(self,e):
+		print("DRAGW")
+		e.accept()
+	#def dragEnterEvent
+				
+	def dropEvent(self,e):
+		print("(FGWFWEFWEFWEFWEF")
+		lstWdg=self.desktopList.currentItem()
+		path=None
+		e.setDropAction(Qt.MoveAction)
+		e.accept()
+		path=self.data[lstWdg]
+		self.drop.emit(path)
+
 class dropTable(QTableWidget):
 	drop=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent,row,col):
@@ -198,12 +270,13 @@ class confLaunchers(confStack):
 			self.update_apps(apps)
 		
 		def _update_desktops():
-			fdia=QFileDialog()
+			cursor=QtGui.QCursor(Qt.WaitCursor)
+			self.setCursor(cursor)
+			fdia=desktopChooser(self)
+			cursor=QtGui.QCursor(Qt.PointingHandCursor)
+			self.setCursor(cursor)
 			fchoosed=''
-			fdia.setFileMode(QFileDialog.AnyFile)
-			fdia.setNameFilter(_("desktops(*.desktop)"))
-			fdia.setDirectory("/usr/share/applications")
-			if (fdia.exec_()):
+			if (fdia.show()):
 				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
 				apps=self._get_table_apps()
@@ -259,11 +332,12 @@ class confLaunchers(confStack):
 	#def _get_all_categories(self):
 	
 	def _tbl_DropEvent(self,path):
-		if path.endswith('desktop'):
-			if os.path.isfile(path):
-				apps=self._get_table_apps()
-				apps['desktops'].append(path)
-				self.update_apps(apps)
+		if type(path)==type(""):
+			if path.endswith('desktop'):
+				if os.path.isfile(path):
+					apps=self._get_table_apps()
+					apps['desktops'].append(path)
+					self.update_apps(apps)
 	#def _tbl_DropEvent
 
 	def _update_apps_data(self):
@@ -293,10 +367,10 @@ class confLaunchers(confStack):
 						btn_desktop.deleteLater()
 						continue
 					btnMenu=QMenu()
-					h_action=_("Show button")
+					h_action=_("Hide button")
 					e_action=_("Edit button")
-					if state=="show":
-						h_action=_("Hide button")
+					if state!="show":
+						h_action=_("Show button")
 					show=btnMenu.addAction(h_action)
 					edit=btnMenu.addAction(e_action)
 					show.triggered.connect(lambda:self._changeBtnState(apps,state))
@@ -354,7 +428,7 @@ class confLaunchers(confStack):
 		row=self.tbl_app.currentRow()
 		col=self.tbl_app.currentColumn()
 		btn=self.tbl_app.cellWidget(row,col)
-		self.stack.gotoStack(idx=4,parms=btn.title)
+		self.stack.gotoStack(idx=3,parms=btn.title)
 
 	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
