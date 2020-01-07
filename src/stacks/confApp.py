@@ -139,6 +139,10 @@ class confApp(confStack):
 		fdia=QFileDialog()
 		fchoosed=''
 		fdia.setFileMode(QFileDialog.AnyFile)
+		if os.path.isdir("/usr/share/lliurex/pixmaps/lliurex_art/stamps"):
+			fdia.setDirectory("/usr/share/lliurex/pixmaps/lliurex_art/stamps")
+		else:
+			fdia.setDirectory("/usr/share/backgrounds")
 		fdia.setNameFilter(_("images(*.png *.svg *jpg *bmp)"))
 		if (fdia.exec_()):
 			fchoosed=fdia.selectedFiles()[0]

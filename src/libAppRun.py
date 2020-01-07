@@ -400,6 +400,7 @@ class appRun():
 					if app in apps['hidden'] and app in apps['desktops']:
 						if runomatic.get(os.path.basename(app),False):
 							idx=apps['desktops'].index(app)
+							self._debug("Banned app: %s"%app)
 							apps['banned'].append(app)
 							if (runomatic[os.path.basename(app)] not in apps['desktops']):
 								apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
