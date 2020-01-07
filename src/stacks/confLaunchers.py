@@ -58,7 +58,7 @@ class desktopChooser(QDialog):
 				listWidget.setIcon(icon)
 				listWidget.setText(name)
 				self.desktopList.addItem(listWidget)
-				self.data[self.desktopList.count()-1]="%s/%s"%(self.menu.desktoppath,desktop)
+				self.data[self.desktopList.count()-1]={'path':"%s/%s"%(self.menu.desktoppath,desktop),'icon':icon}
 		box.addWidget(self.desktopList)
 		self.setLayout(box)
 
@@ -70,9 +70,11 @@ class desktopChooser(QDialog):
 	def _loadMime(self):
 		listWidget=self.desktopList.currentRow()
 		mimedata=QMimeData()
-		mimedata.setText(self.data[listWidget])
+		mimedata.setText(self.data[listWidget]['path'])
 		drag=QtGui.QDrag(self)
 		drag.setMimeData(mimedata)
+		pixmap=self.data[listWidget]['icon'].pixmap(QSize(BTN_SIZE,BTN_SIZE))
+		drag.setPixmap(pixmap)
 		dropAction=drag.exec_(Qt.MoveAction)
 	#def mousePressEvent
 	
