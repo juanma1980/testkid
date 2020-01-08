@@ -25,6 +25,9 @@ if os.path.isfile("%s/%s"%(baseDirs['system'],confFile)):
 		data=conf[level].copy()
 	else:
 		data=conf['system'].copy()
+else:
+	conf=config.getConfig('n4d')
+	data=conf['n4d'].copy()
 
 startup=data.get('startup','')
 if str(startup).lower()=='true':
