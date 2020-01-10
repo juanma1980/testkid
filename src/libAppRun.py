@@ -4,6 +4,7 @@ import sys
 import os
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
 import subprocess
+import base64
 import signal
 import time
 import tempfile
@@ -372,11 +373,6 @@ class appRun():
 			if categories==[] and load_categories:
 				apps['categories']=data[level].get('categories',[])
 				apps['desktops']=data[level].get('desktops',[])
-				apps['keybinds']=data[level].get('keybinds')
-				apps['password']=data[level].get('password')
-				apps['close']=data[level].get('close')
-				apps['startup']=data[level].get('startup')
-				apps['background']=data[level].get('background')
 
 			self._debug("Readed %s"%apps)
 
@@ -404,9 +400,25 @@ class appRun():
 							apps['banned'].append(app)
 							if (runomatic[os.path.basename(app)] not in apps['desktops']):
 								apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
-								print("INSERT: %s"%runomatic[os.path.basename(app)])
 						apps['desktops'].remove(app)
 		self._debug("Banned; %s"%apps['banned'])
+		apps['keybinds']=data[level].get('keybinds')
+		apps['password']=data[level].get('password')
+		apps['close']=data[level].get('close')
+		apps['startup']=data[level].get('startup')
+#				apps['background64']=data[level].get('background64')
+		if not os.path.isfile(data[level].get('background',"")):
+			imgName=data[level].get('background',"generic.png")
+			imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
+			if not os.path.isfile(imgName):
+				if data[level].get('background64',""):
+					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
+						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
+					with open(imgName,"wb") as f:
+						f.write(base64.decodebytes(data[level]['background64'].encode("utf-8")))
+			data[level]['background']=imgName
+		apps['background']=data[level].get('background')
+
 		return(apps)
 
 	def get_category_desktops(self,category):

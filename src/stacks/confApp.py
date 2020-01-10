@@ -97,6 +97,7 @@ class confApp(confStack):
 			self.chk_startup.setChecked(startup)
 		except:
 			pass
+
 		self.bg=config[level].get('background',self.defaultBg)
 		if os.path.isfile(self.bg):
 			icon=QtGui.QIcon(self.bg)
@@ -104,7 +105,9 @@ class confApp(confStack):
 	#def fakeUpdate
 
 	def updateScreen(self):
-		config=self.getConfig(exclude=['background64'])
+			#		config=self.getConfig(exclude=['background64'])
+		config=self.getConfig()
+
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
