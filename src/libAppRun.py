@@ -331,7 +331,7 @@ class appRun():
 				self._debug("User config not available. Reading n4d config")
 				data['system']['config']='n4d'
 		self.level=data['system']['config']
-		self._debug("Read level from config: %s"%self.level)
+		self._debug("Read level from default config: %s"%self.level)
 		return (data)
 	#def get_config(self,level):
 
