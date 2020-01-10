@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
+import base64
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QComboBox,QCheckBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,QSize
@@ -96,15 +97,14 @@ class confApp(confStack):
 			self.chk_startup.setChecked(startup)
 		except:
 			pass
-		bg=config[level].get('background',self.defaultBg)
-		if bg:
-			if os.path.isfile(bg):
-				icon=QtGui.QIcon(bg)
-				self.btn_img.setIcon(icon)
+		self.bg=config[level].get('background',self.defaultBg)
+		if os.path.isfile(self.bg):
+			icon=QtGui.QIcon(self.bg)
+			self.btn_img.setIcon(icon)
 	#def fakeUpdate
 
 	def updateScreen(self):
-		config=self.getConfig()
+		config=self.getConfig(exclude=['background64'])
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -172,5 +172,7 @@ class confApp(confStack):
 		close=self.chk_close.isChecked()
 		self.saveChanges('close',close)
 		self.saveChanges('background',self.bg)
+		with open(self.bg,"rb") as img:
+			self.saveChanges('background64',base64.b64encode(img.read()).decode("utf-8"))
 	#def writeConfig
 
