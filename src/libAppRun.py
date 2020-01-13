@@ -423,6 +423,7 @@ class appRun():
 		apps['background']=data[level].get('background')
 
 		return(apps)
+	#def get_apps
 
 	def get_category_desktops(self,category):
 		apps=[]
@@ -441,6 +442,7 @@ class appRun():
 					tmp_apps.append(data['exe'])
 					tmp_apps.append(app)
 		return(apps)
+	#def get_category_desktops
 
 	def get_category_apps(self,category):
 		apps={}
