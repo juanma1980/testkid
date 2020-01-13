@@ -337,7 +337,7 @@ class confLaunchers(confStack):
 	#def _tbl_DropEvent
 
 	def _update_apps_data(self):
-		apps=self.runner.get_apps()
+		apps=self.runner.get_apps(exclude=['background64'])
 		self.visible_categories=apps['categories']
 		self._debug("Visible: %s"%self.visible_categories)
 		return apps

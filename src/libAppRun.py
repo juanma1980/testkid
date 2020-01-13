@@ -321,9 +321,9 @@ class appRun():
 		return("%s"%display)
 	#def _find_free_display
 
-	def get_default_config(self):
+	def get_default_config(self,exclude=[]):
 		data={}
-		data=self.config.getConfig('system')
+		data=self.config.getConfig('system',exclude=exclude)
 		level=data['system'].get('config','n4d')
 		if level=='user':
 			if os.path.isfile('%s/.config/%s'%(os.environ['HOME'],self.confFile)):
@@ -343,9 +343,9 @@ class appRun():
 		return (data)
 	#def get_config(self,level):
 
-	def get_apps(self,categories=[],load_categories=True):
+	def get_apps(self,categories=[],load_categories=True,exclude=[]):
 		#First read system config
-		sysconfig=self.get_default_config()
+		sysconfig=self.get_default_config(exclude=['background64'])
 		self._debug("Getting apps for level %s"%self.level)
 		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
 		default={'categories':[],'desktops':[],'hidden':[],'banned':[]}
@@ -356,7 +356,7 @@ class appRun():
 		if self.level=='system':
 			data=sysconfig.copy()
 		else:
-			data=self.config.getConfig(self.level)
+			data=self.config.getConfig(self.level,exclude=['background64'])
 
 		self._debug("Read Data: %s"%data)
 		level=self.level
