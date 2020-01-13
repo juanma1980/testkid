@@ -411,6 +411,9 @@ class appRun():
 			imgName=data[level].get('background',"generic.png")
 			imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
 			if not os.path.isfile(imgName):
+				if data[level].get('background64',None)==None:
+					dataBg=self.config.getConfig(level)
+					data[level]['background64']=dataBg.get('background64',"")
 				if data[level].get('background64',""):
 					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
 						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
