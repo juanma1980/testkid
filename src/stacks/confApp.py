@@ -167,6 +167,7 @@ class confApp(confStack):
 
 		if configLevel!=level:
 			if not self.saveChanges('config',configLevel,'system'):
+				#If write fails revert to old config level
 				self.saveChanges('config',level,'system')
 			else:
 				return()
