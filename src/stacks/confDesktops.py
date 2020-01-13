@@ -250,10 +250,10 @@ class confDesktops(confStack):
 		self.app_icon=desktop['Icon']
 		if os.path.isfile(desktop['Icon']):
 			icn=QtGui.QIcon(desktop['Icon'])
-			pass
 		else:
 			icn=QtGui.QIcon.fromTheme(desktop['Icon'])
 		self.btn_icon.setIcon(icn)
 		self.btn_ok.setEnabled(False)
 		self.btn_cancel.setEnabled(False)
 		self.editBtn=parms
+	#def setParms
