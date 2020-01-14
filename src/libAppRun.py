@@ -397,12 +397,12 @@ class appRun():
 		apps['password']=data[level].get('password')
 		apps['close']=data[level].get('close')
 		apps['startup']=data[level].get('startup')
-#				apps['background64']=data[level].get('background64')
 		bg=data[level].get('background',"")
 		bg64=data[level].get('background64',"")
 		data[level]['background']=self._fix_background_path(bg,bg64)
 		apps['background']=data[level].get('background')
 		return(apps)
+	#def get_apps
 
 	def _generate_runodesktops(self,runotar):
 		deskPath="%s/.config/runomatic/applications/"%(os.environ['HOME'])
@@ -480,6 +480,7 @@ class appRun():
 					tmp_apps.append(data['exe'])
 					tmp_apps.append(app)
 		return(apps)
+	#def get_category_desktops
 
 	def get_category_apps(self,category):
 		apps={}

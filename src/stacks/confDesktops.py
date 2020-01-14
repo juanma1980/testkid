@@ -2,6 +2,9 @@
 
 import os
 import subprocess
+import tarfile
+import tempfile
+import base64
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
@@ -34,6 +37,7 @@ class confDesktops(confStack):
 		self.enabled=True
 		self.filename=""
 		self.level='user'
+		self.editBtn=False
 	#def __init__
 		
 	def _debug(self,msg):
@@ -197,31 +201,39 @@ class confDesktops(confStack):
 		self.changes=False
 		try:
 			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
-			self.btn_ok.setEnabled(False)
-			self.btn_cancel.setEnabled(False)
-			self.refresh=True
-			retval=True
-			if self.editBtn:
-				if "runomatic" not in self.editBtn:
-					hidden=self.config[self.level].get("hidden",[])
-					hidden.append(self.editBtn)
-					self.saveChanges('hidden',hidden)
-					desktops=self.config[self.level].get("desktops",[])
-					if self.editBtn in desktops:
-						idx=desktops.index(self.editBtn)
-						desktops.remove(self.editBtn)
-						desktops.insert(idx,filename)
-						self.saveChanges('desktops',desktops)
-				self.default_icon='shell'
-				self.defaultName=""
-				self.defaultExec=""
-				self.defaultDesc=""
-				self.editBtn=False
-				self.stack.gotoStack(idx=2,parms=self.editBtn)
 		except Exception as e:
-			self._debug(e)
-
-	#def writeChanges
+			print("Error saving desktop %s"%filename)
+			self._debug("Error  saving %s: %s"%(filename,e))
+		#Save all runomatic desktops as base64
+		tarFile=tempfile.mkstemp(suffix=".tar.gz")[1]
+		with tarfile.open(tarFile,"w:gz") as tar:
+			for deskFile in os.listdir(self.menu.desktoppath):
+				tar.add("%s/%s"%(self.menu.desktoppath,deskFile))
+		with open(tarFile,"rb") as tar:
+			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
+			
+		self.btn_ok.setEnabled(False)
+		self.btn_cancel.setEnabled(False)
+		self.refresh=True
+		retval=True
+		if self.editBtn:
+			if "runomatic" not in self.editBtn:
+				hidden=self.config[self.level].get("hidden",[])
+				hidden.append(self.editBtn)
+				self.saveChanges('hidden',hidden)
+				desktops=self.config[self.level].get("desktops",[])
+				if self.editBtn in desktops:
+					idx=desktops.index(self.editBtn)
+					desktops.remove(self.editBtn)
+					desktops.insert(idx,filename)
+					self.saveChanges('desktops',desktops)
+			self.default_icon='shell'
+			self.defaultName=""
+			self.defaultExec=""
+			self.defaultDesc=""
+			self.editBtn=False
+			self.stack.gotoStack(idx=2,parms=self.editBtn)
+	#def writeConfig
 
 	def setParms(self,parms):
 		self._debug("Loading %s"%parms)
@@ -238,10 +250,10 @@ class confDesktops(confStack):
 		self.app_icon=desktop['Icon']
 		if os.path.isfile(desktop['Icon']):
 			icn=QtGui.QIcon(desktop['Icon'])
-			pass
 		else:
 			icn=QtGui.QIcon.fromTheme(desktop['Icon'])
 		self.btn_icon.setIcon(icn)
 		self.btn_ok.setEnabled(False)
 		self.btn_cancel.setEnabled(False)
 		self.editBtn=parms
+	#def setParms
