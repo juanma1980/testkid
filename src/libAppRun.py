@@ -399,7 +399,7 @@ class appRun():
 		apps['startup']=data[level].get('startup')
 		bg=data[level].get('background',"")
 		bg64=data[level].get('background64',"")
-		data[level]['background']=self._fix_background_path(bg,bg64)
+		data[level]['background']=self._fix_background_path(bg,bg64,level)
 		apps['background']=data[level].get('background')
 		return(apps)
 	#def get_apps
@@ -409,6 +409,9 @@ class appRun():
 		self._debug("Generating runodesktops")
 		if not os.path.isdir(deskPath):
 			os.makedirs(deskPath)
+		for oldFile in os.listdir(deskPath):
+			if oldFile.endswith(".desktop"):
+				os.remove("%s/%s"%(deskPath,oldFile))
 		if runotar:
 			tmpTar=tempfile.mkstemp(suffix=".tar.gz")[1]
 			with open(tmpTar,"wb") as f:
@@ -417,6 +420,7 @@ class appRun():
 			for runoapp in tar64:
 				runoapp.name=os.path.basename(runoapp.name)
 				tar64.extract(runoapp,deskPath)
+	#def _generate_runodesktops
 
 	def _filter_category_apps(self,categories,desktops,banned,hidden,runoapps):
 		result={}
@@ -425,10 +429,6 @@ class appRun():
 			for app in cat_apps:
 				if ((app not in desktops) and (app not in banned)):
 					desktops.append(app)
-				#elif 'runomatic' in app: 
-				#	if app in apps['desktops']:
-				#		apps['desktops'].remove(app)
-				#		apps['desktops'].append(app)
 				if app in hidden and app in desktops:
 					if runoapps.get(os.path.basename(app),False):
 						idx=desktops.index(app)
@@ -439,8 +439,9 @@ class appRun():
 					desktops.remove(app)
 		result={'desktops':desktops,'banned':banned,'hidden':hidden}
 		return(result)
+	#def _filter_category_apps
 	
-	def _fix_background_path(self,bg,bg64):
+	def _fix_background_path(self,bg,bg64,level):
 		imgName=bg
 		if not os.path.isfile(bg):
 			if bg:
@@ -448,9 +449,9 @@ class appRun():
 			else:
 				imgName="%s/.config/runomatic/backgrounds/generic.png"%(os.environ['HOME'])
 			if not os.path.isfile(imgName):
-				if bg64==None:
+				if bg64=="":
 					dataBg=self.config.getConfig(level)
-					bg64['background64']=dataBg.get('background64',"")
+					bg64=dataBg[level].get('background64',"")
 				if bg64:
 					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
 						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
@@ -463,13 +464,13 @@ class appRun():
 		apps=[]
 		tmp_apps=[]
 		if category=="run-o-matic":
-			if os.path.isdir(self.runoapps):
-				for f in os.listdir(self.runoapps):
-					if f not in apps:
-						apps.append("%s"%os.path.join(self.runoapps,f))
+				#			if os.path.isdir(self.runoapps):
+#				for f in os.listdir(self.runoapps):
+#					if f not in apps and os.path.isfile("%s"%os.path.join(self.runoapps,f)):
+#						apps.append("%s"%os.path.join(self.runoapps,f))
 			if os.path.isdir(self.userRunoapps):
 				for f in os.listdir(self.userRunoapps):
-					if f not in apps:
+					if f not in apps and os.path.isfile("%s"%os.path.join(self.userRunoapps,f)):
 						apps.append("%s"%os.path.join(self.userRunoapps,f))
 		else:
 			self.menu.set_desktop_system()
@@ -485,10 +486,10 @@ class appRun():
 	def get_category_apps(self,category):
 		apps={}
 		if category=="run-o-matic":
-			if os.path.isdir(self.runoapps):
-				for f in os.listdir(self.runoapps):
-					for key,value in self.get_desktop_app(f).items():
-						apps[key]=value
+				#			if os.path.isdir(self.runoapps):
+#				for f in os.listdir(self.runoapps):
+#					for key,value in self.get_desktop_app(f).items():
+#						apps[key]=value
 			if os.path.isdir(self.userRunoapps):
 				for f in os.listdir(self.userRunoapps):
 					for key,value in self.get_desktop_app("%s/%"%(self.userRunoapps,f)).items():

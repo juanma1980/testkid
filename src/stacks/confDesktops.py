@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -24,6 +25,7 @@ class confDesktops(confStack):
 		home=os.environ['HOME']
 #		self.menu.desktoppath="%s/.local/share/applications/"%home
 		self.menu.desktoppath="/usr/share/runomatic/applications"
+		self.userRunoapps="%s/.config/runomatic/applications"%os.environ['HOME']
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
@@ -204,36 +206,46 @@ class confDesktops(confStack):
 		except Exception as e:
 			print("Error saving desktop %s"%filename)
 			self._debug("Error  saving %s: %s"%(filename,e))
+		#Copy newd desktop to userRunoapps
+		runoName="%s/%s"%(self.userRunoapps,os.basename(filename))
+		shutil.copy(filename,runoName)
+
 		#Save all runomatic desktops as base64
-		tarFile=tempfile.mkstemp(suffix=".tar.gz")[1]
-		with tarfile.open(tarFile,"w:gz") as tar:
-			for deskFile in os.listdir(self.menu.desktoppath):
-				tar.add("%s/%s"%(self.menu.desktoppath,deskFile))
-		with open(tarFile,"rb") as tar:
-			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
+		self._tar_runodesktops()
 			
 		self.btn_ok.setEnabled(False)
 		self.btn_cancel.setEnabled(False)
 		self.refresh=True
 		retval=True
 		if self.editBtn:
-			if "runomatic" not in self.editBtn:
-				hidden=self.config[self.level].get("hidden",[])
-				hidden.append(self.editBtn)
-				self.saveChanges('hidden',hidden)
-				desktops=self.config[self.level].get("desktops",[])
-				if self.editBtn in desktops:
-					idx=desktops.index(self.editBtn)
-					desktops.remove(self.editBtn)
-					desktops.insert(idx,filename)
-					self.saveChanges('desktops',desktops)
-			self.default_icon='shell'
-			self.defaultName=""
-			self.defaultExec=""
-			self.defaultDesc=""
-			self.editBtn=False
-			self.stack.gotoStack(idx=2,parms=self.editBtn)
+			self._reset_screen()
 	#def writeConfig
+
+	def _tar_runodesktops(self):
+		tarFile=tempfile.mkstemp(suffix=".tar.gz")[1]
+		with tarfile.open(tarFile,"w:gz") as tar:
+			for deskFile in os.listdir(self.userRunoapps):
+				tar.add("%s/%s"%(self.userRunoapps,deskFile))
+		with open(tarFile,"rb") as tar:
+			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
+
+	def _reset_screen(self):
+		if "runomatic" not in self.editBtn:
+			hidden=self.config[self.level].get("hidden",[])
+			hidden.append(self.editBtn)
+			self.saveChanges('hidden',hidden)
+			desktops=self.config[self.level].get("desktops",[])
+			if self.editBtn in desktops:
+				idx=desktops.index(self.editBtn)
+				desktops.remove(self.editBtn)
+				desktops.insert(idx,filename)
+				self.saveChanges('desktops',desktops)
+		self.default_icon='shell'
+		self.defaultName=""
+		self.defaultExec=""
+		self.defaultDesc=""
+		self.editBtn=False
+		self.stack.gotoStack(idx=2,parms=self.editBtn)
 
 	def setParms(self,parms):
 		self._debug("Loading %s"%parms)

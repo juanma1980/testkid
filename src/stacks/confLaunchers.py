@@ -223,6 +223,7 @@ class confLaunchers(confStack):
 		self.enabled=True
 		self.setStyleSheet(self._define_css())
 		self.runoapps="/usr/share/runomatic/applications"
+		self.userRunoapps="/usr/share/runomatic/applications"
 	#def __init__
 
 	def _debug(self,msg):
@@ -352,10 +353,13 @@ class confLaunchers(confStack):
 			desktopsFixed=[]
 			for desktop in desktops:
 				#Check if desktop is from run-o-matic
-				if os.path.isdir(self.runoapps):
-					if desktop in os.listdir(self.runoapps):
-						desktop=os.path.join(self.runoapps,desktop)
+				if os.path.isdir(self.userRunoapps):
+					if desktop in os.listdir(self.userRunoapps):
+						desktop=os.path.join(self.userRunoapps,desktop)
 				deskInfo=self.runner.get_desktop_app(desktop)
+				if not deskInfo or '' in deskInfo.keys():
+					continue
+				print(deskInfo)
 				for appName,appIcon in deskInfo.items():
 					btn_desktop=dropButton(desktop,self.tbl_app)
 					if not btn_desktop.setImage(appIcon,state):

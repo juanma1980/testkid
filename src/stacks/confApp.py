@@ -107,7 +107,6 @@ class confApp(confStack):
 	def updateScreen(self):
 			#		config=self.getConfig(exclude=['background64'])
 		config=self.getConfig()
-
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -132,18 +131,18 @@ class confApp(confStack):
 		self.chk_startup.setChecked(startup)
 		bg=config[self.level].get('background',self.defaultBg)
 		if bg:
-			if os.path.isfile(bg):
-				icon=QtGui.QIcon(bg)
-				self.btn_img.setIcon(icon)
-			else:
-				if config[self.level].get("background64"):
-					imgName=config[self.level].get('background',"generic.png")
-					imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
-					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
-						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
-					with open(imgName,"wb") as f:
-						f.write(base64.decodebytes(config[self.level]['background64'].encode("utf-8")))
-					config[self.level]['background']=imgName
+			if not os.path.isfile(bg):
+				imgName=config[self.level].get('background',"generic.png")
+				bg="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
+				if not os.path.isfile(bg):
+					if config[self.level].get("background64"):
+						if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
+							os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
+						with open(bg,"wb") as f:
+							f.write(base64.decodebytes(config[self.level]['background64'].encode("utf-8")))
+				config[self.level]['background']=bg
+			icon=QtGui.QIcon(bg)
+			self.btn_img.setIcon(icon)
 
 	#def _udpate_screen
 
