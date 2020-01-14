@@ -207,7 +207,7 @@ class confDesktops(confStack):
 			print("Error saving desktop %s"%filename)
 			self._debug("Error  saving %s: %s"%(filename,e))
 		#Copy newd desktop to userRunoapps
-		runoName="%s/%s"%(self.userRunoapps,os.basename(filename))
+		runoName="%s/%s"%(self.userRunoapps,os.path.basename(filename))
 		shutil.copy(filename,runoName)
 
 		#Save all runomatic desktops as base64
