@@ -136,13 +136,14 @@ class confApp(confStack):
 				icon=QtGui.QIcon(bg)
 				self.btn_img.setIcon(icon)
 			else:
-				imgName=data[level].get('background',"generic.png")
-				imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
-				if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
-					os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
-				with open(imgName,"wb") as f:
-					f.write(base64.decodebytes(data[level]['background64'].encode("utf-8")))
-				config[self.level]['background']=imgName
+				if config[self.level].get("background64"):
+					imgName=config[self.level].get('background',"generic.png")
+					imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
+					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
+						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
+					with open(imgName,"wb") as f:
+						f.write(base64.decodebytes(config[self.level]['background64'].encode("utf-8")))
+					config[self.level]['background']=imgName
 
 	#def _udpate_screen
 

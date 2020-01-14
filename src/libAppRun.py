@@ -8,6 +8,7 @@ import base64
 import signal
 import time
 import tempfile
+import tarfile
 from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
@@ -126,6 +127,7 @@ class appRun():
 		self.baseDir=os.path.abspath(os.path.dirname(exePath))
 		self.baseDir="/usr/share/runomatic/"
 		self.runoapps="/usr/share/runomatic/applications"
+		self.userRunoapps="%s/.config/runomatic/applications"%(os.environ['HOME'])
 		self.bg="%s/rsrc/background2.png"%self.baseDir
 		self.pid=0
 		self.procMons=[]
@@ -379,50 +381,83 @@ class appRun():
 		if not apps['categories'] and not apps['desktops'] and load_categories:
 			apps=default
 		categories=apps.get('categories',[])
-		runomatic={}
+		runoapps={}
 		if 'run-o-matic' not in categories:
 			for runoapp in self.get_category_desktops("run-o-matic"):
-				runomatic[(os.path.basename(runoapp))]=runoapp
-		if categories:
-			for category in apps['categories']:
-				cat_apps=self.get_category_desktops(category.lower())
-				for app in cat_apps:
-					if ((app not in apps['desktops']) and (app not in apps['banned'])):
-						apps['desktops'].append(app)
-					#elif 'runomatic' in app: 
-					#	if app in apps['desktops']:
-					#		apps['desktops'].remove(app)
-					#		apps['desktops'].append(app)
-					if app in apps['hidden'] and app in apps['desktops']:
-						if runomatic.get(os.path.basename(app),False):
-							idx=apps['desktops'].index(app)
-							self._debug("Banned app: %s"%app)
-							apps['banned'].append(app)
-							if (runomatic[os.path.basename(app)] not in apps['desktops']):
-								apps['desktops'].insert(idx,runomatic[os.path.basename(app)])
-						apps['desktops'].remove(app)
+				runoapps[(os.path.basename(runoapp))]=runoapp
+		else:
+			self._generate_runodesktops(data[level].get('runotar',""))
+
+		filteredApps=self._filter_category_apps(apps['categories'],apps['desktops'],apps['banned'],apps['hidden'],runoapps)
+		apps['desktops']=filteredApps.get('desktops',[])
+		apps['banned']=filteredApps.get('banned',[])
+		apps['hidden']=filteredApps.get('hidden',[])
 		self._debug("Banned; %s"%apps['banned'])
 		apps['keybinds']=data[level].get('keybinds')
 		apps['password']=data[level].get('password')
 		apps['close']=data[level].get('close')
 		apps['startup']=data[level].get('startup')
 #				apps['background64']=data[level].get('background64')
-		if not os.path.isfile(data[level].get('background',"")):
-			imgName=data[level].get('background',"generic.png")
-			imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
+		bg=data[level].get('background',"")
+		bg64=data[level].get('background64',"")
+		data[level]['background']=self._fix_background_path(bg,bg64)
+		apps['background']=data[level].get('background')
+		return(apps)
+
+	def _generate_runodesktops(self,runotar):
+		deskPath="%s/.config/runomatic/applications/"%(os.environ['HOME'])
+		self._debug("Generating runodesktops")
+		if not os.path.isdir(deskPath):
+			os.makedirs(deskPath)
+		if runotar:
+			tmpTar=tempfile.mkstemp(suffix=".tar.gz")[1]
+			with open(tmpTar,"wb") as f:
+				f.write(base64.decodebytes(runotar.encode("utf-8")))
+			tar64=tarfile.open(tmpTar,"r:gz")
+			for runoapp in tar64:
+				runoapp.name=os.path.basename(runoapp.name)
+				tar64.extract(runoapp,deskPath)
+
+	def _filter_category_apps(self,categories,desktops,banned,hidden,runoapps):
+		result={}
+		for category in categories:
+			cat_apps=self.get_category_desktops(category.lower())
+			for app in cat_apps:
+				if ((app not in desktops) and (app not in banned)):
+					desktops.append(app)
+				#elif 'runomatic' in app: 
+				#	if app in apps['desktops']:
+				#		apps['desktops'].remove(app)
+				#		apps['desktops'].append(app)
+				if app in hidden and app in desktops:
+					if runoapps.get(os.path.basename(app),False):
+						idx=desktops.index(app)
+						self._debug("Banned app: %s"%app)
+						banned.append(app)
+						if (runapps[os.path.basename(app)] not in desktops):
+							desktops.insert(idx,runoapps[os.path.basename(app)])
+					desktops.remove(app)
+		result={'desktops':desktops,'banned':banned,'hidden':hidden}
+		return(result)
+	
+	def _fix_background_path(self,bg,bg64):
+		imgName=bg
+		if not os.path.isfile(bg):
+			if bg:
+				imgName="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(bg))
+			else:
+				imgName="%s/.config/runomatic/backgrounds/generic.png"%(os.environ['HOME'])
 			if not os.path.isfile(imgName):
-				if data[level].get('background64',None)==None:
+				if bg64==None:
 					dataBg=self.config.getConfig(level)
-					data[level]['background64']=dataBg.get('background64',"")
-				if data[level].get('background64',""):
+					bg64['background64']=dataBg.get('background64',"")
+				if bg64:
 					if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
 						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
 					with open(imgName,"wb") as f:
-						f.write(base64.decodebytes(data[level]['background64'].encode("utf-8")))
-			data[level]['background']=imgName
-		apps['background']=data[level].get('background')
-
-		return(apps)
+						f.write(base64.decodebytes(bg64.encode("utf-8")))
+			return imgName
+	#def _fix_background_path(self,bg,bg64):
 
 	def get_category_desktops(self,category):
 		apps=[]
@@ -432,6 +467,10 @@ class appRun():
 				for f in os.listdir(self.runoapps):
 					if f not in apps:
 						apps.append("%s"%os.path.join(self.runoapps,f))
+			if os.path.isdir(self.userRunoapps):
+				for f in os.listdir(self.userRunoapps):
+					if f not in apps:
+						apps.append("%s"%os.path.join(self.userRunoapps,f))
 		else:
 			self.menu.set_desktop_system()
 			applist=self.menu.get_apps_from_category(category)
@@ -448,6 +487,10 @@ class appRun():
 			if os.path.isdir(self.runoapps):
 				for f in os.listdir(self.runoapps):
 					for key,value in self.get_desktop_app(f).items():
+						apps[key]=value
+			if os.path.isdir(self.userRunoapps):
+				for f in os.listdir(self.userRunoapps):
+					for key,value in self.get_desktop_app("%s/%"%(self.userRunoapps,f)).items():
 						apps[key]=value
 		else:
 			applist=self.menu.get_apps_from_category(category)
