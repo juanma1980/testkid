@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
 import os
+import shutil
 import subprocess
+import tarfile
+import tempfile
+import base64
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
@@ -21,6 +25,7 @@ class confDesktops(confStack):
 		home=os.environ['HOME']
 #		self.menu.desktoppath="%s/.local/share/applications/"%home
 		self.menu.desktoppath="/usr/share/runomatic/applications"
+		self.userRunoapps="%s/.config/runomatic/applications"%os.environ['HOME']
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
@@ -34,6 +39,7 @@ class confDesktops(confStack):
 		self.enabled=True
 		self.filename=""
 		self.level='user'
+		self.editBtn=False
 	#def __init__
 		
 	def _debug(self,msg):
@@ -197,31 +203,49 @@ class confDesktops(confStack):
 		self.changes=False
 		try:
 			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
-			self.btn_ok.setEnabled(False)
-			self.btn_cancel.setEnabled(False)
-			self.refresh=True
-			retval=True
-			if self.editBtn:
-				if "runomatic" not in self.editBtn:
-					hidden=self.config[self.level].get("hidden",[])
-					hidden.append(self.editBtn)
-					self.saveChanges('hidden',hidden)
-					desktops=self.config[self.level].get("desktops",[])
-					if self.editBtn in desktops:
-						idx=desktops.index(self.editBtn)
-						desktops.remove(self.editBtn)
-						desktops.insert(idx,filename)
-						self.saveChanges('desktops',desktops)
-				self.default_icon='shell'
-				self.defaultName=""
-				self.defaultExec=""
-				self.defaultDesc=""
-				self.editBtn=False
-				self.stack.gotoStack(idx=2,parms=self.editBtn)
 		except Exception as e:
-			self._debug(e)
+			print("Error saving desktop %s"%filename)
+			self._debug("Error  saving %s: %s"%(filename,e))
+		#Copy newd desktop to userRunoapps
+		runoName="%s/%s"%(self.userRunoapps,os.path.basename(filename))
+		shutil.copy(filename,runoName)
 
-	#def writeChanges
+		#Save all runomatic desktops as base64
+		self._tar_runodesktops()
+			
+		self.btn_ok.setEnabled(False)
+		self.btn_cancel.setEnabled(False)
+		self.refresh=True
+		retval=True
+		if self.editBtn:
+			self._reset_screen()
+	#def writeConfig
+
+	def _tar_runodesktops(self):
+		tarFile=tempfile.mkstemp(suffix=".tar.gz")[1]
+		with tarfile.open(tarFile,"w:gz") as tar:
+			for deskFile in os.listdir(self.userRunoapps):
+				tar.add("%s/%s"%(self.userRunoapps,deskFile))
+		with open(tarFile,"rb") as tar:
+			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
+
+	def _reset_screen(self):
+		if "runomatic" not in self.editBtn:
+			hidden=self.config[self.level].get("hidden",[])
+			hidden.append(self.editBtn)
+			self.saveChanges('hidden',hidden)
+			desktops=self.config[self.level].get("desktops",[])
+			if self.editBtn in desktops:
+				idx=desktops.index(self.editBtn)
+				desktops.remove(self.editBtn)
+				desktops.insert(idx,filename)
+				self.saveChanges('desktops',desktops)
+		self.default_icon='shell'
+		self.defaultName=""
+		self.defaultExec=""
+		self.defaultDesc=""
+		self.editBtn=False
+		self.stack.gotoStack(idx=2,parms=self.editBtn)
 
 	def setParms(self,parms):
 		self._debug("Loading %s"%parms)
@@ -238,10 +262,10 @@ class confDesktops(confStack):
 		self.app_icon=desktop['Icon']
 		if os.path.isfile(desktop['Icon']):
 			icn=QtGui.QIcon(desktop['Icon'])
-			pass
 		else:
 			icn=QtGui.QIcon.fromTheme(desktop['Icon'])
 		self.btn_icon.setIcon(icn)
 		self.btn_ok.setEnabled(False)
 		self.btn_cancel.setEnabled(False)
 		self.editBtn=parms
+	#def setParms

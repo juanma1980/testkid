@@ -205,6 +205,7 @@ class runomatic(QWidget):
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
 		self.bg=data.get('background',self.defaultBg)
+		print(self.bg)
 		if ((self.bg==None) or (not(os.path.isfile(self.bg)))) :
 			self.bg=self.defaultBg
 		print("******************")
@@ -212,6 +213,7 @@ class runomatic(QWidget):
 		print(self.bg)
 		print("******************")
 		print("******************")
+		print(data)
 		self.runner.setBg(self.bg)
 	#def _read_config(self):
 

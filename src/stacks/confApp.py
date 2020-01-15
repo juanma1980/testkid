@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
+import base64
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QComboBox,QCheckBox,QFileDialog
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,QSize
@@ -96,14 +97,15 @@ class confApp(confStack):
 			self.chk_startup.setChecked(startup)
 		except:
 			pass
-		bg=config[level].get('background',self.defaultBg)
-		if bg:
-			if os.path.isfile(bg):
-				icon=QtGui.QIcon(bg)
-				self.btn_img.setIcon(icon)
+
+		self.bg=config[level].get('background',self.defaultBg)
+		if os.path.isfile(self.bg):
+			icon=QtGui.QIcon(self.bg)
+			self.btn_img.setIcon(icon)
 	#def fakeUpdate
 
 	def updateScreen(self):
+			#		config=self.getConfig(exclude=['background64'])
 		config=self.getConfig()
 		if self.level:
 			idx=0
@@ -129,9 +131,19 @@ class confApp(confStack):
 		self.chk_startup.setChecked(startup)
 		bg=config[self.level].get('background',self.defaultBg)
 		if bg:
-			if os.path.isfile(bg):
-				icon=QtGui.QIcon(bg)
-				self.btn_img.setIcon(icon)
+			if not os.path.isfile(bg):
+				imgName=config[self.level].get('background',"generic.png")
+				bg="%s/.config/runomatic/backgrounds/%s"%(os.environ['HOME'],os.path.basename(imgName))
+				if not os.path.isfile(bg):
+					if config[self.level].get("background64"):
+						if not os.path.isdir("%s/.config/runomatic/backgrounds"%os.environ['HOME']):
+							os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
+						with open(bg,"wb") as f:
+							f.write(base64.decodebytes(config[self.level]['background64'].encode("utf-8")))
+				config[self.level]['background']=bg
+			icon=QtGui.QIcon(bg)
+			self.btn_img.setIcon(icon)
+
 	#def _udpate_screen
 
 	def _setBg(self):
@@ -139,6 +151,10 @@ class confApp(confStack):
 		fdia=QFileDialog()
 		fchoosed=''
 		fdia.setFileMode(QFileDialog.AnyFile)
+		if os.path.isdir("/usr/share/lliurex/pixmaps/lliurex_art/stamps"):
+			fdia.setDirectory("/usr/share/lliurex/pixmaps/lliurex_art/stamps")
+		else:
+			fdia.setDirectory("/usr/share/backgrounds")
 		fdia.setNameFilter(_("images(*.png *.svg *jpg *bmp)"))
 		if (fdia.exec_()):
 			fchoosed=fdia.selectedFiles()[0]
@@ -160,6 +176,7 @@ class confApp(confStack):
 
 		if configLevel!=level:
 			if not self.saveChanges('config',configLevel,'system'):
+				#If write fails revert to old config level
 				self.saveChanges('config',level,'system')
 			else:
 				return()
@@ -168,5 +185,7 @@ class confApp(confStack):
 		close=self.chk_close.isChecked()
 		self.saveChanges('close',close)
 		self.saveChanges('background',self.bg)
+		with open(self.bg,"rb") as img:
+			self.saveChanges('background64',base64.b64encode(img.read()).decode("utf-8"))
 	#def writeConfig
 

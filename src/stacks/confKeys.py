@@ -30,7 +30,7 @@ class confKeys(confStack):
 		self.description=(_("Modify keybindings"))
 		self.icon=('configure-shortcuts')
 		self.tooltip=(_("From here you can modify the keybinding"))
-		self.index=3
+		self.index=4
 		self.enabled=True
 		self.keytext=''
 		self.keys={}
