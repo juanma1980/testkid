@@ -25,7 +25,11 @@ class confDesktops(confStack):
 		home=os.environ['HOME']
 #		self.menu.desktoppath="%s/.local/share/applications/"%home
 		self.menu.desktoppath="/usr/share/runomatic/applications"
+		if not os.path.isdir(self.menu.desktoppath):
+			os.makedirs(self.menu.desktoppath)
 		self.userRunoapps="%s/.config/runomatic/applications"%os.environ['HOME']
+		if not os.path.isdir(self.userRunoapps):
+			os.makedirs(self.userRunoapps)
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
@@ -218,7 +222,7 @@ class confDesktops(confStack):
 		self.refresh=True
 		retval=True
 		if self.editBtn:
-			self._reset_screen()
+			self._reset_screen(filename)
 	#def writeConfig
 
 	def _tar_runodesktops(self):
@@ -229,7 +233,7 @@ class confDesktops(confStack):
 		with open(tarFile,"rb") as tar:
 			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
 
-	def _reset_screen(self):
+	def _reset_screen(self,filename):
 		if "runomatic" not in self.editBtn:
 			hidden=self.config[self.level].get("hidden",[])
 			hidden.append(self.editBtn)
