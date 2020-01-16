@@ -76,11 +76,13 @@ class navButton(QPushButton):
 			self.focusIn.emit(self)
 			self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 			self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+	#def enterEvent
 	
 	def leaveEvent(self,event):
 		if self.isEnabled():
 			self.resize(QSize(BTN_SIZE,BTN_SIZE))
 			self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+	#def leaveEvent
 
 	def keyPressEvent(self,event):
 		sw_mod=False
@@ -102,7 +104,7 @@ class navButton(QPushButton):
 		else:
 			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
 			event.setAccepted(False)
-	#def eventFilter
+	#def keyPressEvent
 #class navButton
 
 class runomatic(QWidget):
@@ -118,9 +120,6 @@ class runomatic(QWidget):
 		self.runoapps="/usr/share/runomatic/applications"
 		self.dbg=False
 		self.procMon=[]
-		cursor=QtGui.QCursor(Qt.PointingHandCursor)
-		self.setCursor(cursor)
-		self.username=getpass.getuser()
 		self.categories={}
 		self.desktops={}
 		self.pid=0
@@ -129,8 +128,6 @@ class runomatic(QWidget):
 		self.tab_id={}
 		self.focusWidgets=[]
 		self.appsWidgets=[]
-		self.bg="/usr/share/runomatic/rsrc/background2.png"
-		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -138,28 +135,13 @@ class runomatic(QWidget):
 		self.closeKey=False
 		self.confKey=False
 		self.keymap={}
-		self._set_keymapping()
-		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
-		btnPrevious=QPushButton()
-		btnPrevious.setObjectName("PushButton")
-		btnPrevious.setIcon(self.previousIcon)
-		btnPrevious.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.sigmap_tabSelect.setMapping(btnPrevious,0)
-		btnPrevious.clicked.connect(self.sigmap_tabSelect.map)
-		self.homeIcon=QtGui.QIcon.fromTheme("go-home")
-		btnHome=QPushButton()
-		btnHome.setObjectName("PushButton")
-		btnHome.setIcon(self.homeIcon)
-		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
-		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
-		self.grab=False
-		self.runner=appRun()
-		self._read_config()
 		self.display=os.environ['DISPLAY']
-		home=os.environ['HOME']
-		self.cache="%s/.cache/runomatic/"%home
-		self.setStyleSheet(self._define_css())
+		self.cache="%s/.cache/runomatic/"%os.environ['HOME']
+		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
+		self.username=getpass.getuser()
+		self.runner=appRun()
+		self._set_keymapping()
+		self._read_config()
 		self._render_gui()
 	#def init
 
@@ -205,27 +187,45 @@ class runomatic(QWidget):
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
 		self.bg=data.get('background',self.defaultBg)
-		print(self.bg)
-		if ((self.bg==None) or (not(os.path.isfile(self.bg)))) :
+		if (not(os.path.isfile(self.bg))):
 			self.bg=self.defaultBg
-		print("******************")
-		print("******************")
-		print(self.bg)
-		print("******************")
-		print("******************")
-		print(data)
 		self.runner.setBg(self.bg)
 	#def _read_config(self):
+
+	def _init_gui(self):
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowModality(Qt.WindowModal)
+		cursor=QtGui.QCursor(Qt.PointingHandCursor)
+		self.setCursor(cursor)
+		self.bg="/usr/share/runomatic/rsrc/background2.png"
+		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
+		btnPrevious=QPushButton()
+		btnPrevious.setObjectName("PushButton")
+		btnPrevious.setIcon(self.previousIcon)
+		btnPrevious.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		self.sigmap_tabSelect.setMapping(btnPrevious,0)
+		btnPrevious.clicked.connect(self.sigmap_tabSelect.map)
+		self.homeIcon=QtGui.QIcon.fromTheme("go-home")
+		btnHome=QPushButton()
+		btnHome.setObjectName("PushButton")
+		btnHome.setIcon(self.homeIcon)
+		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
+		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
+		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
+		self.grab=False
+		self.setStyleSheet(self._define_css())
+		monitor=QDesktopWidget().screenGeometry(1)
+		self.move(monitor.left(),monitor.top())
+		self.showFullScreen()
+	#def _init_gui(self):
 
 	def _render_gui(self):
 		#Enable transparent window
 #		self.setStyleSheet('background:transparent')
 #		self.setAttribute(Qt.WA_TranslucentBackground)
 		####
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.setWindowFlags(Qt.FramelessWindowHint)
-		self.setWindowState(Qt.WindowFullScreen)
-		self.setWindowModality(Qt.WindowModal)
 		def launchConf():
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
@@ -235,9 +235,7 @@ class runomatic(QWidget):
 						self.showMessage(_("runoconfig not found"%self.baseDir),"error2",20)
 				except:
 					print(_("runoconfig not found"))
-		monitor=QDesktopWidget().screenGeometry(1)
-		self.move(monitor.left(),monitor.top())
-		self.showFullScreen()
+		self._init_gui()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
 		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:128px;height:256px")
@@ -372,56 +370,55 @@ class runomatic(QWidget):
 		self.currentBtn=self.focusWidgets.index(widget)
 	#def _get_focus(self,widget)
 
-	def _tabBar(self):
-		row=0
-		col=0
-		def _add_widgets():
-			nonlocal row
-			nonlocal col
-			sigmap_run=QSignalMapper(self)
-			sigmap_run.mapped[QString].connect(self._launch)
-			for appName,appIcon in apps.items():
-				if QtGui.QIcon.hasThemeIcon(appIcon):
-					icnApp=QtGui.QIcon.fromTheme(appIcon)
-				elif os.path.isfile(appIcon):
-						iconPixmap=QtGui.QPixmap(appIcon)
-						scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
-						icnApp=QtGui.QIcon(scaledIcon)
-				elif appIcon.startswith("http"):
-					if not os.path.isdir("%s/icons"%self.cache):
-						os.makedirs("%s/icons"%self.cache)
-					tmpfile=os.path.join("%s/icons"%self.cache,appIcon.split("/")[2].split(".")[0])
-					if not os.path.isfile(tmpfile):
-						try:
-							urlretrieve(appIcon,tmpfile)
-						except:
-							tmpfile=QtGui.QIcon.fromTheme("shell")
-					iconPixmap=QtGui.QPixmap(tmpfile)
+	def _add_widgets(self,vbox,apps):
+		row=int(len(self.appsWidgets)/self.maxCol)
+		col=(self.maxCol*(row+1))-len(self.appsWidgets)
+		sigmap_run=QSignalMapper(self)
+		sigmap_run.mapped[QString].connect(self._launch)
+		for appName,appIcon in apps.items():
+			if QtGui.QIcon.hasThemeIcon(appIcon):
+				icnApp=QtGui.QIcon.fromTheme(appIcon)
+			elif os.path.isfile(appIcon):
+					iconPixmap=QtGui.QPixmap(appIcon)
 					scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 					icnApp=QtGui.QIcon(scaledIcon)
-				else:
-					continue
-				if not appName:
-					continue
-				self.app_icons[appName]=appIcon
-				self._debug("Adding %s"%appName)
-				btnApp=navButton(self)
-				btnApp.setIcon(icnApp)
-				btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
-				btnApp.setToolTip(appName)
-				btnApp.setFocusPolicy(Qt.NoFocus)
-				btnApp.keypress.connect(self._set_focus)
-				btnApp.focusIn.connect(self._get_focus)
-				self.focusWidgets.append(btnApp)
-				self.appsWidgets.append(appName)
-				sigmap_run.setMapping(btnApp,appName)
-				btnApp.clicked.connect(sigmap_run.map)
-				vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
-				col+=1
-				if col==self.maxCol:
-					col=0
-					row+=1
-
+			elif appIcon.startswith("http"):
+				if not os.path.isdir("%s/icons"%self.cache):
+					os.makedirs("%s/icons"%self.cache)
+				tmpfile=os.path.join("%s/icons"%self.cache,appIcon.split("/")[2].split(".")[0])
+				if not os.path.isfile(tmpfile):
+					try:
+						urlretrieve(appIcon,tmpfile)
+					except:
+						tmpfile=QtGui.QIcon.fromTheme("shell")
+				iconPixmap=QtGui.QPixmap(tmpfile)
+				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+				icnApp=QtGui.QIcon(scaledIcon)
+			else:
+				continue
+			if not appName:
+				continue
+			self.app_icons[appName]=appIcon
+			self._debug("Adding %s"%appName)
+			btnApp=navButton(self)
+			btnApp.setIcon(icnApp)
+			btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+			btnApp.setToolTip(appName)
+			btnApp.setFocusPolicy(Qt.NoFocus)
+			btnApp.keypress.connect(self._set_focus)
+			btnApp.focusIn.connect(self._get_focus)
+			self.focusWidgets.append(btnApp)
+			self.appsWidgets.append(appName)
+			sigmap_run.setMapping(btnApp,appName)
+			btnApp.clicked.connect(sigmap_run.map)
+			vbox.addWidget(btnApp,row,col,Qt.Alignment(-1))
+			col+=1
+			if col==self.maxCol:
+				col=0
+				row+=1
+	#def _add_widgets
+	
+	def _tabBar(self):
 		tabBar=QTabWidget()
 		tabScroll=QWidget()
 		tabScroll.setObjectName("scroll")
@@ -438,7 +435,7 @@ class runomatic(QWidget):
 		self._debug("Size: %s\nCols: %s"%(self.width(),self.maxCol))
 		for desktop in self.desktops:
 			apps=self._get_desktop_apps(desktop)
-			_add_widgets()
+			self._add_widgets(vbox,apps)
 
 		tabContent.setLayout(vbox)
 		scrollArea.setWidget(tabContent)
