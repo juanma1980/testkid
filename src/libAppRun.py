@@ -457,7 +457,7 @@ class appRun():
 						os.makedirs("%s/.config/runomatic/backgrounds"%os.environ['HOME'])
 					with open(imgName,"wb") as f:
 						f.write(base64.decodebytes(bg64.encode("utf-8")))
-			return imgName
+		return imgName
 	#def _fix_background_path(self,bg,bg64):
 
 	def get_category_desktops(self,category):
