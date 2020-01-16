@@ -111,6 +111,7 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
+		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -118,7 +119,6 @@ class runomatic(QWidget):
 		signal.signal(signal.SIGUSR1,self._end_process)
 		signal.signal(signal.SIGUSR2,self._fail_process)
 		self.runoapps="/usr/share/runomatic/applications"
-		self.dbg=False
 		self.procMon=[]
 		self.categories={}
 		self.desktops={}
