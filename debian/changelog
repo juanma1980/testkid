@@ -1,3 +1,9 @@
+runomatic (0.8.4) bionic; urgency=medium
+
+  * Code clean
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 16 Jan 2020 18:36:50 +0000
+
 runomatic (0.8.3.1) bionic; urgency=medium
 
   * Implemented n4d features for background and custom desktops 
