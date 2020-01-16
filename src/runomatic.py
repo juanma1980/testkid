@@ -76,11 +76,13 @@ class navButton(QPushButton):
 			self.focusIn.emit(self)
 			self.resize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 			self.setIconSize(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
+	#def enterEvent
 	
 	def leaveEvent(self,event):
 		if self.isEnabled():
 			self.resize(QSize(BTN_SIZE,BTN_SIZE))
 			self.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
+	#def leaveEvent
 
 	def keyPressEvent(self,event):
 		sw_mod=False
@@ -102,7 +104,7 @@ class navButton(QPushButton):
 		else:
 			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
 			event.setAccepted(False)
-	#def eventFilter
+	#def keyPressEvent
 #class navButton
 
 class runomatic(QWidget):
