@@ -14,10 +14,10 @@ class confApp(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self._debug("confApp Load")
-		self.description=(_("Choose the app behaviour"))
+		self.description=(_("App behaviour"))
 		self.menu_description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
-		self.tooltip=(_("From here you can set the behaviour of the app"))
+		self.tooltip=(_("From here you can change background, start and exit options..."))
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.index=1
