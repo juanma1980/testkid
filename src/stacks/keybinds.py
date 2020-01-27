@@ -8,7 +8,7 @@ from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
 _ = gettext.gettext
 
-class confKeys(confStack):
+class keybinds(confStack):
 	keybind_signal=pyqtSignal("PyQt_PyObject")
 
 	def __init_stack__(self):

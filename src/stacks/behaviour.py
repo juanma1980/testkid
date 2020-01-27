@@ -10,7 +10,7 @@ from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
 _ = gettext.gettext
 
-class confApp(confStack):
+class behaviour(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self._debug("confApp Load")

@@ -197,7 +197,7 @@ class dropButton(QPushButton):
 	#def clone
 #class dropButton
 
-class confLaunchers(confStack):
+class runoapps(confStack):
 	dragdrop_signal=pyqtSignal("PyQt_PyObject")
 	def __init_stack__(self,app=None):
 		self.dbg=False
@@ -359,7 +359,6 @@ class confLaunchers(confStack):
 				deskInfo=self.runner.get_desktop_app(desktop)
 				if not deskInfo or '' in deskInfo.keys():
 					continue
-				print(deskInfo)
 				for appName,appIcon in deskInfo.items():
 					btn_desktop=dropButton(desktop,self.tbl_app)
 					if not btn_desktop.setImage(appIcon,state):
