@@ -8,7 +8,7 @@ from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
 _ = gettext.gettext
 
-class confN4d(confStack):
+class n4dtools(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self.menu_description=(_("Configure N4d server"))
