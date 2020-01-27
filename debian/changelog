@@ -1,6 +1,7 @@
-runomatic (0.8.4) bionic; urgency=medium
+runomatic (0.8.5) bionic; urgency=medium
 
   * Code clean
+  * Fix close session when app ends
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 16 Jan 2020 18:36:50 +0000
 
