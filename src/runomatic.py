@@ -285,11 +285,7 @@ class runomatic(QWidget):
 					os.remove(xlockFile)
 		if self.close_on_exit==True:
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
-<<<<<<< HEAD
-		return(True)
-=======
 		return (True)
->>>>>>> master
 	#def closeEvent
 
 	def keyPressEvent(self,event):
