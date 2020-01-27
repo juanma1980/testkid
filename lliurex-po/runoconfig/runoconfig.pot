@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 12:20+0100\n"
+"POT-Creation-Date: 2020-01-27 10:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,123 +17,131 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/stacks/confApp.py:16
-msgid "Choose the app behaviour"
+#: ../src/stacks/confApp.py:17
+msgid "App behaviour"
 msgstr ""
 
-#: ../src/stacks/confApp.py:17
+#: ../src/stacks/confApp.py:18
 msgid "Set app behaviour"
 msgstr ""
 
-#: ../src/stacks/confApp.py:19
-msgid "From here you can set the behaviour of the app"
+#: ../src/stacks/confApp.py:20
+msgid "From here you can change background, start and exit options..."
 msgstr ""
 
-#: ../src/stacks/confApp.py:29
+#: ../src/stacks/confApp.py:32
 msgid "The config will be applied per user"
 msgstr ""
 
-#: ../src/stacks/confApp.py:31
+#: ../src/stacks/confApp.py:34
 msgid "The config will be applied to all users"
 msgstr ""
 
-#: ../src/stacks/confApp.py:33
+#: ../src/stacks/confApp.py:36
 msgid "The config will be applied to all users and clients"
 msgstr ""
 
-#: ../src/stacks/confApp.py:36
+#: ../src/stacks/confApp.py:39
 msgid "Choose the config level that should use the app"
 msgstr ""
 
-#: ../src/stacks/confApp.py:40
+#: ../src/stacks/confApp.py:45
 msgid "User"
 msgstr ""
 
-#: ../src/stacks/confApp.py:41
+#: ../src/stacks/confApp.py:46
 msgid "System"
 msgstr ""
 
-#: ../src/stacks/confApp.py:42
+#: ../src/stacks/confApp.py:47
 msgid "N4d"
 msgstr ""
 
-#: ../src/stacks/confApp.py:49
-msgid "Launch at startup"
+#: ../src/stacks/confApp.py:55
+msgid "Session settings"
 msgstr ""
 
-#: ../src/stacks/confApp.py:51
+#: ../src/stacks/confApp.py:58
 msgid "Close session when application exits"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:26
+#: ../src/stacks/confApp.py:60
+msgid "Choose the background image"
+msgstr ""
+
+#: ../src/stacks/confApp.py:158
+msgid "images(*.png *.svg *jpg *bmp)"
+msgstr ""
+
+#: ../src/stacks/confDesktops.py:35
 msgid "Add new launchers"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:27
+#: ../src/stacks/confDesktops.py:36
 msgid "Add custom launcher"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:29
+#: ../src/stacks/confDesktops.py:38
 msgid "From here you can add a custom launcher"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:54
+#: ../src/stacks/confDesktops.py:65
 msgid "From here you can add Launchers"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:56
+#: ../src/stacks/confDesktops.py:67
 msgid "Icon: "
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:63
+#: ../src/stacks/confDesktops.py:74
 msgid "Push to change icon"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:66
+#: ../src/stacks/confDesktops.py:77
 msgid "Name: "
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:69
+#: ../src/stacks/confDesktops.py:80
 msgid "Desktop name"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:70
+#: ../src/stacks/confDesktops.py:81
 msgid "Insert desktop name"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:72
+#: ../src/stacks/confDesktops.py:83
 msgid "Executable: "
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:76
+#: ../src/stacks/confDesktops.py:90
 msgid "Executable path"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:77
+#: ../src/stacks/confDesktops.py:91
 msgid "Insert path to the executable"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:81
+#: ../src/stacks/confDesktops.py:96
 msgid "Press button to select an executable"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:84
+#: ../src/stacks/confDesktops.py:101
 msgid "Description: "
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:87
+#: ../src/stacks/confDesktops.py:104
 msgid "Description"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:88
+#: ../src/stacks/confDesktops.py:105
 msgid "Insert a description for the app"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:97
+#: ../src/stacks/confDesktops.py:114
 msgid "images(*.png *.xpm *jpg)"
 msgstr ""
 
-#: ../src/stacks/confDesktops.py:99
+#: ../src/stacks/confDesktops.py:116
 msgid "All files(*.*)"
 msgstr ""
 
@@ -161,44 +169,44 @@ msgstr ""
 msgid "Press a key"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:151
+#: ../src/stacks/confLaunchers.py:30
+msgid "Launcher select"
+msgstr ""
+
+#: ../src/stacks/confLaunchers.py:218
 msgid "Configure visible launchers"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:152
+#: ../src/stacks/confLaunchers.py:219
 msgid "Modify launchers"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:154
+#: ../src/stacks/confLaunchers.py:221
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:204
-msgid "desktops(*.desktop)"
-msgstr ""
-
-#: ../src/stacks/confLaunchers.py:221
+#: ../src/stacks/confLaunchers.py:291
 msgid "Categories"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:234
+#: ../src/stacks/confLaunchers.py:304
 msgid "Add launcher"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:235
+#: ../src/stacks/confLaunchers.py:305
 msgid "Add Launcher"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:296
-msgid "Show button"
+#: ../src/stacks/confLaunchers.py:370
+msgid "Hide button"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:297
+#: ../src/stacks/confLaunchers.py:371
 msgid "Edit button"
 msgstr ""
 
-#: ../src/stacks/confLaunchers.py:299
-msgid "Hide button"
+#: ../src/stacks/confLaunchers.py:373
+msgid "Show button"
 msgstr ""
 
 #: ../src/stacks/confN4d.py:14

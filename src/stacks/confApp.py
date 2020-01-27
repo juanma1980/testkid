@@ -48,7 +48,7 @@ class confApp(confStack):
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		hbox.addWidget(self.cmb_level,1,Qt.AlignLeft)
-		lbl_help=QLabel(_(""))
+		lbl_help=QLabel("")
 		hbox.addWidget(lbl_help,1,Qt.AlignTop)
 		wdg_level.setLayout(hbox)
 		box.addWidget(wdg_level,1,Qt.AlignLeft)

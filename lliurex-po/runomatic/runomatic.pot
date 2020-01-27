@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 12:20+0100\n"
+"POT-Creation-Date: 2020-01-27 10:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/runomatic.py:228 ../src/runomatic.py:230 ../src/runomatic.py:306
+#: ../src/runomatic.py:235 ../src/runomatic.py:237 ../src/runomatic.py:312
 msgid "runoconfig not found"
 msgstr ""
 
-#: ../src/runomatic.py:253
+#: ../src/runomatic.py:258
 msgid ""
 "There's no launchers to show.\n"
 "Did you run the configure app?"
 msgstr ""
 
-#: ../src/runomatic.py:255
+#: ../src/runomatic.py:260
 msgid "Launch configuration app"
 msgstr ""
 
-#: ../src/runomatic.py:263
+#: ../src/runomatic.py:268
 msgid "Insert the password"
 msgstr ""
 
-#: ../src/runomatic.py:265
+#: ../src/runomatic.py:270
 msgid "Insert the password. Current session will also be closed."
 msgstr ""
 
-#: ../src/runomatic.py:266
+#: ../src/runomatic.py:271
 msgid "Confirm close"
 msgstr ""
