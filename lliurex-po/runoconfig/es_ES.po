@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-28 12:20+0100\n"
-"PO-Revision-Date: 2019-11-28 12:26+0100\n"
+"POT-Creation-Date: 2020-01-27 10:20+0100\n"
+"PO-Revision-Date: 2020-01-27 10:23+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -18,123 +18,131 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/stacks/confApp.py:16
-msgid "Choose the app behaviour"
+#: ../src/stacks/confApp.py:17
+msgid "App behaviour"
 msgstr "Comportamiento de la aplicación"
 
-#: ../src/stacks/confApp.py:17
+#: ../src/stacks/confApp.py:18
 msgid "Set app behaviour"
 msgstr "Selecciona el comportamiento de la aplicación"
 
-#: ../src/stacks/confApp.py:19
-msgid "From here you can set the behaviour of the app"
-msgstr "Desde aquí puedes seleccionar el comportamiento de la aplicación"
+#: ../src/stacks/confApp.py:20
+msgid "From here you can change background, start and exit options..."
+msgstr "Opciones de inicio y apagado, fondo de pantalla..."
 
-#: ../src/stacks/confApp.py:29
+#: ../src/stacks/confApp.py:32
 msgid "The config will be applied per user"
 msgstr "La configuración se aplicará por usuario"
 
-#: ../src/stacks/confApp.py:31
+#: ../src/stacks/confApp.py:34
 msgid "The config will be applied to all users"
 msgstr "La configuración se aplicará a todos los usuarios"
 
-#: ../src/stacks/confApp.py:33
+#: ../src/stacks/confApp.py:36
 msgid "The config will be applied to all users and clients"
 msgstr "La configuración se aplicará a todos los usuarios y clientes"
 
-#: ../src/stacks/confApp.py:36
+#: ../src/stacks/confApp.py:39
 msgid "Choose the config level that should use the app"
 msgstr "Selecciona el nivel de configuración a usar"
 
-#: ../src/stacks/confApp.py:40
+#: ../src/stacks/confApp.py:45
 msgid "User"
 msgstr "Usuario"
 
-#: ../src/stacks/confApp.py:41
+#: ../src/stacks/confApp.py:46
 msgid "System"
 msgstr "Sistema"
 
-#: ../src/stacks/confApp.py:42
+#: ../src/stacks/confApp.py:47
 msgid "N4d"
 msgstr "N4d"
 
-#: ../src/stacks/confApp.py:49
-msgid "Launch at startup"
-msgstr "Ejecutar al arranque"
+#: ../src/stacks/confApp.py:55
+msgid "Session settings"
+msgstr "Ajustes de sesión"
 
-#: ../src/stacks/confApp.py:51
+#: ../src/stacks/confApp.py:58
 msgid "Close session when application exits"
 msgstr "Cerrar sesión al salir de la aplicación"
 
-#: ../src/stacks/confDesktops.py:26
+#: ../src/stacks/confApp.py:60
+msgid "Choose the background image"
+msgstr "Selecciona la imagen para el fondo"
+
+#: ../src/stacks/confApp.py:158
+msgid "images(*.png *.svg *jpg *bmp)"
+msgstr "imagenes(*.png *.svg *jpg *bmp)"
+
+#: ../src/stacks/confDesktops.py:35
 msgid "Add new launchers"
 msgstr "Añadir lanzadores"
 
-#: ../src/stacks/confDesktops.py:27
+#: ../src/stacks/confDesktops.py:36
 msgid "Add custom launcher"
 msgstr "Añadir lanzador personalizado"
 
-#: ../src/stacks/confDesktops.py:29
+#: ../src/stacks/confDesktops.py:38
 msgid "From here you can add a custom launcher"
 msgstr "Desde aquí se pueden añadir lanzadores personalizados"
 
-#: ../src/stacks/confDesktops.py:54
+#: ../src/stacks/confDesktops.py:65
 msgid "From here you can add Launchers"
 msgstr "Desde aquí se pueden añadir lanzadores"
 
-#: ../src/stacks/confDesktops.py:56
+#: ../src/stacks/confDesktops.py:67
 msgid "Icon: "
 msgstr "Icono:"
 
-#: ../src/stacks/confDesktops.py:63
+#: ../src/stacks/confDesktops.py:74
 msgid "Push to change icon"
 msgstr "Pulsa para cambiar el icono"
 
-#: ../src/stacks/confDesktops.py:66
+#: ../src/stacks/confDesktops.py:77
 msgid "Name: "
 msgstr "Nombre:"
 
-#: ../src/stacks/confDesktops.py:69
+#: ../src/stacks/confDesktops.py:80
 msgid "Desktop name"
 msgstr "Nombre del lanzador"
 
-#: ../src/stacks/confDesktops.py:70
+#: ../src/stacks/confDesktops.py:81
 msgid "Insert desktop name"
 msgstr "Inserta el nombre del lanzador"
 
-#: ../src/stacks/confDesktops.py:72
+#: ../src/stacks/confDesktops.py:83
 msgid "Executable: "
 msgstr "Ejecutable:"
 
-#: ../src/stacks/confDesktops.py:76
+#: ../src/stacks/confDesktops.py:90
 msgid "Executable path"
 msgstr "Ruta al ejecutable"
 
-#: ../src/stacks/confDesktops.py:77
+#: ../src/stacks/confDesktops.py:91
 msgid "Insert path to the executable"
 msgstr "Inserta la ruta al ejecutable"
 
-#: ../src/stacks/confDesktops.py:81
+#: ../src/stacks/confDesktops.py:96
 msgid "Press button to select an executable"
 msgstr "Pulsa para seleccionar un ejecutable"
 
-#: ../src/stacks/confDesktops.py:84
+#: ../src/stacks/confDesktops.py:101
 msgid "Description: "
 msgstr "Descripción:"
 
-#: ../src/stacks/confDesktops.py:87
+#: ../src/stacks/confDesktops.py:104
 msgid "Description"
 msgstr "Descripción"
 
-#: ../src/stacks/confDesktops.py:88
+#: ../src/stacks/confDesktops.py:105
 msgid "Insert a description for the app"
 msgstr "Inserta la descripción del lanzador"
 
-#: ../src/stacks/confDesktops.py:97
+#: ../src/stacks/confDesktops.py:114
 msgid "images(*.png *.xpm *jpg)"
 msgstr "imagenes(*.png *.xpm *jpg)"
 
-#: ../src/stacks/confDesktops.py:99
+#: ../src/stacks/confDesktops.py:116
 msgid "All files(*.*)"
 msgstr "Todos los ficheros(*.*)"
 
@@ -163,45 +171,45 @@ msgstr "Configurar la aplicación"
 msgid "Press a key"
 msgstr "Pulsa una tecla"
 
-#: ../src/stacks/confLaunchers.py:151
+#: ../src/stacks/confLaunchers.py:30
+msgid "Launcher select"
+msgstr "Selección de lanzador"
+
+#: ../src/stacks/confLaunchers.py:218
 msgid "Configure visible launchers"
 msgstr "Configurar los lanzadores "
 
-#: ../src/stacks/confLaunchers.py:152
+#: ../src/stacks/confLaunchers.py:219
 msgid "Modify launchers"
 msgstr "Modificar lanzadores"
 
-#: ../src/stacks/confLaunchers.py:154
+#: ../src/stacks/confLaunchers.py:221
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr "Añadir un lanzador personalizado (en la categoría run-o-matic)"
 
-#: ../src/stacks/confLaunchers.py:204
-msgid "desktops(*.desktop)"
-msgstr "desktops(*.desktop)"
-
-#: ../src/stacks/confLaunchers.py:221
+#: ../src/stacks/confLaunchers.py:291
 msgid "Categories"
 msgstr "Categorías"
 
-#: ../src/stacks/confLaunchers.py:234
+#: ../src/stacks/confLaunchers.py:304
 msgid "Add launcher"
 msgstr "Añadir lanzador\t"
 
-#: ../src/stacks/confLaunchers.py:235
+#: ../src/stacks/confLaunchers.py:305
 msgid "Add Launcher"
 msgstr "Añadir lanzador\t"
 
-#: ../src/stacks/confLaunchers.py:296
-msgid "Show button"
-msgstr "Mostrar"
+#: ../src/stacks/confLaunchers.py:370
+msgid "Hide button"
+msgstr "Ocultar"
 
-#: ../src/stacks/confLaunchers.py:297
+#: ../src/stacks/confLaunchers.py:371
 msgid "Edit button"
 msgstr "Editar"
 
-#: ../src/stacks/confLaunchers.py:299
-msgid "Hide button"
-msgstr "Ocultar"
+#: ../src/stacks/confLaunchers.py:373
+msgid "Show button"
+msgstr "Mostrar"
 
 #: ../src/stacks/confN4d.py:14
 msgid "Configure N4d server"
@@ -252,3 +260,15 @@ msgstr "Las contraseñas no coinciden"
 #: ../src/stacks/confPass.py:54
 msgid "Password is empty"
 msgstr "La contraseña está vacía"
+
+#~ msgid "Choose the app behaviour"
+#~ msgstr "Comportamiento de la aplicación"
+
+#~ msgid "From here you can set the behaviour of the app"
+#~ msgstr "Desde aquí puedes seleccionar el comportamiento de la aplicación"
+
+#~ msgid "Launch at startup"
+#~ msgstr "Ejecutar al arranque"
+
+#~ msgid "desktops(*.desktop)"
+#~ msgstr "desktops(*.desktop)"

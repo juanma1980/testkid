@@ -14,10 +14,10 @@ class confApp(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self._debug("confApp Load")
-		self.description=(_("Choose the app behaviour"))
+		self.description=(_("App behaviour"))
 		self.menu_description=(_("Set app behaviour"))
 		self.icon=('dialog-password')
-		self.tooltip=(_("From here you can set the behaviour of the app"))
+		self.tooltip=(_("From here you can change background, start and exit options..."))
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.defaultBg="/usr/share/runomatic/rsrc/background2.png"
 		self.index=1
@@ -48,7 +48,7 @@ class confApp(confStack):
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		hbox.addWidget(self.cmb_level,1,Qt.AlignLeft)
-		lbl_help=QLabel(_(""))
+		lbl_help=QLabel("")
 		hbox.addWidget(lbl_help,1,Qt.AlignTop)
 		wdg_level.setLayout(hbox)
 		box.addWidget(wdg_level,1,Qt.AlignLeft)
