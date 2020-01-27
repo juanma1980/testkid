@@ -158,7 +158,7 @@ class runomatic(QWidget):
 
 	def _debug(self,msg):
 		if self.dbg:
-			print("%s"%msg)
+			print("runomatic: %s"%msg)
 	#def _debug
 
 	def _set_keymapping(self):
@@ -272,10 +272,8 @@ class runomatic(QWidget):
 			if resp:
 				if not hashpwd.verify(pwd,self.password):
 					event.ignore()
-					return(False)
 			else:
 				event.ignore()
-				return(False)
 		for index in self.tab_id.keys():
 			if index:
 				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
@@ -283,9 +281,9 @@ class runomatic(QWidget):
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
-		if self.close_on_exit==True:
+		if str(self.close_on_exit).lower()=='true':
+			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
-		return (True)
 	#def closeEvent
 
 	def keyPressEvent(self,event):

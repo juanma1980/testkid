@@ -9,7 +9,7 @@ from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
 _ = gettext.gettext
 
-class confPass(confStack):
+class password(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self.txt_pass=QLineEdit()

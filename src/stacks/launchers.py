@@ -17,9 +17,9 @@ import re
 import gettext
 _ = gettext.gettext
 
-class confDesktops(confStack):
+class launchers(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confDesktops Load")
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
