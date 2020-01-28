@@ -53,7 +53,7 @@ class behaviour(confStack):
 		wdg_level.setLayout(hbox)
 		box.addWidget(wdg_level,1,Qt.AlignLeft)
 		box.addWidget(QLabel(_("Session settings")),1,Qt.AlignTop)
-		self.chk_startup=QCheckBox("Launch at startup")
+		self.chk_startup=QCheckBox(_("Launch at startup"))
 		box.addWidget(self.chk_startup,1,Qt.AlignTop)
 		self.chk_close=QCheckBox(_("Close session when application exits"))
 		box.addWidget(self.chk_close,2,Qt.AlignTop)
@@ -73,7 +73,13 @@ class behaviour(confStack):
 	#def _load_screen
 
 	def fakeUpdate(self):
-		level=self.cmb_level.currentText().lower()
+		idx=self.cmb_level.currentIndex()
+		if idx==0:
+			level='user'
+		elif idx==1:
+			level='system'
+		elif idx==2:
+			level='n4d'
 		config=self.getConfig(level)
 		close=False
 		if level in config.keys():
