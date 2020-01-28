@@ -98,6 +98,7 @@ class dropTable(QTableWidget):
 		self.setShowGrid(False)
 		self.horizontalHeader().hide()
 		self.verticalHeader().hide()
+	#def __init__
 	
 	def dragEnterEvent(self,e):
 		e.accept()
@@ -116,6 +117,7 @@ class dropTable(QTableWidget):
 		elif e.mimeData().hasText():
 			path=e.mimeData().text()
 		self.drop.emit(path)
+	#def dropEvent
 
 class dropButton(QPushButton):
 	drop=pyqtSignal("PyQt_PyObject")
@@ -329,11 +331,17 @@ class runoapps(confStack):
 	#def _get_all_categories(self):
 	
 	def _tbl_DropEvent(self,path):
-		if type(path)==type(""):
-			if path.endswith('desktop'):
-				if os.path.isfile(path):
+		deskPath=''
+		if type(path)==type({}):
+			deskPath=path.get('path','')
+		elif type(deskPath)==type(""):
+			deskPath=path
+
+		if deskPath:
+			if deskPath.endswith('desktop'):
+				if os.path.isfile(deskPath):
 					apps=self._get_table_apps()
-					apps['desktops'].append(path)
+					apps['desktops'].append(deskPath)
 					self.update_apps(apps)
 	#def _tbl_DropEvent
 
