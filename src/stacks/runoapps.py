@@ -98,6 +98,7 @@ class dropTable(QTableWidget):
 		self.setShowGrid(False)
 		self.horizontalHeader().hide()
 		self.verticalHeader().hide()
+	#def __init__
 	
 	def dragEnterEvent(self,e):
 		e.accept()
@@ -116,6 +117,7 @@ class dropTable(QTableWidget):
 		elif e.mimeData().hasText():
 			path=e.mimeData().text()
 		self.drop.emit(path)
+	#def dropEvent
 
 class dropButton(QPushButton):
 	drop=pyqtSignal("PyQt_PyObject")
