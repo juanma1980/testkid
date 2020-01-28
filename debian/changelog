@@ -1,6 +1,7 @@
-runomatic (0.8.5) bionic; urgency=medium
+runomatic (0.8.6) bionic; urgency=medium
 
   * Code clean
+  * Double click on desktops in add_launcher adds launcher to app
   * Fix close session when app ends
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 16 Jan 2020 18:36:50 +0000
