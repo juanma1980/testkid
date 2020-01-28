@@ -329,11 +329,15 @@ class runoapps(confStack):
 	#def _get_all_categories(self):
 	
 	def _tbl_DropEvent(self,path):
-		if type(path)==type(""):
-			if path.endswith('desktop'):
-				if os.path.isfile(path):
+		if type(path)==type({}):
+			deskPath=path.get('path','')
+		else:
+			deskPath=path
+		if type(deskPath)==type(""):
+			if deskPath.endswith('desktop'):
+				if os.path.isfile(deskPath):
 					apps=self._get_table_apps()
-					apps['desktops'].append(path)
+					apps['desktops'].append(deskPath)
 					self.update_apps(apps)
 	#def _tbl_DropEvent
 
