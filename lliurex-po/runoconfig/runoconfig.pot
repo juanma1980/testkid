@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-28 13:34+0100\n"
+"POT-Creation-Date: 2020-02-13 11:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -209,38 +209,42 @@ msgstr ""
 msgid "Launcher select"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:218
+#: ../src/stacks/runoapps.py:53
+msgid "Search"
+msgstr ""
+
+#: ../src/stacks/runoapps.py:238
 msgid "Configure visible launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:219
+#: ../src/stacks/runoapps.py:239
 msgid "Modify launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:221
+#: ../src/stacks/runoapps.py:241
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:291
+#: ../src/stacks/runoapps.py:311
 msgid "Categories"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:304
+#: ../src/stacks/runoapps.py:324
 msgid "Add launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:305
+#: ../src/stacks/runoapps.py:325
 msgid "Add Launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:375
+#: ../src/stacks/runoapps.py:395
 msgid "Hide button"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:376
+#: ../src/stacks/runoapps.py:396
 msgid "Edit button"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:378
+#: ../src/stacks/runoapps.py:398
 msgid "Show button"
 msgstr ""

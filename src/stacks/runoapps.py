@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayo
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
-				QHeaderView,QMenu,QAction
+				QHeaderView,QMenu,QAction,QCompleter
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
 from libAppRun import appRun
@@ -30,22 +30,36 @@ class desktopChooser(QDialog):
 		self.setWindowTitle(_("Launcher select"))
 		self.setModal(False)
 		self.desktopList=QListWidget()
+		self.desktopList.setSortingEnabled(True)
 		self.desktopList.setDragEnabled(True)
 		self.desktopList.setAcceptDrops(True)
 		self.desktopList.setSpacing(3)
 		self.desktopList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.desktopList.itemDoubleClicked.connect(self._dblClick)
-		self.desktopList.itemSelectionChanged.connect(self._loadMime)
+		self.desktopList.itemPressed.connect(self._loadMime)
 		self.data={}
 		self._renderGui()
 	
 	def _renderGui(self):
+
+		def searchList():
+			items=self.desktopList.findItems(inp_search.text(),Qt.MatchFlag.MatchContains)
+			if items:
+				self.desktopList.scrollToItem(items[0])
+				self.desktopList.setCurrentItem(items[0])
+
 		box=QVBoxLayout()
+		inp_search=QLineEdit()
+		inp_search.setPlaceholderText(_("Search"))
+		inp_search.textChanged.connect(searchList)
+		completer=QCompleter()
+		completer.setCaseSensitivity(Qt.CaseInsensitive)
+		model=QtGui.QStandardItemModel()
 		#Load available desktops
 		categories=self.menu.get_categories()
 		for category in categories:
 			desktops=self.menu.get_apps_from_category(category)
-			for desktop in desktops:
+			for desktop in desktops.keys():
 				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
 				if desktopInfo.get("NoDisplay",False):
 					continue
@@ -54,11 +68,15 @@ class desktopChooser(QDialog):
 				ficon=desktopInfo.get("Icon","shell")
 				icon=QtGui.QIcon.fromTheme(ficon)
 				name=desktopInfo.get("Name","shell")
+				model.appendRow(QtGui.QStandardItem(name))
 				comment=desktopInfo.get("Comment","shell")
 				listWidget.setIcon(icon)
 				listWidget.setText(name)
 				self.desktopList.addItem(listWidget)
 				self.data[self.desktopList.count()-1]={'path':"%s/%s"%(self.menu.desktoppath,desktop),'icon':icon}
+		completer.setModel(model)
+		inp_search.setCompleter(completer)
+		box.addWidget(inp_search)
 		box.addWidget(self.desktopList)
 		self.setLayout(box)
 
