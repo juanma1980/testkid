@@ -9,4 +9,4 @@ Exec=/usr/bin/runomatic
 Icon=runomatic
 Type=Application
 GenericName=run-o-matic
-Categories=System;Utilities;
+Categories=System;Utility;
