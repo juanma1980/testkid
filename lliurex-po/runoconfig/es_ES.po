@@ -252,24 +252,3 @@ msgstr "Editar"
 #: ../src/stacks/runoapps.py:398
 msgid "Show button"
 msgstr "Mostrar"
-
-#~ msgid "Configure N4d server"
-#~ msgstr "Configurar N4d"
-
-#~ msgid "Configure n4d settings"
-#~ msgstr "Ajustes de N4d"
-
-#~ msgid "From here you can set the n4d settings"
-#~ msgstr "Aquí se configura el N4d"
-
-#~ msgid "Apply n4d policies"
-#~ msgstr "Aplicar ajustes de N4d"
-
-#~ msgid "Choose the app behaviour"
-#~ msgstr "Comportamiento de la aplicación"
-
-#~ msgid "From here you can set the behaviour of the app"
-#~ msgstr "Desde aquí puedes seleccionar el comportamiento de la aplicación"
-
-#~ msgid "desktops(*.desktop)"
-#~ msgstr "desktops(*.desktop)"
