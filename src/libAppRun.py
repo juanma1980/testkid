@@ -34,7 +34,7 @@ class th_runApp(QThread):
 		self.display=display
 		self.app=app.split(" ")
 		self.menu=App2Menu.app2menu()
-		self.dbg=False
+		self.dbg=True
 		self.pid=''
 	#def __init__
 
@@ -120,7 +120,7 @@ class th_runApp(QThread):
 
 class appRun():
 	def __init__(self):
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -145,6 +145,7 @@ class appRun():
 		self.threads_tmp={}
 		self.level='system'
 		self.menu=App2Menu.app2menu()
+		self.main_wid=0
 		self.ratpoisonConf=''
 	#def __init__
 
@@ -210,9 +211,51 @@ class appRun():
 				"-resizeable",
 				"-fullscreen",
 				"%s"%display]
-				p_pid=subprocess.Popen(xephyr_cmd)
+
+				
+				#vnc_cmd=["Xtightvnc",
+				vnc_cmd=["tigervncserver",
+				"%s"%display,
+				"-localhost",
+				"-name",
+				"\"Xephyr on %s\""%display,
+				"-geometry",
+				"800x600",
+				#"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
+				"-nevershared",
+				"-SecurityTypes",
+				"None",
+				"-autokill"]
+				#print("Launch %s"%vnc_cmd)
+				subprocess.run(vnc_cmd)
+
+				xephyr_cmd=["vinagre",
+				"--vnc-scale",
+				"-f",
+				"-n",
+				"%s"%display]
+				#xephyr_cmd=["gvncviewer",
+				#"localhost%s"%display]
+				
+				if self.main_wid==0:
+					v_proc=subprocess.run(["pidof","vinagre"],stdout=subprocess.PIPE)
+					if v_proc.returncode:
+						v_cmd=["vinagre"]
+						v_pid=subprocess.Popen(v_cmd,stderr=subprocess.DEVNULL).pid
+					else:
+						v_pid=v_proc.stdout.decode().split()[0]
+				#xephyr_cmd=["gvncviewer",
+				#"localhost%s"%display]
+					main_wid=subprocess.run(["xdotool","search","--sync","--pid","%s"%(v_pid)],stdout=subprocess.PIPE)
+					wid=main_wid.stdout.decode().split()
+					self.main_wid=wid[1]
+				print("UNMAP: %s"%self.main_wid)
+				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
+				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
+				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Xephyr PID: %s"%p_pid.pid)
+
 		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
 
@@ -227,6 +270,11 @@ class appRun():
 		os.environ['DISPLAY']=dsp
 		return(prc)
 	#def _run_cmd_on_display
+
+	def stop_display(self,display):
+		if display:
+			print("KILLING DISPLAY %s"%display)
+			subprocess.run(["vncserver","--kill","%s"%display])
 
 	def send_signal_to_thread(self,s_signal,thread):
 		self._debug("Send signal: %s to %s"%(s_signal,thread))

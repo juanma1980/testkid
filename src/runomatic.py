@@ -219,6 +219,7 @@ class runomatic(QWidget):
 		monitor=QDesktopWidget().screenGeometry(1)
 		self.move(monitor.left(),monitor.top())
 		self.showFullScreen()
+		#self.show()
 	#def _init_gui(self):
 
 	def _render_gui(self):
@@ -277,7 +278,8 @@ class runomatic(QWidget):
 		for index in self.tab_id.keys():
 			if index:
 				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
-				self.runner.send_signal_to_thread("term",self.tab_id[index].get('xephyr',None))
+				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('xephyr',None))
+				self.runner.stop_display(self.tab_id[index].get('display',':13'))
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
@@ -491,6 +493,8 @@ class runomatic(QWidget):
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
 		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+	#	self.runner.stop_display(self.tab_id[index]['display'])
+
 		xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index]['display'].replace(":",""))
 		if os.path.isfile(xlockFile):
 			os.remove(xlockFile)
@@ -593,19 +597,8 @@ class runomatic(QWidget):
 			self.setCursor(cursor)
 			self.releaseMouse()
 			return
-		#For some reason on first launch the tab doesn't loads the content until there's a tab switch
-		#This is a quick and dirty fix...
-		if self.firstLaunch:
-			self.firstLaunch=False
-			self.tabBar.tabBar().setTabButton(self.id,QTabBar.LeftSide,self.tab_id[self.id]['close'])
-			self.tabBar.tabBar().setTabButton(0,QTabBar.LeftSide,self.tab_id[0]['close'])
-			self.currentTab=1
-			self.tabBar.blockSignals(True)
-			self.tabBar.setCurrentIndex(1)
-			os.environ['DISPLAY']=self.tab_id[self.id]['display']
-			self.tabBar.blockSignals(False)
-		else:
-			self.tabBar.setCurrentIndex(tabCount)
+	
+		self.tabBar.setCurrentIndex(tabCount)
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
 		self.releaseMouse()
@@ -630,6 +623,7 @@ class runomatic(QWidget):
 		self._debug("Current id: %s"%(self.tab_id))
 		for key,data in self.tab_id.items():
 			if 'thread' in data.keys():
+				print(data)
 				if thread==data['thread']:
 					idx=key
 					break
