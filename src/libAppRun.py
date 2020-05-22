@@ -278,21 +278,15 @@ class appRun():
 
 	def stop_display(self,wid,display):
 		if wid:
-			print("CLOSING WID %s"%wid)
-			a=subprocess.run(["xdotool","getwindowfocus"],stdout=subprocess.PIPE)
-			print("**************")
-			b=a.stdout.decode().split()[0]
-			print(b)
-			a=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
-			print(a.stdout)
-			d=""
-			for c in a.stdout.decode().split("\n"):
-				if "Xephyr on %s"%display in c:
-					d=c.split()[0]
-			print("**************")
-			if d:
-				a=subprocess.run("xdotool windowclose %s"%d,shell=True)
-			print(a.returncode)
+			windoWid=subprocess.run(["xdotool","getwindowfocus"],stdout=subprocess.PIPE)
+			currentWid=windoWid.stdout.decode().split()[0]
+			widTree=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
+			hexWid=""
+			for widWindow in widTree.stdout.decode().split("\n"):
+				if "Xephyr on %s"%display in widWindow:
+					hexWid=widWindow.split()[0]
+			if hexWid:
+				subprocess.run("xdotool windowclose %s"%hexWid,shell=True)
 		if display:
 			print("KILLING DISPLAY %s"%display)
 			subprocess.run(["vncserver","--kill","%s"%display])
