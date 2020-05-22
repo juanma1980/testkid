@@ -203,10 +203,10 @@ class runomatic(QWidget):
 	#def _read_config(self):
 
 	def _init_gui(self):
-			#self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		#self.setWindowFlags(Qt.FramelessWindowHint)
-		#self.setWindowState(Qt.WindowFullScreen)
-		#self.setWindowModality(Qt.WindowModal)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowModality(Qt.WindowModal)
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
@@ -228,8 +228,8 @@ class runomatic(QWidget):
 		self.setStyleSheet(self._define_css())
 		monitor=QDesktopWidget().screenGeometry(1)
 		self.move(monitor.left(),monitor.top())
-		#self.showFullScreen()
-		self.show()
+		self.showFullScreen()
+		#self.show()
 	#def _init_gui(self):
 
 	def _render_gui(self):
