@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 import getpass
 import sys
 import os
@@ -9,6 +9,7 @@ import signal
 import time
 import tempfile
 import tarfile
+import shutil
 from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
@@ -34,7 +35,7 @@ class th_runApp(QThread):
 		self.display=display
 		self.app=app.split(" ")
 		self.menu=App2Menu.app2menu()
-		self.dbg=False
+		self.dbg=True
 		self.pid=''
 	#def __init__
 
@@ -80,8 +81,8 @@ class th_runApp(QThread):
 		tmp_file=""
 		self._debug("Launching thread...")
 		try:
-			dsp=os.environ['DISPLAY']
-			os.environ['DISPLAY']=self.display
+			env=os.environ.copy()
+			env['DISPLAY']=self.display
 			if "/usr/bin/resources-launcher.sh" in self.app:
 				self._run_resource()
 			elif 'pysycache' in self.app:
@@ -106,8 +107,8 @@ class th_runApp(QThread):
 				if '%f' in app.lower():
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
-			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False)
-			os.environ['DISPLAY']=dsp
+			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
+			self._debug("Launched %s"%self.app)
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -120,7 +121,7 @@ class th_runApp(QThread):
 
 class appRun():
 	def __init__(self):
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -145,6 +146,7 @@ class appRun():
 		self.threads_tmp={}
 		self.level='system'
 		self.menu=App2Menu.app2menu()
+		self.main_wid=0
 		self.ratpoisonConf=''
 	#def __init__
 
@@ -188,8 +190,9 @@ class appRun():
 	#def new_Xephyr
 
 	def init_Xephyr(self,qwidget,display=":13",create_new=False):
-		os.environ["HOME"]="/home/%s"%self.username
-		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+			#		env=os.environ.copy()
+		#env["HOME"]="/home/%s"%self.username
+		#env["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		if display not in self.xephyr_servers.keys() or create_new:
 			display=self._find_free_display(display)
 			self._debug("Display is set to %s"%display)
@@ -210,29 +213,93 @@ class appRun():
 				"-resizeable",
 				"-fullscreen",
 				"%s"%display]
-				p_pid=subprocess.Popen(xephyr_cmd)
+
+				
+				#vnc_cmd=["Xtightvnc",
+				vnc_cmd=["tigervncserver",
+				"%s"%display,
+				"-localhost",
+				"-name",
+				"\"Xephyr on %s\""%display,
+				"-geometry",
+				"800x600",
+				#"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
+				"-nevershared",
+				"-SecurityTypes",
+				"None",
+				"-autokill"]
+				#print("Launch %s"%vnc_cmd)
+				subprocess.run(vnc_cmd)
+
+				xephyr_cmd=["vinagre",
+				"--vnc-scale",
+				"-f",
+				"-n",
+				"%s"%display]
+				#xephyr_cmd=["gvncviewer",
+				#"localhost%s"%display]
+				
+				if self.main_wid==0:
+					v_proc=subprocess.run(["pidof","vinagre"],stdout=subprocess.PIPE)
+					if v_proc.returncode:
+						v_cmd=["vinagre"]
+						v_pid=subprocess.Popen(v_cmd,stderr=subprocess.DEVNULL).pid
+						#v_pid=self._run_cmd_on_display(v_cmd,"%s"%display)
+					else:
+						v_pid=v_proc.stdout.decode().split()[0]
+				#xephyr_cmd=["gvncviewer",
+				#"localhost%s"%display]
+					main_wid=subprocess.run(["xdotool","search","--sync","--pid","%s"%(v_pid)],stdout=subprocess.PIPE)
+					wid=main_wid.stdout.decode().split()
+					if len(wid)<=1:
+						self.main_wid=wid[-1]
+					else:
+						self.main_wid=wid[1]
+				self._debug("UNMAP: %s"%self.main_wid)
+				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
+				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
+				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Xephyr PID: %s"%p_pid.pid)
+
 		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
 
 	def _run_cmd_on_display(self,cmd=[],display=":13"):
-		os.environ["HOME"]="/home/%s"%self.username
-		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
-		dsp=os.environ['DISPLAY']
-		os.environ['DISPLAY']=display
+		env=os.environ.copy()
+		env["HOME"]="/home/%s"%self.username
+		env["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+		env['DISPLAY']=display
 		self._debug("Running cmd on %s"%display)
 		self._debug("CMD %s"%cmd)
-		prc=subprocess.run(cmd,stdout=subprocess.PIPE)
-		os.environ['DISPLAY']=dsp
+		#prc=subprocess.run(cmd,stdout=subprocess.PIPE)
+		prc=subprocess.run(cmd,stdout=subprocess.PIPE,env=env)
 		return(prc)
 	#def _run_cmd_on_display
+
+	def stop_display(self,wid,display):
+		#if not wid:
+		windoWid=subprocess.run(["xdotool","getwindowfocus"],stdout=subprocess.PIPE)
+		if len(windoWid.stdout)>=1:
+			widTree=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
+			hexWid=""
+			for widWindow in widTree.stdout.decode().split("\n"):
+				if "Xephyr on %s"%display in widWindow:
+					wid=widWindow.split()[0]
+					break
+		if wid:
+			self._debug("CLOSING WINDOW %s"%wid)
+			subprocess.run("xdotool windowclose %s"%wid,shell=True)
+		if display:
+			self._debug("KILLING DISPLAY %s"%display)
+			subprocess.run(["vncserver","--kill","%s"%display])
 
 	def send_signal_to_thread(self,s_signal,thread):
 		self._debug("Send signal: %s to %s"%(s_signal,thread))
 		retval=False
 		sig={'kill':signal.SIGKILL,'term':signal.SIGTERM,'stop':signal.SIGSTOP,'cont':signal.SIGCONT}
 		if thread in self.threads_pid.keys():			
+			self._debug("Sending %s to thread %s with pid %s"%(s_signal,thread,self.threads_pid[thread]))
 			try:
 				if self.threads_pid[thread]:
 					os.kill(self.threads_pid[thread],sig[s_signal])
@@ -259,7 +326,7 @@ class appRun():
 		def _get_th_pid(pid_info):
 			if isinstance(pid_info[0],bool):
 				#Thread failed
-				self._end_process(th_run)
+				self._end_process(th_run,-1)
 			else:
 				self.threads_pid[th_run]=pid_info[0].pid
 				self.threads_tmp[th_run]=pid_info[1]
@@ -276,14 +343,19 @@ class appRun():
 			self.ratpoisonConf=tempfile.mkstemp()[-1]
 		with open(self.ratpoisonConf,'w') as f:
 			f.write("exec wmname LG3D\n")
-			f.write("set border 0\n")
-			f.write("startup message off\n")
-			f.write("set bgcolor white\n")
-			f.write("set fgcolor black\n")
 			f.write("startup_message off\n")
+			f.write("set border 0\n")
+			f.write("set bgcolor black\n")
+			f.write("set fgcolor black\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
 			f.write("exec xloadimage -tile -onroot %s\n"%self.bg)
+		if os.path.isfile("%s/.ratpoisonrc"%os.environ['HOME']):
+			shutil.copy("%s/.ratpoisonrc"%os.environ['HOME'],"%s/.ratpoisonrc2"%os.environ['HOME'])
+		shutil.copy("%s"%self.ratpoisonConf,"%s/.ratpoisonrc"%os.environ['HOME'])
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
+		if os.path.isfile("%s/.ratpoisonrc2"%os.environ['HOME']):
+			shutil.copy("%s/.ratpoisonrc2"%os.environ['HOME'],"%s/.ratpoisonrc"%os.environ['HOME'])
+			os.remove("%s/.ratpoisonrc2"%os.environ['HOME'])
 		th_run=th_runApp(app,display)
 		th_run.start()
 		th_run.processRun.connect(_get_th_pid)
@@ -291,10 +363,10 @@ class appRun():
 	#def launch
 	
 	def _end_process(self,th_run,retCode=0):
-		self._debug("Ending process %s"%th_run)
+		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
-		if retCode:
+		if retCode==-1:
 			os.kill(os.getpid(),signal.SIGUSR2)
 			os.kill(os.getpid(),signal.SIGUSR1)
 		else:
@@ -503,12 +575,14 @@ class appRun():
 		return (apps)
 	#def get_category_apps
 
-	def get_desktop_app(self,f_desktop):
+	def get_desktop_app(self,f_desktop,name=None):
 		apps={}
 		app=self.menu.get_desktop_info(f_desktop)
 		if 'xdg-open' in app['Exec']:
 			app['Exec']=app['Exec'].replace("xdg-open",self.menu.get_default_app_for_file(app['Exec'].split(" ")[-1]))
 		apps[app['Exec']]=app['Icon']
+		if name:
+			apps[app['Exec']]={'Icon':app['Icon'],'Name':app['Name']}
 		return (apps)
 	#def get_desktop_app
 
