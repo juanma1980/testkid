@@ -26,7 +26,10 @@ class launchers(confStack):
 #		self.menu.desktoppath="%s/.local/share/applications/"%home
 		self.menu.desktoppath="/usr/share/runomatic/applications"
 		if not os.path.isdir(self.menu.desktoppath):
-			os.makedirs(self.menu.desktoppath)
+			try:
+				os.makedirs(self.menu.desktoppath)
+			except:
+				print("Failed to create path %s"%self.menu.desktoppath)
 		self.userRunoapps="%s/.config/runomatic/applications"%os.environ['HOME']
 		if not os.path.isdir(self.userRunoapps):
 			os.makedirs(self.userRunoapps)
