@@ -393,7 +393,9 @@ class runomatic(QWidget):
 		col=(self.maxCol*(row+1))-len(self.appsWidgets)
 		sigmap_run=QSignalMapper(self)
 		sigmap_run.mapped[QString].connect(self._launch)
-		for appName,appIcon in apps.items():
+		for appName,data in apps.items():
+			appIcon=data['Icon']
+			appDesc=data['Name']
 			if QtGui.QIcon.hasThemeIcon(appIcon):
 				icnApp=QtGui.QIcon.fromTheme(appIcon)
 			elif os.path.isfile(appIcon):
@@ -412,6 +414,7 @@ class runomatic(QWidget):
 				iconPixmap=QtGui.QPixmap(tmpfile)
 				scaledIcon=iconPixmap.scaled(QSize(BTN_SIZE*1.2,BTN_SIZE*1.2))
 				icnApp=QtGui.QIcon(scaledIcon)
+				appIcon=tmpfile
 			else:
 				continue
 			if not appName:
@@ -421,7 +424,7 @@ class runomatic(QWidget):
 			btnApp=navButton(self)
 			btnApp.setIcon(icnApp)
 			btnApp.setIconSize(QSize(BTN_SIZE,BTN_SIZE))
-			btnApp.setToolTip(appName)
+			btnApp.setToolTip(appDesc)
 			btnApp.setFocusPolicy(Qt.NoFocus)
 			btnApp.keypress.connect(self._set_focus)
 			btnApp.focusIn.connect(self._get_focus)
@@ -543,7 +546,7 @@ class runomatic(QWidget):
 			if os.path.isdir(self.runoapps):
 				if desktop in os.listdir(self.runoapps):
 					desktop=os.path.join(self.runoapps,desktop)
-		apps=self.runner.get_desktop_app(desktop)
+		apps=self.runner.get_desktop_app(desktop,True)
 		return (apps)
 	#def _get_category_apps
 

@@ -9,6 +9,7 @@ import signal
 import time
 import tempfile
 import tarfile
+import shutil
 from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
@@ -107,6 +108,7 @@ class th_runApp(QThread):
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
 			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
+			self._debug("Launched %s"%self.app)
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -343,12 +345,17 @@ class appRun():
 			f.write("exec wmname LG3D\n")
 			f.write("startup_message off\n")
 			f.write("set border 0\n")
-			f.write("startup message off\n")
 			f.write("set bgcolor black\n")
 			f.write("set fgcolor black\n")
 			f.write("exec xsetroot -cursor_name left_ptr\n")
 			f.write("exec xloadimage -tile -onroot %s\n"%self.bg)
+		if os.path.isfile("%s/.ratpoisonrc"%os.environ['HOME']):
+			shutil.copy("%s/.ratpoisonrc"%os.environ['HOME'],"%s/.ratpoisonrc2"%os.environ['HOME'])
+		shutil.copy("%s"%self.ratpoisonConf,"%s/.ratpoisonrc"%os.environ['HOME'])
 		th_runApp("ratpoison -f %s"%self.ratpoisonConf,display).start()
+		if os.path.isfile("%s/.ratpoisonrc2"%os.environ['HOME']):
+			shutil.copy("%s/.ratpoisonrc2"%os.environ['HOME'],"%s/.ratpoisonrc"%os.environ['HOME'])
+			os.remove("%s/.ratpoisonrc2"%os.environ['HOME'])
 		th_run=th_runApp(app,display)
 		th_run.start()
 		th_run.processRun.connect(_get_th_pid)
@@ -568,12 +575,14 @@ class appRun():
 		return (apps)
 	#def get_category_apps
 
-	def get_desktop_app(self,f_desktop):
+	def get_desktop_app(self,f_desktop,name=None):
 		apps={}
 		app=self.menu.get_desktop_info(f_desktop)
 		if 'xdg-open' in app['Exec']:
 			app['Exec']=app['Exec'].replace("xdg-open",self.menu.get_default_app_for_file(app['Exec'].split(" ")[-1]))
 		apps[app['Exec']]=app['Icon']
+		if name:
+			apps[app['Exec']]={'Icon':app['Icon'],'Name':app['Name']}
 		return (apps)
 	#def get_desktop_app
 
