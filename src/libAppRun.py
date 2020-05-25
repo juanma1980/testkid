@@ -257,7 +257,7 @@ class appRun():
 						self.main_wid=wid[1]
 				self._debug("UNMAP: %s"%self.main_wid)
 				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
-				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
+				a=subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE).returncode
 				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Xephyr PID: %s"%p_pid.pid)
@@ -280,7 +280,7 @@ class appRun():
 	def stop_display(self,wid,display):
 		#if not wid:
 		windoWid=subprocess.run(["xdotool","getwindowfocus"],stdout=subprocess.PIPE)
-		if len(windoWid.stdout)>=1:
+		if (windoWid.stdout):
 			widTree=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
 			hexWid=""
 			for widWindow in widTree.stdout.decode().split("\n"):
@@ -289,7 +289,7 @@ class appRun():
 					break
 		if wid:
 			self._debug("CLOSING WINDOW %s"%wid)
-			subprocess.run("xdotool windowclose %s"%wid,shell=True)
+			subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
 		if display:
 			self._debug("KILLING DISPLAY %s"%display)
 			subprocess.run(["vncserver","--kill","%s"%display])
@@ -364,11 +364,12 @@ class appRun():
 	
 	def _end_process(self,th_run,retCode=0):
 		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
+		th_run.wait()
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
-		if retCode==-1:
-			os.kill(os.getpid(),signal.SIGUSR2)
+		if retCode<0:
 			os.kill(os.getpid(),signal.SIGUSR1)
+			os.kill(os.getpid(),signal.SIGUSR2)
 		else:
 			os.kill(os.getpid(),signal.SIGUSR1)
 	#def _end_process
@@ -382,7 +383,7 @@ class appRun():
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))
 		self._debug("Search %s"%count)
-		ret=subprocess.run(["xdpyinfo","-display",display]).returncode
+		ret=subprocess.run(["xdpyinfo","-display",display],stdout=subprocess.DEVNULL).returncode
 		while (ret!=1):
 			count+=1
 			try:

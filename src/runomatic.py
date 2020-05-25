@@ -509,7 +509,6 @@ class runomatic(QWidget):
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
-		self.runner.stop_display(self.tab_id[index]['wid'].wid,self.tab_id[index]['display'])
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
 
@@ -525,6 +524,7 @@ class runomatic(QWidget):
 					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
 		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
 		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+		self.runner.stop_display(self.tab_id[index]['wid'].wid,self.tab_id[index]['display'])
 		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		index=self.currentTab
@@ -645,7 +645,6 @@ class runomatic(QWidget):
 		self._debug("Current id: %s"%(self.tab_id))
 		for key,data in self.tab_id.items():
 			if 'thread' in data.keys():
-				print(data)
 				if thread==data['thread']:
 					idx=key
 					break
