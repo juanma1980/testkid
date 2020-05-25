@@ -14,6 +14,7 @@ import subprocess
 import signal
 import psutil
 from passlib.hash import pbkdf2_sha256 as hashpwd
+import time
 import tempfile
 from urllib.request import urlretrieve
 from libAppRun import appRun
@@ -28,20 +29,29 @@ class appZone(QWidget):
 	def __init__(self,parent):
 		super (appZone,self).__init__(parent)
 		self.setObjectName("appzone")
+		self.wid=0
+#		self.destroyed.connect(self.closeWindow)
 
 	def createZone(self,wid):
-		zone=None
+		zone=QtGui.QWindow()
+		zone.show()
+		self.wid=wid
 		try:
 			subZone=QtGui.QWindow.fromWinId(int(wid))
 		except:
 			pass
 		zone=self.createWindowContainer(subZone,self,Qt.FramelessWindowHint)
+		zone.show()
 		zone.setParent(self)
 		zone.setFocusPolicy(Qt.NoFocus)
-		zone.hide()
-		zone.setGeometry(1,1,10,10)
-		zone.show()
-		return(zone)
+		return(zone,self)
+	#def createZone
+
+#	def closeWindow(self,*args):
+#		if self.wid:
+#			subprocess.run("xdotool windowclose %s"%self.wid,shell=True)
+#		self.close()
+	#def closeWindow
 #class appZone
 
 
@@ -111,7 +121,7 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -128,6 +138,7 @@ class runomatic(QWidget):
 		self.tab_id={}
 		self.focusWidgets=[]
 		self.appsWidgets=[]
+		self.launchErr=False
 		self.id=0
 		self.firstLaunch=True
 		self.currentTab=0
@@ -146,6 +157,8 @@ class runomatic(QWidget):
 	#def init
 
 	def _fail_process(self,*args):
+		self.launchErr=True
+		self._debug("PROCESS %s FAILED TO LAUNCH"%args[0])
 		self._set_focus("Right")
 	#def _fail_process
 
@@ -154,6 +167,9 @@ class runomatic(QWidget):
 			idx=self._get_tabId_from_thread(thread)
 			if idx and idx>0:
 				self._on_tabRemove(idx)
+		if self.launchErr:
+			self.launchErr=False
+			self.showMessage(_("Error launching app"),"",20)
 	#def _end_process
 
 	def _debug(self,msg):
@@ -193,9 +209,10 @@ class runomatic(QWidget):
 	#def _read_config(self):
 
 	def _init_gui(self):
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowFlags(Qt.FramelessWindowHint)
+		self.setWindowFlags(Qt.X11BypassWindowManagerHint)
 		self.setWindowState(Qt.WindowFullScreen)
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
@@ -212,7 +229,7 @@ class runomatic(QWidget):
 		btnHome.setObjectName("PushButton")
 		btnHome.setIcon(self.homeIcon)
 		btnHome.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
-		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
+		self.tab_id[0]={'index':self.id,'thread':0,'xephyr':None,'wid':0,'show':btnHome,'close':btnPrevious,'display':"%s"%os.environ['DISPLAY']}
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 		self.grab=False
 		self.setStyleSheet(self._define_css())
@@ -233,13 +250,13 @@ class runomatic(QWidget):
 						if self.close():
 							os.execv("%s/runoconfig.py"%self.baseDir,["1"])
 					else:
-						self.showMessage(_("runoconfig not found"%self.baseDir),"error2",20)
+						self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 				except:
 					print(_("runoconfig not found"))
 		self._init_gui()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
-		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:128px;height:256px")
+		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,255,0,1), stop:1 rgba(255,0,0,0.6));text-decoration:none;color:white;text-align:center;font-size:128px;height:256px")
 		self.statusBar.setStateCss("error2","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:12px;height:20px")
 		self.statusBar.height_=152
 		self.box.addWidget(self.statusBar,0,0,1,2)
@@ -279,7 +296,7 @@ class runomatic(QWidget):
 			if index:
 				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
 				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('xephyr',None))
-				self.runner.stop_display(self.tab_id[index].get('display',':13'))
+				self.runner.stop_display(self.tab_id[index].get('wid',''),self.tab_id[index].get('display',''))
 				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
 				if os.path.isfile(xlockFile):
 					os.remove(xlockFile)
@@ -341,11 +358,11 @@ class runomatic(QWidget):
 		else:
 			self.focusWidgets[self.currentBtn].resize(QSize(BTN_SIZE,BTN_SIZE))
 			self.focusWidgets[self.currentBtn].setIconSize(QSize(BTN_SIZE,BTN_SIZE))
-			if key=="Right":
+			if key=="Left":
 				self.currentBtn+=1
 				if self.currentBtn>=len(self.focusWidgets):
 					self.currentBtn=0
-			elif key=="Left":
+			elif key=="Right":
 				self.currentBtn-=1
 				if self.currentBtn<0:
 					self.currentBtn=len(self.focusWidgets)-1
@@ -478,7 +495,7 @@ class runomatic(QWidget):
 		self.tabBar.tabBar().setTabButton(self.currentTab,QTabBar.LeftSide,self.tab_id[index][key])
 		self.tabBar.tabBar().tabButton(self.currentTab,QTabBar.LeftSide).setFocusPolicy(Qt.NoFocus)
 		self.runner.send_signal_to_thread("cont",self.tab_id[index]['thread'])
-		os.environ['DISPLAY']=self.tab_id[index]['display']
+		#os.environ['DISPLAY']=self.tab_id[index]['display']
 		self._debug("New Current Tab: %s Icon:%s"%(self.currentTab,key))
 	#def _on_tabChanged
 
@@ -489,11 +506,9 @@ class runomatic(QWidget):
 
 	def _on_tabRemove(self,index):
 		self._debug("Remove tab: %s"%index)
+		self.runner.stop_display(self.tab_id[index]['wid'].wid,self.tab_id[index]['display'])
 		self.tabBar.blockSignals(True)
 		self.tabBar.removeTab(self.tab_id[index]['index'])
-		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
-		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
-	#	self.runner.stop_display(self.tab_id[index]['display'])
 
 		xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index]['display'].replace(":",""))
 		if os.path.isfile(xlockFile):
@@ -505,6 +520,8 @@ class runomatic(QWidget):
 					self._debug("Reasign %s"%(self.tab_id[idx]['index']))
 					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
 					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
+		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
+		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
 		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		index=self.currentTab
@@ -537,7 +554,7 @@ class runomatic(QWidget):
 		self._debug("Window Wid: %s"%wid)
 		zone=None
 		if wid:
-			zone=appZone(tabContent).createZone(wid)
+			(zone,zone_window)=appZone(tabContent).createZone(wid)
 			zone.setObjectName("appzone")
 
 		if not zone or not wid:
@@ -563,8 +580,10 @@ class runomatic(QWidget):
 			btn_close.setIconSize(QSize(TAB_BTN_SIZE,TAB_BTN_SIZE))
 			self.sigmap_tabRemove.setMapping(btn_close,self.id)
 			btn_close.clicked.connect(self.sigmap_tabRemove.map)
-			self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'show':btn,'close':btn_close,'display':self.display}
+			self.tab_id[self.id]={'index':self.tabBar.count(),'thread':None,'wid':zone_window,'show':btn,'close':btn_close,'display':self.display}
+
 			self.tabBar.addTab(tabContent,"")
+
 		return(wid)
 	#def _launchZone
 
@@ -635,9 +654,9 @@ class runomatic(QWidget):
 		self.statusBar.height_=height
 		self.statusBar.setText(msg)
 		if status:
-			self.statusBar.show(status)
+			self.statusBar.show(state=status)
 		else:
-			self.statusBar.show()
+			self.statusBar.show(state=None)
 	#def _show_message
 
 	def _define_css(self):
