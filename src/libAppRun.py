@@ -286,10 +286,10 @@ class appRun():
 					wid=widWindow.split()[0]
 					break
 		if wid:
-			print("CLOSING WINDOW %s"%wid)
+			self._debug("CLOSING WINDOW %s"%wid)
 			subprocess.run("xdotool windowclose %s"%wid,shell=True)
 		if display:
-			print("KILLING DISPLAY %s"%display)
+			self._debug("KILLING DISPLAY %s"%display)
 			subprocess.run(["vncserver","--kill","%s"%display])
 
 	def send_signal_to_thread(self,s_signal,thread):
