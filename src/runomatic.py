@@ -523,7 +523,7 @@ class runomatic(QWidget):
 					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
 					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
 		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
-		self.runner.send_signal_to_thread("kill",self.tab_id[index]['xephyr'])
+		self.runner.send_signal_to_thread("term",self.tab_id[index]['xephyr'])
 		self.runner.stop_display(self.tab_id[index]['wid'].wid,self.tab_id[index]['display'])
 		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
