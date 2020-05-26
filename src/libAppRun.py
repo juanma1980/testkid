@@ -10,6 +10,7 @@ import time
 import tempfile
 import tarfile
 import shutil
+import psutil
 from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
@@ -109,6 +110,18 @@ class th_runApp(QThread):
 					self.app=app.replace("%F","").split(" ")
 			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
 			self._debug("Launched %s"%self.app)
+			#If process launch a child, get the child's pid
+			parent=psutil.Process(self.pid.pid)
+			for child in parent.children():
+				print("******************")
+				print("******************")
+				print("******************")
+				print("******************")
+				print("******************")
+				print(self.pid)
+				self.pid=child
+				print(self.pid)
+				break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -235,6 +248,7 @@ class appRun():
 				"--vnc-scale",
 				"-f",
 				"-n",
+				"--gtk-vnc-debug",
 				"%s"%display]
 				#xephyr_cmd=["gvncviewer",
 				#"localhost%s"%display]
@@ -289,7 +303,7 @@ class appRun():
 					break
 		if wid:
 			self._debug("CLOSING WINDOW %s"%wid)
-			subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
+			a=subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
 		if display:
 			self._debug("KILLING DISPLAY %s"%display)
 			subprocess.run(["vncserver","--kill","%s"%display])
@@ -367,7 +381,7 @@ class appRun():
 		th_run.wait()
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
-		if retCode<0:
+		if retCode==-1:
 			os.kill(os.getpid(),signal.SIGUSR1)
 			os.kill(os.getpid(),signal.SIGUSR2)
 		else:
@@ -383,12 +397,12 @@ class appRun():
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))
 		self._debug("Search %s"%count)
-		ret=subprocess.run(["xdpyinfo","-display",display],stdout=subprocess.DEVNULL).returncode
+		ret=subprocess.run(["xdpyinfo","-display",display],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL).returncode
 		while (ret!=1):
 			count+=1
 			try:
 				display=":%s"%count
-				ret=subprocess.run(["xdpyinfo","-display",display]).returncode
+				ret=subprocess.run(["xdpyinfo","-display",display],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL).returncode
 			except Exception as e:
 				print ("Err: %s"%e)
 				display=":-1"

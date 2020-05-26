@@ -211,7 +211,7 @@ class runomatic(QWidget):
 	def _init_gui(self):
 		self.setWindowFlags(Qt.FramelessWindowHint)
 		self.setWindowFlags(Qt.X11BypassWindowManagerHint)
-		self.setWindowState(Qt.WindowFullScreen)
+		#self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
@@ -235,8 +235,8 @@ class runomatic(QWidget):
 		self.setStyleSheet(self._define_css())
 		monitor=QDesktopWidget().screenGeometry(1)
 		self.move(monitor.left(),monitor.top())
-		self.showFullScreen()
-		#self.show()
+		#self.showFullScreen()
+		self.show()
 	#def _init_gui(self):
 
 	def _render_gui(self):
@@ -294,12 +294,18 @@ class runomatic(QWidget):
 				event.ignore()
 		for index in self.tab_id.keys():
 			if index:
-				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('thread',None))
-				self.runner.send_signal_to_thread("kill",self.tab_id[index].get('xephyr',None))
-				self.runner.stop_display(self.tab_id[index].get('wid',''),self.tab_id[index].get('display',''))
-				xlockFile=os.path.join("/tmp",".X%s-lock"%self.tab_id[index].get('display',"").replace(":",""))
-				if os.path.isfile(xlockFile):
-					os.remove(xlockFile)
+				th=self.tab_id[index].get('thread',None)
+				if th:
+					self.runner.send_signal_to_thread("kill",th)
+				xe=self.tab_id[index].get('xephyr',None)
+				if xe:
+					self.runner.send_signal_to_thread("kill",xe)
+				dsp=self.tab_id[index].get('display',None)
+				if dsp:
+					self.runner.stop_display(self.tab_id[index].get('wid',''),dsp)
+					xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
+					if os.path.isfile(xlockFile):
+						os.remove(xlockFile)
 		if str(self.close_on_exit).lower()=='true':
 			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
@@ -522,9 +528,18 @@ class runomatic(QWidget):
 					self._debug("Reasign %s"%(self.tab_id[idx]['index']))
 					self.tab_id[idx]['index']=self.tab_id[idx]['index']-1
 					self._debug("Reasigned %s -> %s"%(idx,self.tab_id[idx]['index']))
-		self.runner.send_signal_to_thread("term",self.tab_id[index]['thread'])
-		self.runner.send_signal_to_thread("term",self.tab_id[index]['xephyr'])
-		self.runner.stop_display(self.tab_id[index]['wid'].wid,self.tab_id[index]['display'])
+		th=self.tab_id[index].get('thread',None)
+		if th:
+			self.runner.send_signal_to_thread("term",th)
+		xe=self.tab_id[index].get('xephyr',None)
+		if xe:
+			self.runner.send_signal_to_thread("term",xe)
+		dsp=self.tab_id[index].get('display',None)
+		if dsp:
+			self.runner.stop_display(self.tab_id[index].get('wid',''),dsp)
+			xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
+			if os.path.isfile(xlockFile):
+				os.remove(xlockFile)
 		self.tab_id[index]={}
 		self.currentTab=self._get_tabId_from_index(self.tabBar.currentIndex())
 		index=self.currentTab
