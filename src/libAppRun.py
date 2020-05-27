@@ -109,12 +109,11 @@ class th_runApp(QThread):
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
 			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
-			self._debug("Launched %s"%self.app)
 			#If process launch a child, get the child's pid
 			parent=psutil.Process(self.pid.pid)
+			time.sleep(0.5)
 			for child in parent.children():
 				self.pid=child
-				break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -188,6 +187,7 @@ class appRun():
 			if not wid:
 				self._debug("Searching WID for active window")
 		self._debug("WID %s"%wid)
+		subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 		return(wid)
 	#def get_wid
 
@@ -264,10 +264,10 @@ class appRun():
 						self.main_wid=wid[1]
 				self._debug("UNMAP: %s"%self.main_wid)
 				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
-#				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
+				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
 				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
-				self._debug("Xephyr PID: %s"%p_pid.pid)
+				self._debug("Vinagre PID DEPRECATED: %s"%p_pid.pid)
 
 		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
@@ -323,8 +323,8 @@ class appRun():
 				try:
 					os.kill(thread,sig[s_signal])
 					retval=True
-				except:
-					self._debug("%s failed on pid %s"%(s_signal,thread))
+				except Exception as e:
+					self._debug("%s failed on pid %s: %s"%(s_signal,thread,e))
 
 		return(retval)
 	#def send_signal_to_thread

@@ -168,13 +168,14 @@ class runomatic(QWidget):
 				if self.launchErr:
 					self.blocked.append(self.tab_id[idx]['app'])
 				self._on_tabRemove(idx)
+				self.focusWidgets[self.currentBtn].index=None
+				self.focusWidgets[self.currentBtn].statusBar.setText("")
 				if self.launchErr:
 					self.launchErr=False
-					self.focusWidgets[self.currentBtn].statusBar.setText("")
 					self.focusWidgets[self.currentBtn].statusBar.label.setStyleSheet(self.focusWidgets[self.currentBtn].cssError)
 					self.focusWidgets[self.currentBtn].statusBar.show(state='error')
-					self._on_tabSelect(0)
-					self._set_focus("Right")
+				#	self._on_tabSelect(0)
+					self.focusWidgets[self.currentBtn].setFocus()
 	#def _end_process
 
 	def _debug(self,msg):
@@ -340,7 +341,13 @@ class runomatic(QWidget):
 					self.showMessage(_("runoconfig not found"),"error2",20)
 			elif key.isdigit():
 				if int(key)<=self.tabBar.count():
-					self._on_tabSelect(int(key))
+					self._on_tabSelect(int(key),True)
+					cont=0
+					for btn in self.focusWidgets:
+						if btn.statusBar.label.text()==key:
+							self.currentBtn=cont
+							self.focusWidgets[cont].setFocus()
+						cont+=1
 				else:
 					event.ignore()
 			self.releaseKeyboard()
@@ -524,6 +531,9 @@ class runomatic(QWidget):
 		if btn:
 			index=self._get_tabId_from_index(index)
 		self.tabBar.setCurrentIndex(self.tab_id[index]['index'])
+		cursor=QtGui.QCursor()
+		self.setCursor(cursor)
+		cursor.setPos(300,300)
 	#def _on_tabSelect
 
 	def _on_tabRemove(self,index):
@@ -567,6 +577,7 @@ class runomatic(QWidget):
 		self._debug("New tab: %s"%self.currentTab)
 		self._on_tabChanged()
 		self.tabBar.blockSignals(False)
+		self.tabBar.setFocus()
 		self.tabBar.setCurrentIndex(index)
 		self._debug("Removed tab: %s"%index)
 	#def _on_tabRemove
