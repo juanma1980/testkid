@@ -113,14 +113,7 @@ class th_runApp(QThread):
 			#If process launch a child, get the child's pid
 			parent=psutil.Process(self.pid.pid)
 			for child in parent.children():
-				print("******************")
-				print("******************")
-				print("******************")
-				print("******************")
-				print("******************")
-				print(self.pid)
 				self.pid=child
-				print(self.pid)
 				break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
@@ -248,7 +241,7 @@ class appRun():
 				"--vnc-scale",
 				"-f",
 				"-n",
-				"--gtk-vnc-debug",
+#				"--gtk-vnc-debug",
 				"%s"%display]
 				#xephyr_cmd=["gvncviewer",
 				#"localhost%s"%display]
@@ -271,7 +264,7 @@ class appRun():
 						self.main_wid=wid[1]
 				self._debug("UNMAP: %s"%self.main_wid)
 				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
-				a=subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE).returncode
+#				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
 				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Xephyr PID: %s"%p_pid.pid)
@@ -382,8 +375,8 @@ class appRun():
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
 		if retCode==-1:
-			os.kill(os.getpid(),signal.SIGUSR1)
 			os.kill(os.getpid(),signal.SIGUSR2)
+			os.kill(os.getpid(),signal.SIGUSR1)
 		else:
 			os.kill(os.getpid(),signal.SIGUSR1)
 	#def _end_process
