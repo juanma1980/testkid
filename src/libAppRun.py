@@ -51,16 +51,17 @@ class th_runApp(QThread):
 
 	def _run_firefox(self):
 		newProfile=tempfile.mkdtemp()
-		self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
-		os.makedirs("%s/chrome"%newProfile)
-		css_content=[
-					"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
-					"#TabsToolbar {visibility: collapse;}",
-					"#navigator-toolbox {visibility: collapse;}",
-					"browser {margin-right: -14px; margin-bottom: -14px;}"
-					]
-		with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
-			f.writelines(css_content)
+		self.app=["firefox","--kiosk",self.app[-1]]
+		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
+		#os.makedirs("%s/chrome"%newProfile)
+		#css_content=[
+		#			"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
+		#			"#TabsToolbar {visibility: collapse;}",
+		#			"#navigator-toolbox {visibility: collapse;}",
+		#			"browser {margin-right: -14px; margin-bottom: -14px;}"
+		#			]
+		#with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
+		#	f.writelines(css_content)
 		self._debug("Firefox Launch: %s"%self.app)
 	#def _run_firefox
 
@@ -114,6 +115,7 @@ class th_runApp(QThread):
 			time.sleep(0.5)
 			for child in parent.children():
 				self.pid=child
+				break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -337,7 +339,6 @@ class appRun():
 			else:
 				self.threads_pid[th_run]=pid_info[0].pid
 				self.threads_tmp[th_run]=pid_info[1]
-				self.threads_tmp[th_run]=pid_info[1]
 				self._debug("Add %s to procMon"%pid_info[0].pid)
 				procMon=th_procMon(pid_info[0])
 				procMon.start()
@@ -370,8 +371,8 @@ class appRun():
 	#def launch
 	
 	def _end_process(self,th_run,retCode=0):
-		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
 		th_run.wait()
+		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
 		if retCode==-1:

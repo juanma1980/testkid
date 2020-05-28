@@ -59,7 +59,7 @@ class navButton(QPushButton):
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
 		self.statusBar.btn_close.hide()
 		self.statusBar.setStateCss("error","border-radius:25px;background-color:qlineargradient(x1:110 y1:110,x2:0 y2:1,stop:0 rgba(0,110,110,0.2), stop:1 rgba(110,110,0,0.2));color:red;text-align:center;border:0px;font-size:36px;height:256px")
-		self.cssError=("border-radius:25px;margin:0px;border:0px;text-decoration:none;text-align:center;background-image: url(../rsrc/blocked.png);color:white;font-size:%spx;min-width:%s;min-height:%s"%(BTN_SIZE,BTN_SIZE,BTN_SIZE-40))
+		self.cssError=("border-radius:25px;margin:0px;border:0px;text-decoration:none;text-align:center;background-image: url(../rsrc/blocked.png);background-position:center;background-repeat:no-repeat;color:white;font-size:%spx;min-width:%s;min-height:%s"%(BTN_SIZE,BTN_SIZE,BTN_SIZE-40))
 		self.cssRun=("border-radius:25px;margin:0px;border:0px;text-decoration:none;text-align:center;background-color:rgba(255,0,0,0.6);color:white;font-size:%spx;min-height:%s"%(BTN_SIZE,BTN_SIZE-40))
 		a.addWidget(self.statusBar,0,0,1,1)
 		self.setLayout(a)
