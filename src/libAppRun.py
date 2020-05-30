@@ -51,7 +51,7 @@ class th_runApp(QThread):
 
 	def _run_firefox(self):
 		newProfile=tempfile.mkdtemp()
-		self.app=["firefox","--kiosk",self.app[-1]]
+		self.app=["firefox","--kiosk","-profile",newProfile,"--private-window","--no-remote",self.app[-1]]
 		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
 		#css_content=[
@@ -111,11 +111,11 @@ class th_runApp(QThread):
 					self.app=app.replace("%F","").split(" ")
 			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
 			#If process launch a child, get the child's pid
-			parent=psutil.Process(self.pid.pid)
-			time.sleep(0.5)
-			for child in parent.children():
-				self.pid=child
-				break
+			if 'firefox' not in self.app:
+				parent=psutil.Process(self.pid.pid)
+				for child in parent.children():
+					self.pid=child
+					break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
