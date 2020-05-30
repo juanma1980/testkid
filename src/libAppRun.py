@@ -10,6 +10,7 @@ import time
 import tempfile
 import tarfile
 import shutil
+import psutil
 from appconfig.appConfig import appConfig 
 from app2menu import App2Menu
 QString=type("")
@@ -50,16 +51,17 @@ class th_runApp(QThread):
 
 	def _run_firefox(self):
 		newProfile=tempfile.mkdtemp()
-		self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
-		os.makedirs("%s/chrome"%newProfile)
-		css_content=[
-					"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
-					"#TabsToolbar {visibility: collapse;}",
-					"#navigator-toolbox {visibility: collapse;}",
-					"browser {margin-right: -14px; margin-bottom: -14px;}"
-					]
-		with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
-			f.writelines(css_content)
+		self.app=["firefox","--kiosk","-profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
+		#os.makedirs("%s/chrome"%newProfile)
+		#css_content=[
+		#			"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
+		#			"#TabsToolbar {visibility: collapse;}",
+		#			"#navigator-toolbox {visibility: collapse;}",
+		#			"browser {margin-right: -14px; margin-bottom: -14px;}"
+		#			]
+		#with open ("%s/chrome/userChrome.css"%newProfile,'w') as f:
+		#	f.writelines(css_content)
 		self._debug("Firefox Launch: %s"%self.app)
 	#def _run_firefox
 
@@ -108,7 +110,12 @@ class th_runApp(QThread):
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
 			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
-			self._debug("Launched %s"%self.app)
+			#If process launch a child, get the child's pid
+			if 'firefox' not in self.app:
+				parent=psutil.Process(self.pid.pid)
+				for child in parent.children():
+					self.pid=child
+					break
 			retval=[self.pid,tmp_file]
 		except Exception as e:
 			print("Error running: %s"%e)
@@ -182,6 +189,7 @@ class appRun():
 			if not wid:
 				self._debug("Searching WID for active window")
 		self._debug("WID %s"%wid)
+		subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 		return(wid)
 	#def get_wid
 
@@ -235,6 +243,7 @@ class appRun():
 				"--vnc-scale",
 				"-f",
 				"-n",
+#				"--gtk-vnc-debug",
 				"%s"%display]
 				#xephyr_cmd=["gvncviewer",
 				#"localhost%s"%display]
@@ -257,10 +266,10 @@ class appRun():
 						self.main_wid=wid[1]
 				self._debug("UNMAP: %s"%self.main_wid)
 				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
-				a=subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE).returncode
+				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
 				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
-				self._debug("Xephyr PID: %s"%p_pid.pid)
+				self._debug("Vinagre PID DEPRECATED: %s"%p_pid.pid)
 
 		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
@@ -289,7 +298,7 @@ class appRun():
 					break
 		if wid:
 			self._debug("CLOSING WINDOW %s"%wid)
-			subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
+			a=subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
 		if display:
 			self._debug("KILLING DISPLAY %s"%display)
 			subprocess.run(["vncserver","--kill","%s"%display])
@@ -316,8 +325,8 @@ class appRun():
 				try:
 					os.kill(thread,sig[s_signal])
 					retval=True
-				except:
-					self._debug("%s failed on pid %s"%(s_signal,thread))
+				except Exception as e:
+					self._debug("%s failed on pid %s: %s"%(s_signal,thread,e))
 
 		return(retval)
 	#def send_signal_to_thread
@@ -329,7 +338,6 @@ class appRun():
 				self._end_process(th_run,-1)
 			else:
 				self.threads_pid[th_run]=pid_info[0].pid
-				self.threads_tmp[th_run]=pid_info[1]
 				self.threads_tmp[th_run]=pid_info[1]
 				self._debug("Add %s to procMon"%pid_info[0].pid)
 				procMon=th_procMon(pid_info[0])
@@ -363,13 +371,13 @@ class appRun():
 	#def launch
 	
 	def _end_process(self,th_run,retCode=0):
-		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
 		th_run.wait()
+		self._debug("Ending process %s with retCode %s"%(th_run,retCode))
 		#self.processEnd.emit()
 		self.deadProcesses.append(th_run)
-		if retCode<0:
-			os.kill(os.getpid(),signal.SIGUSR1)
+		if retCode==-1:
 			os.kill(os.getpid(),signal.SIGUSR2)
+			os.kill(os.getpid(),signal.SIGUSR1)
 		else:
 			os.kill(os.getpid(),signal.SIGUSR1)
 	#def _end_process
@@ -383,12 +391,12 @@ class appRun():
 	def _find_free_display(self,display=":13"):
 		count=int(display.replace(":",""))
 		self._debug("Search %s"%count)
-		ret=subprocess.run(["xdpyinfo","-display",display],stdout=subprocess.DEVNULL).returncode
+		ret=subprocess.run(["xdpyinfo","-display",display],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL).returncode
 		while (ret!=1):
 			count+=1
 			try:
 				display=":%s"%count
-				ret=subprocess.run(["xdpyinfo","-display",display]).returncode
+				ret=subprocess.run(["xdpyinfo","-display",display],stderr=subprocess.DEVNULL,stdout=subprocess.DEVNULL).returncode
 			except Exception as e:
 				print ("Err: %s"%e)
 				display=":-1"
