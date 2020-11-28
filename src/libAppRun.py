@@ -189,7 +189,7 @@ class appRun():
 			if not wid:
 				self._debug("Searching WID for active window")
 		self._debug("WID %s"%wid)
-		subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
+		###subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 		return(wid)
 	#def get_wid
 
@@ -239,35 +239,35 @@ class appRun():
 				#print("Launch %s"%vnc_cmd)
 				subprocess.run(vnc_cmd)
 
-				xephyr_cmd=["vinagre",
-				"--vnc-scale",
-				"-f",
-				"-n",
-#				"--gtk-vnc-debug",
-				"%s"%display]
-				#xephyr_cmd=["gvncviewer",
-				#"localhost%s"%display]
+#				xephyr_cmd=["vinagre",
+#				"--vnc-scale",
+#				"-f",
+#				"-n",
+##				"--gtk-vnc-debug",
+#				"%s"%display]
+##				xephyr_cmd=["gvncviewer","localhost%s"%display]
 				
-				if self.main_wid==0:
-					v_proc=subprocess.run(["pidof","vinagre"],stdout=subprocess.PIPE)
-					if v_proc.returncode:
-						v_cmd=["vinagre"]
-						v_pid=subprocess.Popen(v_cmd,stderr=subprocess.DEVNULL).pid
+#				if self.main_wid==0:
+#					v_proc=subprocess.run(["pidof","vinagre"],stdout=subprocess.PIPE)
+#					if v_proc.returncode:
+#						v_cmd=["vinagre"]
+#						v_pid=subprocess.Popen(v_cmd,stderr=subprocess.DEVNULL).pid
 						#v_pid=self._run_cmd_on_display(v_cmd,"%s"%display)
-					else:
-						v_pid=v_proc.stdout.decode().split()[0]
-				#xephyr_cmd=["gvncviewer",
-				#"localhost%s"%display]
-					main_wid=subprocess.run(["xdotool","search","--sync","--pid","%s"%(v_pid)],stdout=subprocess.PIPE)
-					wid=main_wid.stdout.decode().split()
-					if len(wid)<=1:
-						self.main_wid=wid[-1]
-					else:
-						self.main_wid=wid[1]
-				self._debug("UNMAP: %s"%self.main_wid)
+#					else:
+#						v_pid=v_proc.stdout.decode().split()[0]
+				xephyr_cmd=["gvncviewer","localhost%s"%display]
+####ADD TAB IF VINAGRE
+				#main_wid=subprocess.run(["xdotool","search","--sync","--pid","%s"%(v_pid)],stdout=subprocess.PIPE)
+				#wid=main_wid.stdout.decode().split()
+				#if len(wid)<=1:
+				#	self.main_wid=wid[-1]
+				#else:
+				#	self.main_wid=wid[1]
+####!ADD TAB IF VINAGRE
+				#self._debug("UNMAP: %s"%self.main_wid)
 				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
-				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
-				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
+#				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
+#				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
 				self._debug("Vinagre PID DEPRECATED: %s"%p_pid.pid)
 
