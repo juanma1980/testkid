@@ -255,7 +255,7 @@ class appRun():
 						#v_pid=self._run_cmd_on_display(v_cmd,"%s"%display)
 #					else:
 #						v_pid=v_proc.stdout.decode().split()[0]
-				xephyr_cmd=["gvncviewer","localhost%s"%display]
+				xephyr_cmd=["runovnc","localhost%s"%display]
 ####ADD TAB IF VINAGRE
 				#main_wid=subprocess.run(["xdotool","search","--sync","--pid","%s"%(v_pid)],stdout=subprocess.PIPE)
 				#wid=main_wid.stdout.decode().split()
