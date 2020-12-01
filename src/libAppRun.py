@@ -36,7 +36,7 @@ class th_runApp(QThread):
 		self.display=display
 		self.app=app.split(" ")
 		self.menu=App2Menu.app2menu()
-		self.dbg=True
+		self.dbg=False
 		self.pid=''
 	#def __init__
 
@@ -128,7 +128,7 @@ class th_runApp(QThread):
 
 class appRun():
 	def __init__(self):
-		self.dbg=True
+		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])

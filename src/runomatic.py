@@ -2,7 +2,7 @@
 import getpass
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
 				QDialog,QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog,QDesktopWidget
@@ -107,11 +107,11 @@ class navButton(QPushButton):
 				keypressed.append(key)
 			if sw_mod==False:
 				key=("+".join(keypressed))
-		if key!="Alt" and key!="Control":
+		if key not in ("Alt","Control","Super_L"):
 			self.keypress.emit(key)
 		else:
-			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
-			event.setAccepted(False)
+				#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
+				event.setAccepted(False)
 	#def keyPressEvent
 #class navButton
 
@@ -119,7 +119,14 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
-		self.dbg=True
+		cmd=['kwriteconfig5','--file','~/.config/kwinrc','--group', 'ModifierOnlyShortcuts','--key','Meta','""']
+		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta ""'
+		env=os.environ.copy()
+		a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
+		a.wait()
+		cmd2=['qdbus','org.kde.KWin','/KWin','reconfigure']
+		subprocess.run(cmd2)
+		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -154,6 +161,9 @@ class runomatic(QWidget):
 		self._set_keymapping()
 		self._read_config()
 		self._render_gui()
+		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"'
+		a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
+		a.wait()
 	#def init
 
 	def _fail_process(self,*args):
@@ -184,6 +194,7 @@ class runomatic(QWidget):
 	#def _debug
 
 	def _set_keymapping(self):
+		#Disable meta association within plasma. I've no eggs to capture and block this event in kde
 		for key,value in vars(Qt).items():
 			if isinstance(value, Qt.Key):
 				self.keymap[value]=key.partition('_')[2]
@@ -199,6 +210,9 @@ class runomatic(QWidget):
 		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
 		self.sigmap_tabRemove=QSignalMapper(self)
 		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
+		#Shortcut for super_keys
+
+
 	#def _set_keymapping
 
 	def _read_config(self):
@@ -222,6 +236,7 @@ class runomatic(QWidget):
 		self.setWindowModality(Qt.WindowModal)
 		self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
+		self.previousIcon=QtGui.QIcon.fromTheme("go-home")
 		btnPrevious=QPushButton()
 		btnPrevious.setObjectName("PushButton")
 		btnPrevious.setIcon(self.previousIcon)
@@ -298,6 +313,8 @@ class runomatic(QWidget):
 					event.ignore()
 			else:
 				event.ignore()
+		cmd2=['qdbus','org.kde.KWin','/KWin','reconfigure']
+		subprocess.run(cmd2)
 		for index in self.tab_id.keys():
 			if index:
 				th=self.tab_id[index].get('thread',None)
@@ -319,7 +336,7 @@ class runomatic(QWidget):
 
 	def keyPressEvent(self,event):
 		key=self.keymap.get(event.key(),event.text())
-		if key=="Alt":
+		if key in ("Alt" ,"Super_L"):
 			self.grab=True
 		self.grabKeyboard()
 	#def eventFilter
@@ -329,7 +346,7 @@ class runomatic(QWidget):
 		confKey=''
 		if self.keybinds:
 			confKey=self.keybinds.get('conf',None)
-		if key!='Tab':
+		if key not in ('Tab','Super_L'):
 			if key=='F4' and self.grab:
 				self.closeKey=True
 			elif key==confKey:
@@ -351,8 +368,13 @@ class runomatic(QWidget):
 				else:
 					event.ignore()
 			self.releaseKeyboard()
-		if key=='Alt' or key=='Control':
-			self.releaseKeyboard()
+		if key in ('Alt','Control','Super_L'):
+			if key!='Super_L':
+				self.releaseKeyboard()
+			else:
+				event.setAccepted(True)
+				self._on_tabSelect(0,True)
+				event.accept()
 			self.grab=False
 			if key=='Alt':
 				if self.closeKey:
