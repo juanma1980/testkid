@@ -119,13 +119,7 @@ class runomatic(QWidget):
 	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
-		cmd=['kwriteconfig5','--file','~/.config/kwinrc','--group', 'ModifierOnlyShortcuts','--key','Meta','""']
-		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta ""'
-		env=os.environ.copy()
-		a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
-		a.wait()
-		cmd2=['qdbus','org.kde.KWin','/KWin','reconfigure']
-		subprocess.run(cmd2)
+		self._plasmaMetaHotkey(enable=False,reconfigure=True)
 		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
@@ -160,11 +154,28 @@ class runomatic(QWidget):
 		self.runner=appRun()
 		self._set_keymapping()
 		self._read_config()
+		self._plasmaMetaHotkey(enable=True)
 		self._render_gui()
-		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"'
-		a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
-		a.wait()
 	#def init
+
+	def _plasmaMetaHotkey(self,enable=None,reconfigure=None):
+		env=os.environ.copy()
+		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"'
+		if enable==False:
+			cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta ""'
+		try:
+			a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
+			a.wait()
+		except Exception as e:
+			self._debug("kwriteconfig: %s"%e)
+		
+		if reconfigure==True:
+			try:
+				cmd='qdbus org.kde.KWin /KWin reconfigure'
+				a=subprocess.Popen(cmd,stdin=None,stdout=None,stderr=None,shell=True,env=env)
+				a.wait()
+			except Exception as e:
+				self._debug("qdbus: %s"%e)
 
 	def _fail_process(self,*args):
 		self.launchErr=True
@@ -313,8 +324,7 @@ class runomatic(QWidget):
 					event.ignore()
 			else:
 				event.ignore()
-		cmd2=['qdbus','org.kde.KWin','/KWin','reconfigure']
-		subprocess.run(cmd2)
+		self._plasmaMetaHotkey(reconfigure=True)
 		for index in self.tab_id.keys():
 			if index:
 				th=self.tab_id[index].get('thread',None)
