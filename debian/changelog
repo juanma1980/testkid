@@ -1,6 +1,7 @@
 runomatic (0.9.4) bionic; urgency=medium
 
   * Block meta key on kde plasma
+  * Disable n4d
 
  -- Juanma1980 <juanma1980@gmail.com>  Tue, 01 Dec 2020 06:18:52 +0100
 
