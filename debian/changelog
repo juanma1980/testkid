@@ -1,3 +1,9 @@
+runomatic (0.9.5) UNRELEASED; urgency=medium
+
+  * First focal release 
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 27 Apr 2021 16:15:41 +0200
+
 runomatic (0.9.4) bionic; urgency=medium
 
   * Block meta key on kde plasma
