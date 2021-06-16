@@ -1,3 +1,10 @@
+runomatic (0.9.6) bionic; urgency=medium
+
+  * Migrated to PySide2
+  * Replace hidden option by remove at runoconfig
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 16 Jun 2021 17:11:19 +0200
+
 runomatic (0.9.5) focal; urgency=medium
 
   * First focal release 
