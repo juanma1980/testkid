@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLa
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
 				QHeaderView,QMenu,QAction,QCompleter
 from PySide2 import QtGui
-from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent,QMimeData
+from PySide2.QtCore import QPoint,QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent,QMimeData
 from libAppRun import appRun
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
@@ -166,6 +166,9 @@ class dropButton(QPushButton):
 	#def dragEnterEvent
 	
 	def mousePressEvent(self,e):
+		if e.button() == Qt.RightButton:
+			self.menu().popup(self.mapToGlobal(QPoint(0,self.height())))
+			return()
 		self.drop.emit({"drag":self})
 		self.position=e.pos()
 		mimedata=QMimeData()
@@ -233,6 +236,7 @@ class runoapps(confStack):
 		self._debug("confLaunchers Load")
 		self.parm="app"
 		self.app=None
+		self.hidden=[]
 		(self.columns,self.width,self.height)=(3,800,600)
 		self.setStyleSheet(self._define_css())
 		self.runner=appRun()
@@ -400,21 +404,25 @@ class runoapps(confStack):
 						self._debug("Discard: %s"%appName)
 						btn_desktop.deleteLater()
 						continue
-					btnMenu=QMenu()
-					h_action=_("Hide button")
+					btnMenu=QMenu(appName)
+					h_action=_("Remove button")
 					e_action=_("Edit button")
+				 #	r_action=_("Remove button")
 					if state!="show":
-						h_action=_("Show button")
+						h_action=_("Remove button")
 					show=btnMenu.addAction(h_action)
 					edit=btnMenu.addAction(e_action)
+					#remove=btnMenu.addAction(r_action)
 					show.triggered.connect(lambda:self._changeBtnState(apps,state))
 					edit.triggered.connect(lambda:self._editBtn(apps))
+				#	remove.triggered.connect(lambda:self._removeBtn(apps))
 					btn_desktop.setToolTip(desktop)
 					btn_desktop.setMenu(btnMenu)
 					btn_desktop.setObjectName("confBtn")
 					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
 					btn_desktop.drop.connect(self._btn_dragDropEvent)
 					self._debug("Adding %s at %s %s"%(appName,row,col))
+					print(btn_desktop.menu())
 					self.tbl_app.setCellWidget(row,col,btn_desktop)
 					col+=1
 					if col>=self.columns:
@@ -429,7 +437,7 @@ class runoapps(confStack):
 		self.tbl_app.setRowCount(1)
 		self.tbl_app.setColumnCount(self.columns)
 		_add_desktop(apps['desktops'])
-		_add_desktop(apps['hidden'],"hidden")
+		#_add_desktop(apps['hidden'],"hidden")
 		self.tbl_app.resizeColumnsToContents()
 		for act in self.menu_cat.actions():
 			if act.text() in self.visible_categories:
@@ -446,11 +454,24 @@ class runoapps(confStack):
 			state='hidden'
 			apps['desktops'].remove(btn.title)
 			apps['hidden'].append(btn.title)
+			self.hidden.append(btn.title)
 		else:
 			state='show'
 			apps['desktops'].append(btn.title)
 			apps['hidden'].remove(btn.title)
 		self.btn_grid['state']=state
+		self.update_apps(apps)
+		self.btn_ok.setEnabled(True)
+		self.btn_cancel.setEnabled(True)
+		self.refresh=True
+		retval=True
+	#def _changeBtnState
+	
+	def _removeBtn(self,apps):
+		row=self.tbl_app.currentRow()
+		col=self.tbl_app.currentColumn()
+		btn=self.tbl_app.cellWidget(row,col)
+		apps['desktops'].remove(btn.title)
 		self.update_apps(apps)
 		self.btn_ok.setEnabled(True)
 		self.btn_cancel.setEnabled(True)
@@ -529,6 +550,7 @@ class runoapps(confStack):
 						apps['desktops'].append(btn.title)
 					else:
 						apps['hidden'].append(btn.title)
+		apps['hidden']=self.hidden
 		return apps
 	#def _get_table_apps
 
@@ -543,7 +565,6 @@ class runoapps(confStack):
 	def _define_css(self):
 		css="""
 		#confBtn{
-			background:red;
 			padding: 6px;
 			margin:6px;
 			border:solid black 10px;
