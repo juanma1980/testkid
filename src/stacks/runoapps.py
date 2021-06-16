@@ -30,7 +30,7 @@ class desktopChooser(QDialog):
 		self.setWindowTitle(_("Launcher select"))
 		self.setModal(False)
 		self.desktopList=QListWidget()
-		self.desktopList.setSortingEnabled(False)
+		self.desktopList.setSortingEnabled(True)
 		self.desktopList.setDragEnabled(True)
 		self.desktopList.setAcceptDrops(True)
 		self.desktopList.setSpacing(3)
@@ -57,23 +57,32 @@ class desktopChooser(QDialog):
 		model=QtGui.QStandardItemModel()
 		#Load available desktops
 		categories=self.menu.get_categories()
+		desktops={}
+		desktopDict={}
 		for category in categories:
 			desktops=self.menu.get_apps_from_category(category)
 			for desktop in desktops.keys():
-				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
+				desktopInfo=self.menu.get_desktop_info(os.path.join(self.menu.desktoppath,desktop))
 				if desktopInfo.get("NoDisplay",False):
 					continue
 				listWidget=QListWidgetItem()
 				desktopLayout=QGridLayout()
 				ficon=desktopInfo.get("Icon","shell")
 				icon=QtGui.QIcon.fromTheme(ficon)
+				if not icon:
+					continue
 				name=desktopInfo.get("Name","shell")
 				model.appendRow(QtGui.QStandardItem(name))
 				comment=desktopInfo.get("Comment","shell")
 				listWidget.setIcon(icon)
 				listWidget.setText(name)
-				self.desktopList.addItem(listWidget)
-				self.data[self.desktopList.count()-1]={'path':"%s/%s"%(self.menu.desktoppath,desktop),'icon':icon}
+				if name not in desktopDict.keys():
+					self.desktopList.addItem(listWidget)
+				desktopDict[name]={'icon':icon,'desktop':desktop}
+		cont=0
+		for desktop in sorted(desktopDict.keys(),key=str.lower):
+			self.data[cont]={'path':os.path.join(self.menu.desktoppath,desktopDict[desktop].get('desktop')),'icon':desktopDict[desktop].get('icon','')}
+			cont+=1
 		completer.setModel(model)
 		inp_search.setCompleter(completer)
 		box.addWidget(inp_search)
@@ -83,7 +92,6 @@ class desktopChooser(QDialog):
 	def _dblClick(self):
 		listWidget=self.desktopList.currentRow()
 		path=self.data[listWidget]
-		print(path)
 		self.dblClicked.emit(path)
 	
 	def _loadMime(self):
