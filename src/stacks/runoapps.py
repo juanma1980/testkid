@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 import os
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
+from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
 				QHeaderView,QMenu,QAction,QCompleter
-from PyQt5 import QtGui
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
+from PySide2 import QtGui
+from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent,QMimeData
 from libAppRun import appRun
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
@@ -22,7 +22,7 @@ BTN_SIZE=32
 
 
 class desktopChooser(QDialog):
-	dblClicked=pyqtSignal("PyQt_PyObject")
+	dblClicked=Signal("PyObject")
 	def __init__(self,parent):
 		super (desktopChooser,self).__init__(parent)
 		self.parent=parent
@@ -30,7 +30,7 @@ class desktopChooser(QDialog):
 		self.setWindowTitle(_("Launcher select"))
 		self.setModal(False)
 		self.desktopList=QListWidget()
-		self.desktopList.setSortingEnabled(True)
+		self.desktopList.setSortingEnabled(False)
 		self.desktopList.setDragEnabled(True)
 		self.desktopList.setAcceptDrops(True)
 		self.desktopList.setSpacing(3)
@@ -83,6 +83,7 @@ class desktopChooser(QDialog):
 	def _dblClick(self):
 		listWidget=self.desktopList.currentRow()
 		path=self.data[listWidget]
+		print(path)
 		self.dblClicked.emit(path)
 	
 	def _loadMime(self):
@@ -105,7 +106,7 @@ class desktopChooser(QDialog):
 	#def dragEnterEvent
 
 class dropTable(QTableWidget):
-	drop=pyqtSignal("PyQt_PyObject")
+	drop=Signal("PyObject")
 	def __init__(self,parent,row,col):
 		super (dropTable,self).__init__(row,col,parent)
 		self.parent=parent
@@ -138,7 +139,7 @@ class dropTable(QTableWidget):
 	#def dropEvent
 
 class dropButton(QPushButton):
-	drop=pyqtSignal("PyQt_PyObject")
+	drop=Signal("PyObject")
 	def __init__(self,title,parent):
 		super (dropButton,self).__init__("",parent)
 		self.title=title
@@ -218,7 +219,7 @@ class dropButton(QPushButton):
 #class dropButton
 
 class runoapps(confStack):
-	dragdrop_signal=pyqtSignal("PyQt_PyObject")
+	dragdrop_signal=Signal("PyObject")
 	def __init_stack__(self,app=None):
 		self.dbg=False
 		self._debug("confLaunchers Load")
