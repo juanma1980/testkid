@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 import os
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
+from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,\
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
 				QHeaderView,QMenu,QAction,QCompleter
-from PyQt5 import QtGui
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent,QMimeData
+from PySide2 import QtGui
+from PySide2.QtCore import QPoint,QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent,QMimeData
 from libAppRun import appRun
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
@@ -22,7 +22,7 @@ BTN_SIZE=32
 
 
 class desktopChooser(QDialog):
-	dblClicked=pyqtSignal("PyQt_PyObject")
+	dblClicked=Signal("PyObject")
 	def __init__(self,parent):
 		super (desktopChooser,self).__init__(parent)
 		self.parent=parent
@@ -57,23 +57,32 @@ class desktopChooser(QDialog):
 		model=QtGui.QStandardItemModel()
 		#Load available desktops
 		categories=self.menu.get_categories()
+		desktops={}
+		desktopDict={}
 		for category in categories:
 			desktops=self.menu.get_apps_from_category(category)
 			for desktop in desktops.keys():
-				desktopInfo=self.menu.get_desktop_info("%s/%s"%(self.menu.desktoppath,desktop))
+				desktopInfo=self.menu.get_desktop_info(os.path.join(self.menu.desktoppath,desktop))
 				if desktopInfo.get("NoDisplay",False):
 					continue
 				listWidget=QListWidgetItem()
 				desktopLayout=QGridLayout()
 				ficon=desktopInfo.get("Icon","shell")
 				icon=QtGui.QIcon.fromTheme(ficon)
+				if not icon:
+					continue
 				name=desktopInfo.get("Name","shell")
 				model.appendRow(QtGui.QStandardItem(name))
 				comment=desktopInfo.get("Comment","shell")
 				listWidget.setIcon(icon)
 				listWidget.setText(name)
-				self.desktopList.addItem(listWidget)
-				self.data[self.desktopList.count()-1]={'path':"%s/%s"%(self.menu.desktoppath,desktop),'icon':icon}
+				if name not in desktopDict.keys():
+					self.desktopList.addItem(listWidget)
+				desktopDict[name]={'icon':icon,'desktop':desktop}
+		cont=0
+		for desktop in sorted(desktopDict.keys(),key=str.lower):
+			self.data[cont]={'path':os.path.join(self.menu.desktoppath,desktopDict[desktop].get('desktop')),'icon':desktopDict[desktop].get('icon','')}
+			cont+=1
 		completer.setModel(model)
 		inp_search.setCompleter(completer)
 		box.addWidget(inp_search)
@@ -105,7 +114,7 @@ class desktopChooser(QDialog):
 	#def dragEnterEvent
 
 class dropTable(QTableWidget):
-	drop=pyqtSignal("PyQt_PyObject")
+	drop=Signal("PyObject")
 	def __init__(self,parent,row,col):
 		super (dropTable,self).__init__(row,col,parent)
 		self.parent=parent
@@ -138,7 +147,7 @@ class dropTable(QTableWidget):
 	#def dropEvent
 
 class dropButton(QPushButton):
-	drop=pyqtSignal("PyQt_PyObject")
+	drop=Signal("PyObject")
 	def __init__(self,title,parent):
 		super (dropButton,self).__init__("",parent)
 		self.title=title
@@ -157,6 +166,9 @@ class dropButton(QPushButton):
 	#def dragEnterEvent
 	
 	def mousePressEvent(self,e):
+		if e.button() == Qt.RightButton:
+			self.menu().popup(self.mapToGlobal(QPoint(0,self.height())))
+			return()
 		self.drop.emit({"drag":self})
 		self.position=e.pos()
 		mimedata=QMimeData()
@@ -218,12 +230,13 @@ class dropButton(QPushButton):
 #class dropButton
 
 class runoapps(confStack):
-	dragdrop_signal=pyqtSignal("PyQt_PyObject")
+	dragdrop_signal=Signal("PyObject")
 	def __init_stack__(self,app=None):
 		self.dbg=False
 		self._debug("confLaunchers Load")
 		self.parm="app"
 		self.app=None
+		self.hidden=[]
 		(self.columns,self.width,self.height)=(3,800,600)
 		self.setStyleSheet(self._define_css())
 		self.runner=appRun()
@@ -391,21 +404,25 @@ class runoapps(confStack):
 						self._debug("Discard: %s"%appName)
 						btn_desktop.deleteLater()
 						continue
-					btnMenu=QMenu()
-					h_action=_("Hide button")
+					btnMenu=QMenu(appName)
+					h_action=_("Remove button")
 					e_action=_("Edit button")
+				 #	r_action=_("Remove button")
 					if state!="show":
-						h_action=_("Show button")
+						h_action=_("Remove button")
 					show=btnMenu.addAction(h_action)
 					edit=btnMenu.addAction(e_action)
+					#remove=btnMenu.addAction(r_action)
 					show.triggered.connect(lambda:self._changeBtnState(apps,state))
 					edit.triggered.connect(lambda:self._editBtn(apps))
+				#	remove.triggered.connect(lambda:self._removeBtn(apps))
 					btn_desktop.setToolTip(desktop)
 					btn_desktop.setMenu(btnMenu)
 					btn_desktop.setObjectName("confBtn")
 					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
 					btn_desktop.drop.connect(self._btn_dragDropEvent)
 					self._debug("Adding %s at %s %s"%(appName,row,col))
+					print(btn_desktop.menu())
 					self.tbl_app.setCellWidget(row,col,btn_desktop)
 					col+=1
 					if col>=self.columns:
@@ -420,7 +437,7 @@ class runoapps(confStack):
 		self.tbl_app.setRowCount(1)
 		self.tbl_app.setColumnCount(self.columns)
 		_add_desktop(apps['desktops'])
-		_add_desktop(apps['hidden'],"hidden")
+		#_add_desktop(apps['hidden'],"hidden")
 		self.tbl_app.resizeColumnsToContents()
 		for act in self.menu_cat.actions():
 			if act.text() in self.visible_categories:
@@ -437,11 +454,24 @@ class runoapps(confStack):
 			state='hidden'
 			apps['desktops'].remove(btn.title)
 			apps['hidden'].append(btn.title)
+			self.hidden.append(btn.title)
 		else:
 			state='show'
 			apps['desktops'].append(btn.title)
 			apps['hidden'].remove(btn.title)
 		self.btn_grid['state']=state
+		self.update_apps(apps)
+		self.btn_ok.setEnabled(True)
+		self.btn_cancel.setEnabled(True)
+		self.refresh=True
+		retval=True
+	#def _changeBtnState
+	
+	def _removeBtn(self,apps):
+		row=self.tbl_app.currentRow()
+		col=self.tbl_app.currentColumn()
+		btn=self.tbl_app.cellWidget(row,col)
+		apps['desktops'].remove(btn.title)
 		self.update_apps(apps)
 		self.btn_ok.setEnabled(True)
 		self.btn_cancel.setEnabled(True)
@@ -520,6 +550,7 @@ class runoapps(confStack):
 						apps['desktops'].append(btn.title)
 					else:
 						apps['hidden'].append(btn.title)
+		apps['hidden']=self.hidden
 		return apps
 	#def _get_table_apps
 
@@ -534,7 +565,6 @@ class runoapps(confStack):
 	def _define_css(self):
 		css="""
 		#confBtn{
-			background:red;
 			padding: 6px;
 			margin:6px;
 			border:solid black 10px;
