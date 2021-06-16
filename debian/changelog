@@ -1,3 +1,6 @@
+runomatic (0.9.6) bionic; urgency=medium
+  * Backport from focal
+
 runomatic (0.9.4) bionic; urgency=medium
 
   * Block meta key on kde plasma
