@@ -1,4 +1,4 @@
-runomatic (0.9.6.1) focal; urgency=medium
+runomatic (0.9.7+1lliurexfocal) focal; urgency=medium
 
   * Migrated to PySide2
   * Replace hidden option by remove at runoconfig
