@@ -9,7 +9,7 @@ import gettext
 _ = gettext.gettext
 
 class keybinds(confStack):
-	keybind_signal=Signal("PyQt_PyObject")
+	keybind_signal=Signal("PyObject")
 
 	def __init_stack__(self):
 		self.dbg=False
