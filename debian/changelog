@@ -1,8 +1,10 @@
-runomatic (0.9.7+2lliurexfocal) focal; urgency=medium
+runomatic (0.9.8) focal; urgency=medium
 
   * Migrated to PySide2
   * Replace hidden option by remove at runoconfig
   * Add catalan translation
+  * Add dependency on pyside2-qtquick
+  * Fix category
 
  -- Juanma1980 <juanma1980@gmail.com>  Wed, 16 Jun 2021 17:11:19 +0200
 
