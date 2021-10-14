@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 import sys
 import os
-from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QSignalMapper,QProcess,QEvent,QSize
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 from appconfig.appConfigStack import appConfigStack as confStack
 import gettext
 _ = gettext.gettext
 
 class keybinds(confStack):
-	keybind_signal=Signal("PyQt_PyObject")
+	keybind_signal=pyqtSignal("PyQt_PyObject")
 
 	def __init_stack__(self):
 		self.dbg=False

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
-from PySide2.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 from appconfig.appConfigScreen import appConfigScreen as appConfig
 app=QApplication(["Run-O-Matic"])
 config=appConfig("Runoconfig",{'app':app})
