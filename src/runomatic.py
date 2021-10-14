@@ -2,12 +2,12 @@
 import getpass
 import sys
 import os
-from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
 				QDialog,QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog,QDesktopWidget
-from PySide2 import QtGui
-from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent
+from PyQt5 import QtGui
+from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess,QEvent
 from edupals.ui import QAnimatedStatusBar
 import gettext
 import subprocess
@@ -49,8 +49,8 @@ class appZone(QWidget):
 
 
 class navButton(QPushButton):
-	keypress=Signal("PyObject")
-	focusIn=Signal("PyObject")
+	keypress=pyqtSignal("PyQt_PyObject")
+	focusIn=pyqtSignal("PyQt_PyObject")
 	def __init__(self,parent):
 		super (navButton,self).__init__("",parent)
 		self.keymap={}
@@ -116,7 +116,7 @@ class navButton(QPushButton):
 #class navButton
 
 class runomatic(QWidget):
-	update_signal=Signal("PyObject")
+	update_signal=pyqtSignal("PyQt_PyObject")
 	def __init__(self):
 		super().__init__()
 		self._plasmaMetaHotkey(enable=False,reconfigure=True)

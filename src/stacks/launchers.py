@@ -6,9 +6,9 @@ import subprocess
 import tarfile
 import tempfile
 import base64
-from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QSignalMapper,QProcess,QEvent,QSize
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox,QFileDialog
+from PyQt5 import QtGui
+from PyQt5.QtCore import Qt,pyqtSignal,QSignalMapper,QProcess,QEvent,QSize
 from app2menu import App2Menu
 from appconfig.appConfigStack import appConfigStack as confStack
 from urllib.request import Request,urlopen,urlretrieve
