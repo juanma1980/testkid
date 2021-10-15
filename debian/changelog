@@ -1,3 +1,10 @@
+runomatic (0.9.9) focal; urgency=medium
+
+  * Forces kwin to ignore meta keymap
+  * Fake xdg dirs in order to avoid autostarting apps
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 15 Oct 2021 12:37:20 +0200
+
 runomatic (0.9.8) focal; urgency=medium
 
   * Migrated to PySide2
