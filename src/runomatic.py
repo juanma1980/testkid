@@ -110,8 +110,11 @@ class navButton(QPushButton):
 		if key not in ("Alt","Control","Super_L"):
 			self.keypress.emit(key)
 		else:
-				#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
-				event.setAccepted(False)
+			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
+			event.setAccepted(False)
+			#Win key is ignored
+			if key=="Super_L":
+				event.ignore()
 	#def keyPressEvent
 #class navButton
 
@@ -120,7 +123,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		self._plasmaMetaHotkey(enable=False,reconfigure=True)
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -154,13 +157,12 @@ class runomatic(QWidget):
 		self.runner=appRun()
 		self._set_keymapping()
 		self._read_config()
-		self._plasmaMetaHotkey(enable=True)
 		self._render_gui()
 	#def init
 
-	def _plasmaMetaHotkey(self,enable=None,reconfigure=None):
+	def _plasmaMetaHotkey(self,enable=None,reconfigure=True):
 		env=os.environ.copy()
-		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"'
+		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta --delete'
 		if enable==False:
 			cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta ""'
 		try:
@@ -215,7 +217,9 @@ class runomatic(QWidget):
 					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
 					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
-					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
+					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock],
+					Qt.Key_Super_L: self.keymap[Qt.Key_Meta],
+					Qt.Key_Super_R: self.keymap[Qt.Key_Meta]
 					}
 		self.sigmap_tabSelect=QSignalMapper(self)
 		self.sigmap_tabSelect.mapped[QInt].connect(self._on_tabSelect)
@@ -324,7 +328,7 @@ class runomatic(QWidget):
 					event.ignore()
 			else:
 				event.ignore()
-		self._plasmaMetaHotkey(reconfigure=True)
+		self._plasmaMetaHotkey(enable=True,reconfigure=True)
 		for index in self.tab_id.keys():
 			if index:
 				th=self.tab_id[index].get('thread',None)
@@ -379,13 +383,15 @@ class runomatic(QWidget):
 					event.ignore()
 			self.releaseKeyboard()
 		if key in ('Alt','Control','Super_L'):
+			self.grab=False
 			if key!='Super_L':
 				self.releaseKeyboard()
 			else:
 				event.setAccepted(True)
 				self._on_tabSelect(0,True)
 				event.accept()
-			self.grab=False
+				return(True)
+			#self.grab=False
 			if key=='Alt':
 				if self.closeKey:
 					self.closeKey=False
