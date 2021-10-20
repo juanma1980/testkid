@@ -15,6 +15,8 @@ from appconfig.appConfig import appConfig
 from app2menu import App2Menu
 QString=type("")
 
+NOLAUNCH="/tmp/.nolaunch"
+
 class th_procMon(QThread):
 #	processEnd=pyqtSignal("PyQt_PyObject")
 	def __init__(self,pid,parent=None):
@@ -82,9 +84,18 @@ class th_runApp(QThread):
 		p_pid=''
 		tmp_file=""
 		self._debug("Launching thread...")
+		env=os.environ.copy()
+		env['DISPLAY']=self.display
+		if not os.path.isdir(NOLAUNCH):
+			try:
+				os.makedirs(NOLAUNCH)
+			except:
+				pass
+		env['XDG_CONFIG_DIRS']=NOLAUNCH
+		env['XDG_SESSION_DESKTOP']="ratpoison"
+		env['DESKTOP_SESSION']="ratpoison"
+		env['KDE_FULL_SESSION']="false"
 		try:
-			env=os.environ.copy()
-			env['DISPLAY']=self.display
 			if "/usr/bin/resources-launcher.sh" in self.app:
 				self._run_resource()
 			elif 'pysycache' in self.app:
@@ -233,11 +244,21 @@ class appRun():
 				"800x600",
 				#"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
 				"-nevershared",
+				"-localhost",
+				"yes",
 				"-SecurityTypes",
 				"None",
 				"-autokill"]
 				#print("Launch %s"%vnc_cmd)
-				subprocess.run(vnc_cmd)
+				#Set environment to prevent autostart
+				if not os.path.isdir(NOLAUNCH):
+					try:
+						os.makedirs(NOLAUNCH)
+					except:
+						pass
+				fakeEnv=os.environ.copy()
+				fakeEnv['XDG_CONFIG_DIRS']=NOLAUNCH
+				subprocess.run(vnc_cmd,env=fakeEnv)
 
 #				xephyr_cmd=["vinagre",
 #				"--vnc-scale",
@@ -351,7 +372,7 @@ class appRun():
 			self.ratpoisonConf=tempfile.mkstemp()[-1]
 		with open(self.ratpoisonConf,'w') as f:
 			f.write("exec wmname LG3D\n")
-			f.write("startup_message off\n")
+			f.write("set startupmessage off\n")
 			f.write("set border 0\n")
 			f.write("set bgcolor black\n")
 			f.write("set fgcolor black\n")

@@ -74,6 +74,7 @@ class behaviour(confStack):
 
 	def fakeUpdate(self):
 		idx=self.cmb_level.currentIndex()
+		level='user'
 		if idx==0:
 			level='user'
 		elif idx==1:
