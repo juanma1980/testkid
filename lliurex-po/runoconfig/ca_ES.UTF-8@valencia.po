@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-01-28 13:34+0100\n"
-"PO-Revision-Date: 2020-02-05 10:09+0100\n"
+"PO-Revision-Date: 2021-10-20 12:25+0200\n"
 "Last-Translator: empar <montoro_mde@gva.es>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 19.04.2\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: ../src/stacks/behaviour.py:17
 msgid "App behaviour"
@@ -83,8 +83,8 @@ msgstr "imatges(*.png *.svg *jpg *bmp)"
 #: ../src/stacks/keybinds.py:29
 msgid "Set keybindings for launch the configuration from Run-O-Matic"
 msgstr ""
-"Establiu les vinculacions de tecles per a llançar la configuració des de"
-" Run-O-Matic"
+"Establiu les vinculacions de tecles per a llançar la configuració des de Run-"
+"O-Matic"
 
 #: ../src/stacks/keybinds.py:30
 msgid "Modify keybindings"
@@ -100,7 +100,7 @@ msgstr "Des d'ací podeu definir les vinculacions de tecles"
 
 #: ../src/stacks/keybinds.py:56
 msgid "Launch configuration"
-msgstr "Configura"
+msgstr "Tecla per a llançar la configuració de run-o-matic"
 
 #: ../src/stacks/keybinds.py:57
 msgid "Press a key"

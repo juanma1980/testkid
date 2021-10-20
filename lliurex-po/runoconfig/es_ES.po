@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-02-13 11:16+0100\n"
-"PO-Revision-Date: 2020-02-13 11:17+0100\n"
+"PO-Revision-Date: 2021-10-20 12:24+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -97,7 +97,7 @@ msgstr "Desde aquí se pueden definir los atajos de teclado"
 
 #: ../src/stacks/keybinds.py:56
 msgid "Launch configuration"
-msgstr "Configurar la aplicación"
+msgstr "Tecla para acceder a la configuración de runomatic"
 
 #: ../src/stacks/keybinds.py:57
 msgid "Press a key"
