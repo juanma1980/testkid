@@ -284,7 +284,7 @@ class runomatic(QWidget):
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 						if self.close():
-							os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+							os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
 					else:
 						self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 				except:
