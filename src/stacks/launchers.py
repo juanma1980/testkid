@@ -91,7 +91,7 @@ class launchers(confStack):
 		self.inp_exec=QLineEdit()
 		self.inp_exec.editingFinished.connect(self._get_icon)
 		self.inp_exec.setPlaceholderText(_("Executable path"))
-		self.inp_exec.setToolTip(_("Insert path to the executable"))
+		self.inp_exec.setToolTip(_("1Insert path to the executable"))
 		self.inp_exec.setStyleSheet("margin:0px")
 		hbox.addWidget(self.inp_exec,Qt.Alignment(0))
 		btn_exec=QPushButton("...")
@@ -139,6 +139,7 @@ class launchers(confStack):
 		if txt.startswith("http"):
 			txt="firefox %s"%txt
 		exeLine=txt.split(' ')
+		self._debug("Analize {}".format(exeLine))
 		if 'firefox' not in exeLine and 'chromium' not in exeLine and 'chrome' not in exeLine :
 			return
 		path=exeLine[-1]
@@ -156,17 +157,19 @@ class launchers(confStack):
 			return
 		ico=""
 		try:
-			content=urlopen(req).read()
+			content=urlopen(req,timeout=2).read()
 			soup=BeautifulSoup(content,'html.parser')
 			favicon=soup.head
 			for link in favicon.find_all(href=re.compile("favicon")):
 				fname=link
 				if "favicon" in str(fname):
+					self._debug("Favicon {}".format(fname))
 					splitName=str(fname).split(" ")
 					for splitWord in splitName:
 						if splitWord.startswith("href="):
 							ico=splitWord.split("\"")[1].split("?")[0]
-							outputIco="/tmp/%s.ico"%splitPath[0]
+							outputIco="/tmp/%s.ico"%splitPath[-1]
+							self._debug("Favicon {}".format(outputIco))
 							try:
 								urlretrieve(ico,outputIco)
 							except:
@@ -176,7 +179,9 @@ class launchers(confStack):
 							self.btn_icon.setIcon(icn)
 							break
 		except Exception as e:
-				self._debug("Couldn't open %s: %s"%(req,e))
+			self._debug("Couldn't open %s: %s"%(req,e))
+		finally:
+			self._debug("Selected icon: {}".format(self.app_icon))
 	#def _get_icon
 
 
