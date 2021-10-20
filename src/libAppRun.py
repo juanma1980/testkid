@@ -452,7 +452,7 @@ class appRun():
 		sysconfig=self.get_default_config(exclude=['background64'])
 		self._debug("Getting apps for level %s"%self.level)
 		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
-		default={'categories':[],'desktops':[],'hidden':[],'banned':[]}
+		default={'categories':['run-o-matic'],'desktops':[],'hidden':[],'banned':[]}
 		
 		if categories:
 			apps['categories']=categories
