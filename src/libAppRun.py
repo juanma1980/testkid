@@ -430,8 +430,11 @@ class appRun():
 		data=self.config.getConfig('system',exclude=exclude)
 		level=data['system'].get('config','n4d')
 		if level=='user':
-			if os.path.isfile('%s/.config/%s'%(os.environ['HOME'],self.confFile)):
+			if os.path.isfile(os.path.join(os.environ['HOME'],".config",self.confFile)):
 				data['system']['config']='user'
+			elif os.path.isfile("/usr/share/ruomatic/runomatic.conf"):
+				self._debug("User config not available. Reading system config")
+				data['system']['config']='system'
 			else:
 				self._debug("User config not available. Reading n4d config")
 				data['system']['config']='n4d'
@@ -452,7 +455,7 @@ class appRun():
 		sysconfig=self.get_default_config(exclude=['background64'])
 		self._debug("Getting apps for level %s"%self.level)
 		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
-		default={'categories':[],'desktops':[],'hidden':[],'banned':[]}
+		default={'categories':['run-o-matic'],'desktops':[],'hidden':[],'banned':[]}
 		
 		if categories:
 			apps['categories']=categories
