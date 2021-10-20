@@ -1,3 +1,15 @@
+runomatic (0.9.99,1) focal; urgency=medium
+
+  * Fix multiple keys for runoconfig hotkey
+  * Fix translations
+  * Add run-o-matic as default category
+  * Improve keyboard management
+  * Restart runomatic after call runoconfig
+  * Fix desktop category for runomatic
+  * Reenabled n4d config level
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 20 Oct 2021 19:31:48 +0200
+
 runomatic (0.9.9) focal; urgency=medium
 
   * Forces kwin to ignore meta keymap
