@@ -38,7 +38,7 @@ class th_runApp(QThread):
 		self.display=display
 		self.app=app.split(" ")
 		self.menu=App2Menu.app2menu()
-		self.dbg=True
+		self.dbg=False
 		self.pid=''
 	#def __init__
 
@@ -131,7 +131,6 @@ class th_runApp(QThread):
 		except Exception as e:
 			print("Error running: %s"%e)
 			os.kill(os.getpid(),signal.SIGUSR2)
-		print(env)
 		self.processRun.emit(retval)
 		self._debug("PROCESS FINISHED")
 	#def run
@@ -431,8 +430,11 @@ class appRun():
 		data=self.config.getConfig('system',exclude=exclude)
 		level=data['system'].get('config','n4d')
 		if level=='user':
-			if os.path.isfile('%s/.config/%s'%(os.environ['HOME'],self.confFile)):
+			if os.path.isfile(os.path.join(os.environ['HOME'],".config",self.confFile)):
 				data['system']['config']='user'
+			elif os.path.isfile("/usr/share/ruomatic/runomatic.conf"):
+				self._debug("User config not available. Reading system config")
+				data['system']['config']='system'
 			else:
 				self._debug("User config not available. Reading n4d config")
 				data['system']['config']='n4d'
@@ -453,7 +455,7 @@ class appRun():
 		sysconfig=self.get_default_config(exclude=['background64'])
 		self._debug("Getting apps for level %s"%self.level)
 		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
-		default={'categories':[],'desktops':[],'hidden':[],'banned':[]}
+		default={'categories':['run-o-matic'],'desktops':[],'hidden':[],'banned':[]}
 		
 		if categories:
 			apps['categories']=categories
