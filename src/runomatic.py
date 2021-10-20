@@ -110,8 +110,11 @@ class navButton(QPushButton):
 		if key not in ("Alt","Control","Super_L"):
 			self.keypress.emit(key)
 		else:
-				#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
-				event.setAccepted(False)
+			#Alt key is passed to parent. Parent then grabs the keyboard to prevent window switching 
+			event.setAccepted(False)
+			#Win key is ignored
+			if key=="Super_L":
+				event.ignore()
 	#def keyPressEvent
 #class navButton
 
@@ -154,13 +157,12 @@ class runomatic(QWidget):
 		self.runner=appRun()
 		self._set_keymapping()
 		self._read_config()
-		self._plasmaMetaHotkey(enable=True)
 		self._render_gui()
 	#def init
 
-	def _plasmaMetaHotkey(self,enable=None,reconfigure=None):
+	def _plasmaMetaHotkey(self,enable=None,reconfigure=True):
 		env=os.environ.copy()
-		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"'
+		cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta --delete'
 		if enable==False:
 			cmd='kwriteconfig5 --file ~/.config/kwinrc --group ModifierOnlyShortcuts --key Meta ""'
 		try:
@@ -324,7 +326,7 @@ class runomatic(QWidget):
 					event.ignore()
 			else:
 				event.ignore()
-		self._plasmaMetaHotkey(reconfigure=True)
+		self._plasmaMetaHotkey(enable=True,reconfigure=True)
 		for index in self.tab_id.keys():
 			if index:
 				th=self.tab_id[index].get('thread',None)
