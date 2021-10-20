@@ -1,6 +1,6 @@
-runomatic (0.9.97+1llx19) bionic; urgency=medium
+runomatic (0.9.99.1+1llx19) bionic; urgency=medium
 
-  * Merge with 0.99 llx21
+  * Merge with 0.99.1 llx21
 
  -- Juanma1980 <juanma1980@gmail.com>  Wed, 20 Oct 2021 12:22:11 +0200
 
