@@ -158,6 +158,8 @@ class runomatic(QWidget):
 		self._set_keymapping()
 		self._read_config()
 		self._render_gui()
+		self.oldKey=""
+		self.currentKey=""
 	#def init
 
 	def _plasmaMetaHotkey(self,enable=None,reconfigure=True):
@@ -347,7 +349,9 @@ class runomatic(QWidget):
 	#def closeEvent
 
 	def keyPressEvent(self,event):
+		self.oldKey=self.currentKey
 		key=self.keymap.get(event.key(),event.text())
+		self.currentKey=key
 		if key in ("Alt" ,"Super_L"):
 			self.grab=True
 		self.grabKeyboard()
@@ -358,10 +362,12 @@ class runomatic(QWidget):
 		confKey=''
 		if self.keybinds:
 			confKey=self.keybinds.get('conf',None)
+			print("Confkey {}".format(confKey))
 		if key not in ('Tab','Super_L'):
+			sw=True	
 			if key=='F4' and self.grab:
 				self.closeKey=True
-			elif key==confKey:
+			elif key==confKey or "{}+{}".format(self.oldKey,key)==confKey:
 				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 					if self.close():
 						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
@@ -379,7 +385,10 @@ class runomatic(QWidget):
 						cont+=1
 				else:
 					event.ignore()
-			self.releaseKeyboard()
+			else:
+				sw=False	
+			if sw:
+				self.releaseKeyboard()
 		if key in ('Alt','Control','Super_L'):
 			if key!='Super_L':
 				self.releaseKeyboard()
