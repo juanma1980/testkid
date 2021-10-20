@@ -123,7 +123,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		self._plasmaMetaHotkey(enable=False,reconfigure=True)
-		self.dbg=True
+		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -158,6 +158,8 @@ class runomatic(QWidget):
 		self._set_keymapping()
 		self._read_config()
 		self._render_gui()
+		self.oldKey=""
+		self.currentKey=""
 	#def init
 
 	def _plasmaMetaHotkey(self,enable=None,reconfigure=True):
@@ -284,7 +286,7 @@ class runomatic(QWidget):
 				try:
 					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 						if self.close():
-							os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+							os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
 					else:
 						self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 				except:
@@ -349,7 +351,9 @@ class runomatic(QWidget):
 	#def closeEvent
 
 	def keyPressEvent(self,event):
+		self.oldKey=self.currentKey
 		key=self.keymap.get(event.key(),event.text())
+		self.currentKey=key
 		if key in ("Alt" ,"Super_L"):
 			self.grab=True
 		self.grabKeyboard()
@@ -361,9 +365,10 @@ class runomatic(QWidget):
 		if self.keybinds:
 			confKey=self.keybinds.get('conf',None)
 		if key not in ('Tab','Super_L'):
+			sw=True	
 			if key=='F4' and self.grab:
 				self.closeKey=True
-			elif key==confKey:
+			elif key==confKey or "{}+{}".format(self.oldKey,key)==confKey:
 				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 					if self.close():
 						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
@@ -381,17 +386,18 @@ class runomatic(QWidget):
 						cont+=1
 				else:
 					event.ignore()
-			self.releaseKeyboard()
+			else:
+				sw=False	
+			if sw:
+				self.releaseKeyboard()
 		if key in ('Alt','Control','Super_L'):
-			self.grab=False
 			if key!='Super_L':
 				self.releaseKeyboard()
 			else:
 				event.setAccepted(True)
 				self._on_tabSelect(0,True)
 				event.accept()
-				return(True)
-			#self.grab=False
+			self.grab=False
 			if key=='Alt':
 				if self.closeKey:
 					self.closeKey=False
