@@ -281,9 +281,9 @@ class runomatic(QWidget):
 #		self.setAttribute(Qt.WA_TranslucentBackground)
 		####
 		def launchConf():
-			sw=self.close_on_exit
-			self.close_on_exit=False
 			try:
+				sw=self.close_on_exit
+				self.close_on_exit=False
 				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 					if self.close():
 						os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
