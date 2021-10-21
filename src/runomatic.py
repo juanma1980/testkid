@@ -281,14 +281,18 @@ class runomatic(QWidget):
 #		self.setAttribute(Qt.WA_TranslucentBackground)
 		####
 		def launchConf():
-				try:
-					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-						if self.close():
-							os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
-					else:
-						self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
-				except:
-					print(_("runoconfig not found"))
+			try:
+				sw=self.close_on_exit
+				self.close_on_exit=False
+				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
+					if self.close():
+						os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+				else:
+					self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
+			except:
+				print(_("runoconfig not found"))
+			finally:
+				self.close_on_exit=sw
 		self._init_gui()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
@@ -362,15 +366,22 @@ class runomatic(QWidget):
 		confKey=''
 		if self.keybinds:
 			confKey=self.keybinds.get('conf',None)
-			print("Confkey {}".format(confKey))
 		if key not in ('Tab','Super_L'):
 			sw=True	
 			if key=='F4' and self.grab:
 				self.closeKey=True
 			elif key==confKey or "{}+{}".format(self.oldKey,key)==confKey:
 				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
+					sw=self.close_on_exit
+					self.close_on_exit=False
 					if self.close():
-						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+						try:
+							os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+						except:
+							self.showMessage(_("runoconfig not found"),"error2",20)
+						finally:
+							self.close_on_exit=sw
+					self.close_on_exit=sw
 				else:
 					event.ignore()
 					self.showMessage(_("runoconfig not found"),"error2",20)
@@ -394,7 +405,7 @@ class runomatic(QWidget):
 				self.releaseKeyboard()
 			else:
 				event.setAccepted(True)
-				self._on_tabSelect(0,True)
+				sel._on_tabSelect(0,True)
 				event.accept()
 			self.grab=False
 			if key=='Alt':
