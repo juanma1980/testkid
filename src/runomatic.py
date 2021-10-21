@@ -370,8 +370,11 @@ class runomatic(QWidget):
 				self.closeKey=True
 			elif key==confKey or "{}+{}".format(self.oldKey,key)==confKey:
 				if os.path.isfile("%s/runoconfig.py"%self.baseDir):
+					sw=self.close_on_exit
+					self.close_on_exit=False
 					if self.close():
-						os.execv("%s/runoconfig.py"%self.baseDir,["1"])
+						os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+					self.close_on_exit=sw
 				else:
 					event.ignore()
 					self.showMessage(_("runoconfig not found"),"error2",20)
