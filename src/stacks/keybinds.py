@@ -26,7 +26,7 @@ class keybinds(confStack):
 					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
 					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
 					}
-		self.menu_description=(_("Set keybindings for launch the configuration from Run-O-Matic"))
+		self.menu_description=(_("Keybind for launching configuration from Run-O-Matic"))
 		self.description=(_("Modify keybindings"))
 		self.icon=('configure-shortcuts')
 		self.tooltip=(_("From here you can modify the keybinding"))
