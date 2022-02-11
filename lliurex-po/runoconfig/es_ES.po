@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-13 11:16+0100\n"
-"PO-Revision-Date: 2021-10-20 12:24+0200\n"
+"POT-Creation-Date: 2022-02-11 20:31+0100\n"
+"PO-Revision-Date: 2022-02-11 20:33+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../src/stacks/behaviour.py:17
@@ -74,18 +74,17 @@ msgstr "Cerrar sesión al salir de la aplicación"
 msgid "Choose the background image"
 msgstr "Selecciona la imagen para el fondo"
 
-#: ../src/stacks/behaviour.py:164
+#: ../src/stacks/behaviour.py:165
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr "imagenes(*.png *.svg *jpg *bmp)"
 
 #: ../src/stacks/keybinds.py:29
-msgid "Set keybindings for launch the configuration from Run-O-Matic"
-msgstr ""
-"Establece atajos de teclado para lanzar la configuración desde Run-O-Matic"
+msgid "Keybind for launching configuration from Run-O-Matic"
+msgstr "Atajo para lanzar la configuración desde Run-O-Matic"
 
 #: ../src/stacks/keybinds.py:30
 msgid "Modify keybindings"
-msgstr "Modificar atajos de teclado"
+msgstr "Modificar atajos"
 
 #: ../src/stacks/keybinds.py:32
 msgid "From here you can modify the keybinding"
@@ -103,75 +102,75 @@ msgstr "Tecla para acceder a la configuración de runomatic"
 msgid "Press a key"
 msgstr "Pulsa una tecla"
 
-#: ../src/stacks/launchers.py:35
+#: ../src/stacks/launchers.py:38
 msgid "Add new launchers"
 msgstr "Añadir lanzadores"
 
-#: ../src/stacks/launchers.py:36
+#: ../src/stacks/launchers.py:39
 msgid "Add custom launcher"
 msgstr "Añadir lanzador personalizado"
 
-#: ../src/stacks/launchers.py:38
+#: ../src/stacks/launchers.py:41
 msgid "From here you can add a custom launcher"
 msgstr "Desde aquí se pueden añadir lanzadores personalizados"
 
-#: ../src/stacks/launchers.py:65
+#: ../src/stacks/launchers.py:68
 msgid "From here you can add Launchers"
 msgstr "Desde aquí se pueden añadir lanzadores"
 
-#: ../src/stacks/launchers.py:67
+#: ../src/stacks/launchers.py:70
 msgid "Icon: "
 msgstr "Icono:"
 
-#: ../src/stacks/launchers.py:74
+#: ../src/stacks/launchers.py:77
 msgid "Push to change icon"
 msgstr "Pulsa para cambiar el icono"
 
-#: ../src/stacks/launchers.py:77
+#: ../src/stacks/launchers.py:80
 msgid "Name: "
 msgstr "Nombre:"
 
-#: ../src/stacks/launchers.py:80
+#: ../src/stacks/launchers.py:83
 msgid "Desktop name"
 msgstr "Nombre del lanzador"
 
-#: ../src/stacks/launchers.py:81
+#: ../src/stacks/launchers.py:84
 msgid "Insert desktop name"
 msgstr "Inserta el nombre del lanzador"
 
-#: ../src/stacks/launchers.py:83
+#: ../src/stacks/launchers.py:86
 msgid "Executable: "
 msgstr "Ejecutable:"
 
-#: ../src/stacks/launchers.py:90
+#: ../src/stacks/launchers.py:93
 msgid "Executable path"
 msgstr "Ruta al ejecutable"
 
-#: ../src/stacks/launchers.py:91
+#: ../src/stacks/launchers.py:94
 msgid "Insert path to the executable"
 msgstr "Inserta la ruta al ejecutable"
 
-#: ../src/stacks/launchers.py:96
+#: ../src/stacks/launchers.py:99
 msgid "Press button to select an executable"
 msgstr "Pulsa para seleccionar un ejecutable"
 
-#: ../src/stacks/launchers.py:101
+#: ../src/stacks/launchers.py:104
 msgid "Description: "
 msgstr "Descripción:"
 
-#: ../src/stacks/launchers.py:104
+#: ../src/stacks/launchers.py:107
 msgid "Description"
 msgstr "Descripción"
 
-#: ../src/stacks/launchers.py:105
+#: ../src/stacks/launchers.py:108
 msgid "Insert a description for the app"
 msgstr "Inserta la descripción del lanzador"
 
-#: ../src/stacks/launchers.py:114
+#: ../src/stacks/launchers.py:117
 msgid "images(*.png *.xpm *jpg)"
 msgstr "imagenes(*.png *.xpm *jpg)"
 
-#: ../src/stacks/launchers.py:116
+#: ../src/stacks/launchers.py:119
 msgid "All files(*.*)"
 msgstr "Todos los ficheros(*.*)"
 
@@ -217,38 +216,37 @@ msgstr "Selección de lanzador"
 msgid "Search"
 msgstr "Búsqueda"
 
-#: ../src/stacks/runoapps.py:238
+#: ../src/stacks/runoapps.py:252
 msgid "Configure visible launchers"
 msgstr "Configurar los lanzadores "
 
-#: ../src/stacks/runoapps.py:239
+#: ../src/stacks/runoapps.py:253
 msgid "Modify launchers"
 msgstr "Modificar lanzadores"
 
-#: ../src/stacks/runoapps.py:241
+#: ../src/stacks/runoapps.py:255
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr "Añadir un lanzador personalizado (en la categoría run-o-matic)"
 
-#: ../src/stacks/runoapps.py:311
+#: ../src/stacks/runoapps.py:324
 msgid "Categories"
 msgstr "Categorías"
 
-#: ../src/stacks/runoapps.py:324
+#: ../src/stacks/runoapps.py:337
 msgid "Add launcher"
 msgstr "Añadir lanzador\t"
 
-#: ../src/stacks/runoapps.py:325
+#: ../src/stacks/runoapps.py:338
 msgid "Add Launcher"
 msgstr "Añadir lanzador\t"
 
-#: ../src/stacks/runoapps.py:395
-msgid "Hide button"
-msgstr "Ocultar"
+#: ../src/stacks/runoapps.py:408 ../src/stacks/runoapps.py:412
+msgid "Remove button"
+msgstr "Eliminar"
 
-#: ../src/stacks/runoapps.py:396
+#: ../src/stacks/runoapps.py:409
 msgid "Edit button"
 msgstr "Editar"
 
-#: ../src/stacks/runoapps.py:398
-msgid "Show button"
-msgstr "Mostrar"
+#~ msgid "Show button"
+#~ msgstr "Mostrar"
