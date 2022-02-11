@@ -4,7 +4,7 @@ from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLa
 				QDialog,QGridLayout,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QListWidget,\
 				QListWidgetItem,QStackedWidget,QButtonGroup,QComboBox,QTableWidget,QTableWidgetItem,\
-				QHeaderView,QMenu,QAction,QCompleter
+				QHeaderView,QMenu,QAction,QCompleter,QAbstractItemView
 from PySide2 import QtGui
 from PySide2.QtCore import QPoint,QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent,QMimeData
 from libAppRun import appRun
@@ -120,6 +120,7 @@ class dropTable(QTableWidget):
 		self.parent=parent
 		self.setAcceptDrops(True)
 		self.setDragEnabled(True)
+		self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 		Hheader=self.horizontalHeader()
 		Vheader=self.verticalHeader()
 		self.setShowGrid(False)
@@ -307,7 +308,6 @@ class runoapps(confStack):
 			self.setCursor(cursor)
 			fchoosed=''
 			if (fdia.show()):
-				self.setChanged(True)
 				fchoosed=fdia.selectedFiles()[0]
 				apps=self._get_table_apps()
 				apps['desktops'].append(fchoosed)
@@ -444,6 +444,7 @@ class runoapps(confStack):
 				act.setChecked(True)
 			else:
 				act.setChecked(False)
+		self.setChanged()
 	#def update_apps
 
 	def _changeBtnState(self,apps,state='show'):
