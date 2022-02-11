@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-13 11:16+0100\n"
+"POT-Creation-Date: 2022-02-11 20:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -73,12 +73,12 @@ msgstr ""
 msgid "Choose the background image"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:164
+#: ../src/stacks/behaviour.py:165
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr ""
 
 #: ../src/stacks/keybinds.py:29
-msgid "Set keybindings for launch the configuration from Run-O-Matic"
+msgid "Keybind for launching configuration from Run-O-Matic"
 msgstr ""
 
 #: ../src/stacks/keybinds.py:30
@@ -101,75 +101,75 @@ msgstr ""
 msgid "Press a key"
 msgstr ""
 
-#: ../src/stacks/launchers.py:35
+#: ../src/stacks/launchers.py:38
 msgid "Add new launchers"
 msgstr ""
 
-#: ../src/stacks/launchers.py:36
+#: ../src/stacks/launchers.py:39
 msgid "Add custom launcher"
 msgstr ""
 
-#: ../src/stacks/launchers.py:38
+#: ../src/stacks/launchers.py:41
 msgid "From here you can add a custom launcher"
 msgstr ""
 
-#: ../src/stacks/launchers.py:65
+#: ../src/stacks/launchers.py:68
 msgid "From here you can add Launchers"
 msgstr ""
 
-#: ../src/stacks/launchers.py:67
+#: ../src/stacks/launchers.py:70
 msgid "Icon: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:74
+#: ../src/stacks/launchers.py:77
 msgid "Push to change icon"
 msgstr ""
 
-#: ../src/stacks/launchers.py:77
+#: ../src/stacks/launchers.py:80
 msgid "Name: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:80
+#: ../src/stacks/launchers.py:83
 msgid "Desktop name"
 msgstr ""
 
-#: ../src/stacks/launchers.py:81
+#: ../src/stacks/launchers.py:84
 msgid "Insert desktop name"
 msgstr ""
 
-#: ../src/stacks/launchers.py:83
+#: ../src/stacks/launchers.py:86
 msgid "Executable: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:90
+#: ../src/stacks/launchers.py:93
 msgid "Executable path"
 msgstr ""
 
-#: ../src/stacks/launchers.py:91
+#: ../src/stacks/launchers.py:94
 msgid "Insert path to the executable"
 msgstr ""
 
-#: ../src/stacks/launchers.py:96
+#: ../src/stacks/launchers.py:99
 msgid "Press button to select an executable"
 msgstr ""
 
-#: ../src/stacks/launchers.py:101
+#: ../src/stacks/launchers.py:104
 msgid "Description: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:104
+#: ../src/stacks/launchers.py:107
 msgid "Description"
 msgstr ""
 
-#: ../src/stacks/launchers.py:105
+#: ../src/stacks/launchers.py:108
 msgid "Insert a description for the app"
 msgstr ""
 
-#: ../src/stacks/launchers.py:114
+#: ../src/stacks/launchers.py:117
 msgid "images(*.png *.xpm *jpg)"
 msgstr ""
 
-#: ../src/stacks/launchers.py:116
+#: ../src/stacks/launchers.py:119
 msgid "All files(*.*)"
 msgstr ""
 
@@ -213,38 +213,34 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:238
+#: ../src/stacks/runoapps.py:252
 msgid "Configure visible launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:239
+#: ../src/stacks/runoapps.py:253
 msgid "Modify launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:241
+#: ../src/stacks/runoapps.py:255
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:311
+#: ../src/stacks/runoapps.py:324
 msgid "Categories"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:324
+#: ../src/stacks/runoapps.py:337
 msgid "Add launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:325
+#: ../src/stacks/runoapps.py:338
 msgid "Add Launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:395
-msgid "Hide button"
+#: ../src/stacks/runoapps.py:408 ../src/stacks/runoapps.py:412
+msgid "Remove button"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:396
+#: ../src/stacks/runoapps.py:409
 msgid "Edit button"
-msgstr ""
-
-#: ../src/stacks/runoapps.py:398
-msgid "Show button"
 msgstr ""
