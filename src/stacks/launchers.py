@@ -223,7 +223,7 @@ class launchers(confStack):
 		shutil.copy(filename,runoName)
 
 		#Save all runomatic desktops as base64
-		self._tar_runodesktops()
+		#self._tar_runodesktops()
 			
 		self.btn_ok.setEnabled(False)
 		self.btn_cancel.setEnabled(False)

@@ -3,8 +3,8 @@ import getpass
 import sys
 import os
 from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
-				QDialog,QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
-				QStatusBar,QFileDialog,QDialogButtonBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
+				QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
+				QStatusBar,QFileDialog,QMessageBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog,QDesktopWidget
 from PySide2 import QtGui
 from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent
@@ -18,12 +18,39 @@ import time
 import tempfile
 from urllib.request import urlretrieve
 from libAppRun import appRun
+from appconfig.appConfigStack import appConfigStack as confStack
+from app2menu import App2Menu as app2menu
 QString=type("")
 QInt=type(0)
 TAB_BTN_SIZE=96
 BTN_SIZE=128
 gettext.textdomain('runomatic')
 _ = gettext.gettext
+
+class QCheckBoxWithDescriptions(QCheckBox):
+	def __init__(self,text="",parent=None):
+		super (QCheckBoxWithDescriptions,self).__init__("",parent)
+		self.app2menu=app2menu.app2menu()
+		if text:
+			self.setText(text)
+		self._generateApplist(text)
+
+	def _generateApplist(self,text=''):
+		if self.text()!='':
+			text=self.text()
+		if text=='':
+			self.setToolTip(_("Empty"))
+			return
+		applist=self.app2menu.get_apps_from_category(text)
+		tooltext=''
+		for app in applist:
+			for key,item in applist.items():
+				tooltext="{0}{1}\n".format(tooltext,item.get('name'),key)
+		if tooltext=='':
+			tooltext=_('Empty')
+		self.setToolTip(tooltext)
+#class QCheckBoxWithDescriptions
+
 
 class appZone(QWidget):
 	def __init__(self,parent):
@@ -123,7 +150,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		self._plasmaMetaHotkey(enable=False,reconfigure=True)
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -157,6 +184,7 @@ class runomatic(QWidget):
 		self.runner=appRun()
 		self._set_keymapping()
 		self._read_config()
+		self.app2menu=app2menu.app2menu()
 		self._render_gui()
 		self.oldKey=""
 		self.currentKey=""
@@ -282,20 +310,11 @@ class runomatic(QWidget):
 #		self.setStyleSheet('background:transparent')
 #		self.setAttribute(Qt.WA_TranslucentBackground)
 		####
-		def launchConf():
-				try:
-					if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-						if self.close():
-							os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
-					else:
-						self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
-				except:
-					print(_("runoconfig not found"))
 		self._init_gui()
 		self.box=QGridLayout()
 		self.statusBar=QAnimatedStatusBar.QAnimatedStatusBar()
 		self.statusBar.setStateCss("error","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,255,0,1), stop:1 rgba(255,0,0,0.6));text-decoration:none;color:white;text-align:center;font-size:128px;height:256px")
-		self.statusBar.setStateCss("error2","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;font-size:12px;height:20px")
+		self.statusBar.setStateCss("error2","background-color:qlineargradient(x1:0 y1:0,x2:0 y2:1,stop:0 rgba(255,0,0,1), stop:1 rgba(255,0,0,0.6));color:white;text-align:center;text-decoration:none;height:20px")
 		self.statusBar.height_=152
 		self.box.addWidget(self.statusBar,0,0,1,2)
 		self.tabBar=self._tabBar()
@@ -309,15 +328,68 @@ class runomatic(QWidget):
 			self._set_focus("")
 		else:
 			wdg=QWidget()
-			lyt=QVBoxLayout()
+			lyt=QGridLayout()
 			wdg.setLayout(lyt)
 			lbl=QLabel(_("There's no launchers to show.\nDid you run the configure app?"))
-			lyt.addWidget(lbl)
+			lyt.addWidget(lbl,0,0,1,4)
 			btn=QPushButton(_("Launch configuration app"))
-			btn.clicked.connect(launchConf)
-			lyt.addWidget(btn)
+			btn.clicked.connect(self._launchConf)
+			lyt.addWidget(btn,1,0,1,4)
+			lbl2=QLabel(_("Or you can set directly a template from the menu"))
+			lyt.addWidget(lbl2,2,1,1,2)
+			catList=self.app2menu.get_categories()
+			row=3
+			col=0
+			blacklist=['information','translation','internet','settingsmenu','system','utilities','lliurex preferences','lliurex administration']
+			for cat in catList:
+				if cat and cat not in blacklist:
+					chk=QCheckBoxWithDescriptions(text=cat)
+					lyt.addWidget(chk,row,col,1,1)
+					col+=1
+					if col==4:
+						row+=1
+						col=0
+			btnTemplates=QPushButton(_("Set apps from selected templates"))
+			btnTemplates.clicked.connect(self._setTemplates)
+			lyt.addWidget(btnTemplates,row,0,1,4)
+
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
+
+	def _launchConf(self):
+		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
+			if self.close():
+				self.hide()
+				cmd=["{}/runoconfig.py".format(self.baseDir),"1","2"]
+				try:
+					subprocess.run(cmd)
+				except Exception as e:
+					msgErr=_("Error launching config")
+					print(_("{0}: {1}".format(msgErr,e)))
+				#os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+				self.show()
+		else:
+			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
+	#def launchConf
+
+	def _setTemplates(self):
+		categories=[]
+		items =(self.box.itemAt(item).widget() for item in range(self.box.count()))
+		userRunoapps="{}/.config/runomatic/applications".format(os.environ['HOME'])
+		if os.path.isdir(userRunoapps)==False:
+			os.makedirs(userRunoapps)
+		for item in items:
+			if isinstance(item,QWidget):
+				for chk in item.findChildren(QCheckBoxWithDescriptions):
+					if chk.isChecked():
+						self._debug("Loading apps from {}".format(chk.text()))
+						categories.append(chk.text())
+				self.runner.write_config(categories,key='categories')
+
+		msg=QMessageBox()
+		msg.setText(_("On accept run-o-matic will be launched with selected categories."))
+		msg.exec()
+		os.execv("%s/runomatic.py"%self.baseDir,["1","2"])
 
 	def closeEvent(self,event):
 		if self.password:
