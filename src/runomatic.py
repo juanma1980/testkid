@@ -4,7 +4,7 @@ import sys
 import os
 from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
 				QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
-				QStatusBar,QFileDialog,QMessageBox,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
+				QStatusBar,QFileDialog,QDialog,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
 				QTableWidgetItem,QHeaderView,QTableWidgetSelectionRange,QInputDialog,QDesktopWidget
 from PySide2 import QtGui
 from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess,QEvent
@@ -350,7 +350,7 @@ class runomatic(QWidget):
 						row+=1
 						col=0
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
-			btnTemplates.clicked.connect(self._setTemplates)
+			btnTemplates.clicked.connect(self._applyTemplates)
 			lyt.addWidget(btnTemplates,row,0,1,4)
 
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
@@ -372,7 +372,7 @@ class runomatic(QWidget):
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 	#def launchConf
 
-	def _setTemplates(self):
+	def _applyTemplates(self):
 		categories=[]
 		items =(self.box.itemAt(item).widget() for item in range(self.box.count()))
 		userRunoapps="{}/.config/runomatic/applications".format(os.environ['HOME'])
@@ -384,12 +384,36 @@ class runomatic(QWidget):
 					if chk.isChecked():
 						self._debug("Loading apps from {}".format(chk.text()))
 						categories.append(chk.text())
-				self.runner.write_config(categories,key='categories')
+		dlg=QDialog()
+		lay=QGridLayout()
+		dlg.setLayout(lay)
+		msg=_("The next categories will be added")
+		lbl=QLabel("{0}:".format(msg))
+		lay.addWidget(lbl,0,0,1,3)
+		lbl2=QLabel("{0}<br>".format("<br>".join(categories)))
+		lbl2.setStyleSheet("background-color:white;color:black;margin:3px;border:3px solid white")
+		lay.addWidget(lbl2,1,0,1,3)
+		msg=_("On apply Run-O-Matic will be launched with the apps from choosed categories.<br>For fine tuning it's recommended to launch Run-O-Config.")
+		lbl3=QLabel("{0}".format(msg))
+		lay.addWidget(lbl3,2,0,1,3)
+		btnOk=QPushButton(_("Apply"))
+		btnOk.clicked.connect(lambda:self._setTemplates(categories))
+		lay.addWidget(btnOk,3,0,1,1)
+		btnCancel=QPushButton(_("Cancel"))
+		btnCancel.clicked.connect(dlg.close)
+		lay.addWidget(btnCancel,3,1,1,1)
+		btnConfig=QPushButton(_("Launch Run-O-Config"))
+		btnConfig.clicked.connect(lambda:self._setTemplatesAndLaunch(categories))
+		lay.addWidget(btnConfig,3,2,1,1)
+		dlg.exec_()
 
-		msg=QMessageBox()
-		msg.setText(_("On accept run-o-matic will be launched with selected categories."))
-		msg.exec()
+	def _setTemplates(self,categories):
+		self.runner.write_config(categories,key='categories')
 		os.execv("%s/runomatic.py"%self.baseDir,["1","2"])
+
+	def _setTemplatesAndLaunch(self,categories):
+		self.runner.write_config(categories,key='categories')
+		os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
 
 	def closeEvent(self,event):
 		if self.password:
