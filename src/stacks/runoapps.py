@@ -336,7 +336,7 @@ class runoapps(confStack):
 		btn_cat.setMenu(self.menu_cat)
 		btn_add=QPushButton(_("Add launcher"))
 		btn_add.setToolTip(_("Add Launcher"))
-		btn_add.setFixedWidth(150)
+		#btn_add.setFixedWidth(150)
 		btn_add.clicked.connect(_update_desktops)
 		btnBox.addWidget(btn_cat,1,Qt.AlignLeft)
 		btnBox.addWidget(btn_add,2,Qt.AlignLeft)
