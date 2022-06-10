@@ -1,4 +1,4 @@
-runomatic (1.1.2) focal; urgency=medium
+runomatic (1.1.3) focal; urgency=medium
 
   * Minor bugfixes
   * Promp the user to launch run-o-config or choose a category on 1st launch
