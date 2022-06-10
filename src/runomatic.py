@@ -42,10 +42,12 @@ class QCheckBoxWithDescriptions(QCheckBox):
 			self.setToolTip(_("Empty"))
 			return
 		applist=self.app2menu.get_apps_from_category(text)
+		addedApp=[]
 		tooltext=''
-		for app in applist:
-			for key,item in applist.items():
+		for key,item in applist.items():
+			if item.get('name','') not in addedApp:
 				tooltext="{0}{1}\n".format(tooltext,item.get('name'),key)
+				addedApp.append(item.get('name'))
 		if tooltext=='':
 			tooltext=_('Empty')
 		self.setToolTip(tooltext)
@@ -331,7 +333,7 @@ class runomatic(QWidget):
 			lyt=QGridLayout()
 			wdg.setLayout(lyt)
 			wdg.setObjectName("container")
-			wdg.setStyleSheet("#container {background-color:white;qproperty-alignment: AlignCenter;margin:3px;border:3px solid white}")
+			wdg.setStyleSheet("#container {background-color:white;qproperty-alignment:AlignCenter;margin:3px;border:3px solid white}")
 			msg=_("There's no launchers to show.\nDid you run the configure app?")
 			lbl=QLabel("<strong>{}</strong>".format(msg))
 			lyt.addWidget(lbl,0,0,1,4)
@@ -356,6 +358,9 @@ class runomatic(QWidget):
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
 			btnTemplates.clicked.connect(self._applyTemplates)
 			lyt.addWidget(btnTemplates,row,0,1,4)
+
+			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic it's with Alt+F4"))
+			lyt.addWidget(lbl3,row+1,0,1,4)
 
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
