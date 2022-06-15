@@ -359,7 +359,7 @@ class runomatic(QWidget):
 			btnTemplates.clicked.connect(self._applyTemplates)
 			lyt.addWidget(btnTemplates,row,0,1,4)
 
-			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic it's with Alt+F4"))
+			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic is with Alt+F4"))
 			lyt.addWidget(lbl3,row+1,0,1,4)
 
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
@@ -764,6 +764,7 @@ class runomatic(QWidget):
 			tabContent.destroy()
 			wid=None
 		else:
+			time.sleep(3)
 			box.addWidget(zone)
 			zone.setFocusPolicy(Qt.NoFocus)
 			tabContent.setLayout(box)
