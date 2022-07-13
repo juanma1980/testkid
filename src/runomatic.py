@@ -160,6 +160,7 @@ class runomatic(QWidget):
 		signal.signal(signal.SIGUSR1,self._end_process)
 		signal.signal(signal.SIGUSR2,self._fail_process)
 		self.runoapps="/usr/share/runomatic/applications"
+		self.userRunoapps="{}/.config/runomatic/applications".format(os.environ.get('HOME'))
 		self.launched=[]
 		self.blocked=[]
 		self.procMon=[]
@@ -745,6 +746,9 @@ class runomatic(QWidget):
 			if os.path.isdir(self.runoapps):
 				if desktop in os.listdir(self.runoapps):
 					desktop=os.path.join(self.runoapps,desktop)
+				if os.path.isdir(self.userRunoapps):
+					if desktop in os.listdir(self.userRunoapps):
+						desktop=os.path.join(self.userRunoapps,desktop)
 		apps=self.runner.get_desktop_app(desktop,True)
 		return (apps)
 	#def _get_category_apps
