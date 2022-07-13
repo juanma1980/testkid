@@ -569,14 +569,15 @@ class appRun():
 		apps=[]
 		tmp_apps=[]
 		if category=="run-o-matic":
-				#			if os.path.isdir(self.runoapps):
-#				for f in os.listdir(self.runoapps):
-#					if f not in apps and os.path.isfile("%s"%os.path.join(self.runoapps,f)):
-#						apps.append("%s"%os.path.join(self.runoapps,f))
-			if os.path.isdir(self.userRunoapps):
-				for f in os.listdir(self.userRunoapps):
-					if f not in apps and os.path.isfile("%s"%os.path.join(self.userRunoapps,f)):
-						apps.append("%s"%os.path.join(self.userRunoapps,f))
+			if os.path.isdir(self.runoapps):
+				for f in os.listdir(self.runoapps):
+					if f not in apps and os.path.isfile("%s"%os.path.join(self.runoapps,f)):
+						apps.append("%s"%os.path.join(self.runoapps,f))
+			if self.level=="user":
+				if os.path.isdir(self.userRunoapps):
+					for f in os.listdir(self.userRunoapps):
+						if f not in apps and os.path.isfile("%s"%os.path.join(self.userRunoapps,f)):
+							apps.append("%s"%os.path.join(self.userRunoapps,f))
 		else:
 			self.menu.set_desktop_system()
 			applist=self.menu.get_apps_from_category(category)
@@ -591,14 +592,15 @@ class appRun():
 	def get_category_apps(self,category):
 		apps={}
 		if category=="run-o-matic":
-				#			if os.path.isdir(self.runoapps):
-#				for f in os.listdir(self.runoapps):
-#					for key,value in self.get_desktop_app(f).items():
-#						apps[key]=value
-			if os.path.isdir(self.userRunoapps):
-				for f in os.listdir(self.userRunoapps):
-					for key,value in self.get_desktop_app("%s/%"%(self.userRunoapps,f)).items():
+			if os.path.isdir(self.runoapps):
+				for f in os.listdir(self.runoapps):
+					for key,value in self.get_desktop_app(f).items():
 						apps[key]=value
+			if self.level=="user":
+				if os.path.isdir(self.userRunoapps):
+					for f in os.listdir(self.userRunoapps):
+						for key,value in self.get_desktop_app("%s/%"%(self.userRunoapps,f)).items():
+							apps[key]=value
 		else:
 			applist=self.menu.get_apps_from_category(category)
 			for key,app in applist.items():
