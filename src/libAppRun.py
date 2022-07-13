@@ -163,6 +163,7 @@ class appRun():
 		self.threads_pid={}
 		self.threads_tmp={}
 		self.level='system'
+		self.trueLevel='system'
 		self.menu=App2Menu.app2menu()
 		self.main_wid=0
 		self.ratpoisonConf=''
@@ -429,10 +430,11 @@ class appRun():
 		data={}
 		data=self.config.getConfig('system',exclude=exclude)
 		level=data['system'].get('config','n4d')
+		self.trueLevel=level
 		if level=='user':
-			if os.path.isfile(os.path.join(os.environ['HOME'],".config",self.confFile)):
+			if os.path.isfile(os.path.join(os.environ['HOME'],".config","runomatic",self.confFile)):
 				data['system']['config']='user'
-			elif os.path.isfile("/usr/share/ruomatic/runomatic.conf"):
+			elif os.path.isfile("/usr/share/runomatic/runomatic.conf"):
 				self._debug("User config not available. Reading system config")
 				data['system']['config']='system'
 			else:
@@ -487,10 +489,9 @@ class appRun():
 			apps=default
 		categories=apps.get('categories',[])
 		runoapps={}
-		if 'run-o-matic' not in categories:
-			for runoapp in self.get_category_desktops("run-o-matic"):
-				runoapps[(os.path.basename(runoapp))]=runoapp
-		else:
+		for runoapp in self.get_category_desktops("run-o-matic"):
+			runoapps[(os.path.basename(runoapp))]=runoapp
+		if 'run-o-matic' in categories:
 			self._generate_runodesktops(data[level].get('runotar',""))
 
 		filteredApps=self._filter_category_apps(apps['categories'],apps['desktops'],apps['banned'],apps['hidden'],runoapps)
@@ -510,6 +511,7 @@ class appRun():
 	#def get_apps
 
 	def _generate_runodesktops(self,runotar):
+		return
 		deskPath="%s/.config/runomatic/applications/"%(os.environ['HOME'])
 		self._debug("Generating runodesktops")
 		if not os.path.isdir(deskPath):
@@ -573,7 +575,7 @@ class appRun():
 				for f in os.listdir(self.runoapps):
 					if f not in apps and os.path.isfile("%s"%os.path.join(self.runoapps,f)):
 						apps.append("%s"%os.path.join(self.runoapps,f))
-			if self.level=="user":
+			if self.level=="user" or self.trueLevel=="user":
 				if os.path.isdir(self.userRunoapps):
 					for f in os.listdir(self.userRunoapps):
 						if f not in apps and os.path.isfile("%s"%os.path.join(self.userRunoapps,f)):
@@ -591,12 +593,13 @@ class appRun():
 
 	def get_category_apps(self,category):
 		apps={}
+		self._debug(category)
 		if category=="run-o-matic":
 			if os.path.isdir(self.runoapps):
 				for f in os.listdir(self.runoapps):
 					for key,value in self.get_desktop_app(f).items():
 						apps[key]=value
-			if self.level=="user":
+			if self.trueLevel=="user" or self.level=='user':
 				if os.path.isdir(self.userRunoapps):
 					for f in os.listdir(self.userRunoapps):
 						for key,value in self.get_desktop_app("%s/%"%(self.userRunoapps,f)).items():

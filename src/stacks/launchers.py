@@ -206,6 +206,15 @@ class launchers(confStack):
 		desktop['Exec']=txt
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
+
+		if self.level=="user":
+			self.menu.desktoppath="{}/.config/runomatic/applications".format(os.environ.get('HOME'))
+			if not os.path.isdir(self.menu.desktoppath):
+				try:
+					os.makedirs(self.menu.desktoppath)
+				except:
+					print("Failed to create path %s"%self.menu.desktoppath)
+
 		if self.filename:
 			filename=os.path.join(self.menu.desktoppath,"%s"%self.filename)
 		else:
@@ -214,13 +223,17 @@ class launchers(confStack):
 		self._debug("Saving %s"%desktop)
 		self.changes=False
 		try:
-			subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
+			if self.level=="user":
+				subprocess.check_call(["/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
+			else:
+				subprocess.check_call(["pkexec","/usr/share/app2menu/app2menu-helper.py",desktop['Name'],desktop['Icon'],desktop['Comment'],desktop['Categories'],desktop['Exec'],filename])
 		except Exception as e:
 			print("Error saving desktop %s"%filename)
 			self._debug("Error  saving %s: %s"%(filename,e))
 		#Copy newd desktop to userRunoapps
 		runoName="%s/%s"%(self.userRunoapps,os.path.basename(filename))
-		shutil.copy(filename,runoName)
+		if filename!=runoName:
+			shutil.copy(filename,runoName)
 
 		#Save all runomatic desktops as base64
 		#self._tar_runodesktops()
