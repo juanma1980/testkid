@@ -178,7 +178,7 @@ class appRun():
 		self.bg=bg
 
 	def __init__config(self):
-		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config'%os.environ['HOME']})
+		self.config.set_baseDirs({'system':'/usr/share/runomatic','user':'%s/.config/runomatic'%os.environ['HOME']})
 		self.config.set_configFile(self.confFile)
 	#def __init__config
 
@@ -459,6 +459,7 @@ class appRun():
 		apps={'categories':[],'desktops':[],'hidden':[],'banned':[]}
 		default={'categories':['run-o-matic'],'desktops':[],'hidden':[],'banned':[]}
 		
+		self.config.level=self.level
 		if categories:
 			apps['categories']=categories
 

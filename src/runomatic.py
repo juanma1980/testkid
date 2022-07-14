@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import getpass
 import sys
-import os
+import os,shutil
 from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QShortcut,\
 				QStackedWidget,QGridLayout,QTabBar,QTabWidget,QHBoxLayout,QFormLayout,QLineEdit,QComboBox,\
 				QStatusBar,QFileDialog,QDialog,QScrollBar,QScrollArea,QCheckBox,QTableWidget,\
@@ -161,6 +161,13 @@ class runomatic(QWidget):
 		signal.signal(signal.SIGUSR2,self._fail_process)
 		self.runoapps="/usr/share/runomatic/applications"
 		self.userRunoapps="{}/.config/runomatic/applications".format(os.environ.get('HOME'))
+		oldUser="{}/.config/runomatic.conf".format(os.environ.get('HOME'))
+		if os.path.isfile(oldUser):
+			newUser="{}/.config/runomatic/runomatic.conf".format(os.environ.get('HOME'))
+			if os.path.isdir(os.path.dirname(newUser))==False:
+				os.makedirs(os.path.dirname(newUser))
+			if os.path.isfile(newUser)==False:
+				shutil.move(oldUser,newUser)
 		self.launched=[]
 		self.blocked=[]
 		self.procMon=[]
