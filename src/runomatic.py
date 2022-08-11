@@ -307,8 +307,9 @@ class runomatic(QWidget):
 		self.closeIcon=QtGui.QIcon.fromTheme("window-close")
 		self.grab=False
 		self.setStyleSheet(self._define_css())
-		monitor=QDesktopWidget().screenGeometry(1)
-		self.move(monitor.left(),monitor.top())
+		#monitor=QDesktopWidget().screenGeometry(1)
+		screenGeometry=app.screens()[0].geometry()
+		self.move(screenGeometry.left(),screenGeometry.top())
 		cursor=QtGui.QCursor(Qt.PointingHandCursor)
 		self.setCursor(cursor)
 		self.showFullScreen()
@@ -633,11 +634,16 @@ class runomatic(QWidget):
 		scrollArea.setFocusPolicy(Qt.NoFocus)
 		tabContent=QWidget()
 		vbox=QGridLayout()
-		scr=app.primaryScreen()
-		w=scr.size().width()-BTN_SIZE
-		h=scr.size().height()-(2*BTN_SIZE)
-		self.maxCol=int(w/BTN_SIZE)-3
-		self._debug("Size: %s\nCols: %s"%(self.width(),self.maxCol))
+		#scr=app.primaryScreen()
+		screenGeometry=app.screens()[0]
+		screenSize=screenGeometry.geometry()
+		w=screenSize.width()#-BTN_SIZE
+		h=screenSize.height()-(2*BTN_SIZE)
+		self.maxCol=int(w/BTN_SIZE)-2
+		self._debug("PrimarySize: {}".format(screenSize))
+		self._debug("ComponentsSize: {}x{}".format(screenSize.width(),screenSize.height()))
+		self._debug("CalculatedSize: {}x{}".format(w,h))
+		self._debug("Size: {0}\nCols: {1}".format(self.width(),self.maxCol))
 		for desktop in self.desktops:
 			apps=self._get_desktop_apps(desktop)
 			self._add_widgets(vbox,apps)
