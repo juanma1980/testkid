@@ -1,3 +1,10 @@
+runomatic (1.3) lliurex22; urgency=medium
+
+  * Always use primary screen
+  * Fix columns for resolutions>=1360
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Aug 2022 11:10:27 +0200
+
 runomatic (1.2.2) lliurex22; urgency=medium
 
   * Always load system runoapps
