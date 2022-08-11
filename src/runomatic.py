@@ -639,8 +639,18 @@ class runomatic(QWidget):
 		screenSize=screenGeometry.geometry()
 		w=screenSize.width()#-BTN_SIZE
 		h=screenSize.height()-(2*BTN_SIZE)
-		self.maxCol=int(w/BTN_SIZE)-2
+		self.maxCol=1
+		neededSpace=0
+		while (neededSpace)<int(w-((BTN_SIZE*2)+1)):
+			neededSpace+=BTN_SIZE
+			self.maxCol+=1
+		self.maxCol-=1
+		if self.maxCol*BTN_SIZE>=neededSpace:
+			self.maxCol-=1
+
+		#self.maxCol=int(w/BTN_SIZE)-2
 		self._debug("PrimarySize: {}".format(screenSize))
+		self._debug("NeededSpace: {}".format(neededSpace))
 		self._debug("ComponentsSize: {}x{}".format(screenSize.width(),screenSize.height()))
 		self._debug("CalculatedSize: {}x{}".format(w,h))
 		self._debug("Size: {0}\nCols: {1}".format(self.width(),self.maxCol))
