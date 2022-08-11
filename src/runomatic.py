@@ -645,7 +645,8 @@ class runomatic(QWidget):
 			neededSpace+=BTN_SIZE
 			self.maxCol+=1
 		self.maxCol-=1
-		if self.maxCol*BTN_SIZE>=neededSpace:
+		#On resolutions higher than 1024 there's room for up to -2 columns
+		if ((self.maxCol*BTN_SIZE>=neededSpace) and (w>1024)):
 			self.maxCol-=1
 
 		#self.maxCol=int(w/BTN_SIZE)-2
