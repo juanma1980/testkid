@@ -645,15 +645,15 @@ class runomatic(QWidget):
 			neededSpace+=BTN_SIZE
 			self.maxCol+=1
 		self.maxCol-=1
-		#On resolutions higher than 1024 there's room for up to -2 columns
-		if ((self.maxCol*BTN_SIZE>=neededSpace) and (w>1024)):
+		#Avoid horizontal scroll on resolutions>=1360
+		if ((self.maxCol*BTN_SIZE>=neededSpace) and (w>=1360)):
 			self.maxCol-=1
 
 		#self.maxCol=int(w/BTN_SIZE)-2
 		self._debug("PrimarySize: {}".format(screenSize))
-		self._debug("NeededSpace: {}".format(neededSpace))
 		self._debug("ComponentsSize: {}x{}".format(screenSize.width(),screenSize.height()))
 		self._debug("CalculatedSize: {}x{}".format(w,h))
+		self._debug("NeededSpace: {}".format(neededSpace))
 		self._debug("Size: {0}\nCols: {1}".format(self.width(),self.maxCol))
 		for desktop in self.desktops:
 			apps=self._get_desktop_apps(desktop)
