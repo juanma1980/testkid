@@ -12,7 +12,7 @@ _ = gettext.gettext
 
 class behaviour(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confApp Load")
 		self.description=(_("App behaviour"))
 		self.menu_description=(_("Set app behaviour"))
@@ -114,6 +114,7 @@ class behaviour(confStack):
 	def updateScreen(self):
 			#		config=self.getConfig(exclude=['background64'])
 		config=self.getConfig()
+		self.force_change=False
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -150,10 +151,9 @@ class behaviour(confStack):
 				config[self.level]['background']=bg
 			icon=QtGui.QIcon(bg)
 			self.btn_img.setIcon(icon)
-
 	#def _udpate_screen
 
-	def _setBg(self):
+	def _setBgDlg(self):
 		self._debug("Changing background")
 		fdia=QFileDialog()
 		fchoosed=''
@@ -168,7 +168,14 @@ class behaviour(confStack):
 			self.bg=fdia.selectedFiles()[0]
 			icn=QtGui.QIcon(self.bg)
 			self.btn_img.setIcon(icn)
-			return(fchoosed)
+		return(fchoosed)
+	#def _setBg(self)
+
+	def _setBg(self):
+		if self._setBgDlg()!='':
+			print("Enabling controls...")
+			self.force_change=True
+			self.setChanged(True)
 	#def _setBg(self)
 	
 	def writeConfig(self):
