@@ -12,7 +12,7 @@ _ = gettext.gettext
 
 class behaviour(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confApp Load")
 		self.description=(_("App behaviour"))
 		self.menu_description=(_("Set app behaviour"))
@@ -114,6 +114,7 @@ class behaviour(confStack):
 	def updateScreen(self):
 			#		config=self.getConfig(exclude=['background64'])
 		config=self.getConfig()
+		self.force_change=False
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -150,10 +151,9 @@ class behaviour(confStack):
 				config[self.level]['background']=bg
 			icon=QtGui.QIcon(bg)
 			self.btn_img.setIcon(icon)
-
 	#def _udpate_screen
 
-	def _setBg(self):
+	def _setBgDlg(self):
 		self._debug("Changing background")
 		fdia=QFileDialog()
 		fchoosed=''
@@ -168,8 +168,35 @@ class behaviour(confStack):
 			self.bg=fdia.selectedFiles()[0]
 			icn=QtGui.QIcon(self.bg)
 			self.btn_img.setIcon(icn)
-			return(fchoosed)
+		return(fchoosed)
 	#def _setBg(self)
+
+	def _setBg(self):
+		if self._setBgDlg()!='':
+			print("Enabling controls...")
+			self.force_change=True
+			self.setChanged(True)
+	#def _setBg(self)
+
+	def _setAutostart(self,enable):
+		desktopFile="runomatic.desktop"
+		desktopSystemPath="/usr/share/applications"
+		desktopUserPath=os.path.join(os.environ.get('HOME'),".config/autostart")
+		if enable==True:
+			desktopPath=os.path.join(desktopSystemPath,desktopFile)
+			if os.path.isfile(desktopPath):
+				with open (desktopPath,'r') as f:
+					flines=f.readlines()
+				desktopPath=os.path.join(desktopUserPath,desktopFile)
+				if os.path.isdir(desktopUserPath)==False:
+					os.makedirs(desktopUserPath)
+				with open (desktopPath,'w') as f:
+					f.writelines(flines)
+		else:
+			desktopPath=os.path.join(desktopUserPath,desktopFile)
+			if os.path.isfile(desktopPath):
+				os.remove(desktopPath)
+	#def _setAutostart(self,enable):
 	
 	def writeConfig(self):
 		level=self.level
@@ -192,6 +219,7 @@ class behaviour(confStack):
 			else:
 				return()
 		startup=self.chk_startup.isChecked()
+		self._setAutostart(startup)
 		self.saveChanges('startup',startup)
 		close=self.chk_close.isChecked()
 		self.saveChanges('close',close)
