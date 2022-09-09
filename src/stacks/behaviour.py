@@ -177,6 +177,26 @@ class behaviour(confStack):
 			self.force_change=True
 			self.setChanged(True)
 	#def _setBg(self)
+
+	def _setAutostart(self,enable):
+		desktopFile="runomatic.desktop"
+		desktopSystemPath="/usr/share/applications"
+		desktopUserPath=os.path.join(os.environ.get('HOME'),".config/autostart")
+		if enable==True:
+			desktopPath=os.path.join(desktopSystemPath,desktopFile)
+			if os.path.isfile(desktopPath):
+				with open (desktopPath,'r') as f:
+					flines=f.readlines()
+				desktopPath=os.path.join(desktopUserPath,desktopFile)
+				if os.path.isdir(desktopUserPath)==False:
+					os.makedirs(desktopUserPath)
+				with open (desktopPath,'w') as f:
+					f.writelines(flines)
+		else:
+			desktopPath=os.path.join(desktopUserPath,desktopFile)
+			if os.path.isfile(desktopPath):
+				os.remove(desktopPath)
+	#def _setAutostart(self,enable):
 	
 	def writeConfig(self):
 		level=self.level
@@ -199,6 +219,7 @@ class behaviour(confStack):
 			else:
 				return()
 		startup=self.chk_startup.isChecked()
+		self._setAutostart(startup)
 		self.saveChanges('startup',startup)
 		close=self.chk_close.isChecked()
 		self.saveChanges('close',close)
