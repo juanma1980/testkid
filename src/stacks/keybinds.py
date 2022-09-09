@@ -71,6 +71,7 @@ class keybinds(confStack):
 	#def _load_screen
 
 	def updateScreen(self):
+		self.force_change=False
 		config=self.getConfig()
 		self.keytext=''
 		if config:
@@ -84,6 +85,7 @@ class keybinds(confStack):
 		sw_mod=False
 		keypressed=[]
 		if (event.type()==QEvent.KeyPress):
+			self.force_change=True
 			for modifier,text in self.modmap.items():
 				if event.modifiers() & modifier:
 					sw_mod=True
@@ -97,7 +99,6 @@ class keybinds(confStack):
 				self.keybind_signal.emit("+".join(keypressed))
 		if (event.type()==QEvent.KeyRelease):
 			self.releaseKeyboard()
-
 		return False
 	#def eventFilter
 
