@@ -278,7 +278,7 @@ class runomatic(QWidget):
 		self.password=data.get('password')
 		self.close_on_exit=data.get('close',False)
 		self.bg=data.get('background',self.defaultBg)
-		if (not(os.path.isfile(self.bg))):
+		if os.path.isfile(self.bg)==False:
 			self.bg=self.defaultBg
 		self.runner.setBg(self.bg)
 	#def _read_config(self):
@@ -289,7 +289,8 @@ class runomatic(QWidget):
 		self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowModality(Qt.WindowModal)
-		self.bg="/usr/share/runomatic/rsrc/background2.png"
+		if os.path.isfile(self.bg)==False:
+			self.bg="/usr/share/runomatic/rsrc/background2.png"
 		self.previousIcon=QtGui.QIcon.fromTheme("go-previous")
 		self.previousIcon=QtGui.QIcon.fromTheme("go-home")
 		btnPrevious=QPushButton()
