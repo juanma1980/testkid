@@ -12,7 +12,7 @@ _ = gettext.gettext
 
 class behaviour(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confApp Load")
 		self.description=(_("App behaviour"))
 		self.menu_description=(_("Set app behaviour"))

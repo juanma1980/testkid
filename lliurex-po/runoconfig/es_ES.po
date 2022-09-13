@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 20:31+0100\n"
-"PO-Revision-Date: 2022-02-11 20:33+0100\n"
+"POT-Creation-Date: 2022-09-13 15:24+0200\n"
+"PO-Revision-Date: 2022-09-13 15:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -71,34 +71,42 @@ msgid "Close session when application exits"
 msgstr "Cerrar sesión al salir de la aplicación"
 
 #: ../src/stacks/behaviour.py:60
+msgid ""
+"For session closing it's mandatory a keybind for launch configuration within "
+"run-o-matic"
+msgstr ""
+"Para poder cerrar la sesión es obligatorio configurar un acceso directo para "
+"lanzar el configurador desde el propio run-o-matic"
+
+#: ../src/stacks/behaviour.py:64
 msgid "Choose the background image"
 msgstr "Selecciona la imagen para el fondo"
 
-#: ../src/stacks/behaviour.py:165
+#: ../src/stacks/behaviour.py:187
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr "imagenes(*.png *.svg *jpg *bmp)"
 
-#: ../src/stacks/keybinds.py:29
+#: ../src/stacks/keybinds.py:18
 msgid "Keybind for launching configuration from Run-O-Matic"
 msgstr "Atajo para lanzar la configuración desde Run-O-Matic"
 
-#: ../src/stacks/keybinds.py:30
+#: ../src/stacks/keybinds.py:19
 msgid "Modify keybindings"
 msgstr "Modificar atajos"
 
-#: ../src/stacks/keybinds.py:32
+#: ../src/stacks/keybinds.py:21
 msgid "From here you can modify the keybinding"
 msgstr "Desde aquí se pueden modificar los atajos de teclado"
 
-#: ../src/stacks/keybinds.py:54
+#: ../src/stacks/keybinds.py:31
 msgid "From here you can define the keybindings"
 msgstr "Desde aquí se pueden definir los atajos de teclado"
 
-#: ../src/stacks/keybinds.py:56
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr "Tecla para acceder a la configuración de runomatic"
 
-#: ../src/stacks/keybinds.py:57
+#: ../src/stacks/keybinds.py:34
 msgid "Press a key"
 msgstr "Pulsa una tecla"
 

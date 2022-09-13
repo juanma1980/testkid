@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 20:31+0100\n"
+"POT-Creation-Date: 2022-09-13 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,34 +70,40 @@ msgid "Close session when application exits"
 msgstr ""
 
 #: ../src/stacks/behaviour.py:60
+msgid ""
+"For session closing it's mandatory a keybind for launch configuration within "
+"run-o-matic"
+msgstr ""
+
+#: ../src/stacks/behaviour.py:64
 msgid "Choose the background image"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:165
+#: ../src/stacks/behaviour.py:187
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:29
+#: ../src/stacks/keybinds.py:18
 msgid "Keybind for launching configuration from Run-O-Matic"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:30
+#: ../src/stacks/keybinds.py:19
 msgid "Modify keybindings"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:32
+#: ../src/stacks/keybinds.py:21
 msgid "From here you can modify the keybinding"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:54
+#: ../src/stacks/keybinds.py:31
 msgid "From here you can define the keybindings"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:56
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:57
+#: ../src/stacks/keybinds.py:34
 msgid "Press a key"
 msgstr ""
 

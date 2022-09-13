@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 20:31+0100\n"
-"PO-Revision-Date: 2022-02-11 20:35+0100\n"
+"POT-Creation-Date: 2022-09-13 15:24+0200\n"
+"PO-Revision-Date: 2022-09-13 15:26+0200\n"
 "Last-Translator: empar <montoro_mde@gva.es>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -74,34 +74,42 @@ msgid "Close session when application exits"
 msgstr "Tanca la sessió en eixir de l'aplicació"
 
 #: ../src/stacks/behaviour.py:60
+msgid ""
+"For session closing it's mandatory a keybind for launch configuration within "
+"run-o-matic"
+msgstr ""
+"Per a tancar la sessió es obligatori configurar una drecera per a executar "
+"el configurador desde el propi run-o-matic"
+
+#: ../src/stacks/behaviour.py:64
 msgid "Choose the background image"
 msgstr "Seleccioneu la imatge de fons"
 
-#: ../src/stacks/behaviour.py:165
+#: ../src/stacks/behaviour.py:187
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr "imatges(*.png *.svg *jpg *bmp)"
 
-#: ../src/stacks/keybinds.py:29
+#: ../src/stacks/keybinds.py:18
 msgid "Keybind for launching configuration from Run-O-Matic"
 msgstr "Drecera per a llançar la configuració des de Run-O-Matic"
 
-#: ../src/stacks/keybinds.py:30
+#: ../src/stacks/keybinds.py:19
 msgid "Modify keybindings"
 msgstr "Modifica les vinculacions de tecles"
 
-#: ../src/stacks/keybinds.py:32
+#: ../src/stacks/keybinds.py:21
 msgid "From here you can modify the keybinding"
 msgstr "Des d'ací podeu modificar les vinculacions de tecles"
 
-#: ../src/stacks/keybinds.py:54
+#: ../src/stacks/keybinds.py:31
 msgid "From here you can define the keybindings"
 msgstr "Des d'ací podeu definir les vinculacions de tecles"
 
-#: ../src/stacks/keybinds.py:56
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr "Tecla per a llançar la configuració de run-o-matic"
 
-#: ../src/stacks/keybinds.py:57
+#: ../src/stacks/keybinds.py:34
 msgid "Press a key"
 msgstr "Premeu una tecla"
 
