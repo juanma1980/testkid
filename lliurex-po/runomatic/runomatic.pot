@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 20:31+0100\n"
+"POT-Creation-Date: 2022-09-13 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,33 +17,82 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/runomatic.py:291
-#, python-format
-msgid "runoconfig not found at %s"
+#: ../src/runomatic.py:42 ../src/runomatic.py:52
+msgid "Empty"
 msgstr ""
 
-#: ../src/runomatic.py:293 ../src/runomatic.py:380
-msgid "runoconfig not found"
-msgstr ""
-
-#: ../src/runomatic.py:314
+#: ../src/runomatic.py:347
 msgid ""
 "There's no launchers to show.\n"
 "Did you run the configure app?"
 msgstr ""
 
-#: ../src/runomatic.py:316
+#: ../src/runomatic.py:350
 msgid "Launch configuration app"
 msgstr ""
 
-#: ../src/runomatic.py:324
+#: ../src/runomatic.py:354
+msgid "Or you can set directly a template from the menu"
+msgstr ""
+
+#: ../src/runomatic.py:368
+msgid "Set apps from selected templates"
+msgstr ""
+
+#: ../src/runomatic.py:372
+msgid ""
+"Remember that run-o-matic will block the desktop. The only way for close run-"
+"o-matic is with Alt+F4"
+msgstr ""
+
+#: ../src/runomatic.py:386
+msgid "Error launching config"
+msgstr ""
+
+#: ../src/runomatic.py:387
+#, python-brace-format
+msgid "{0}: {1}"
+msgstr ""
+
+#: ../src/runomatic.py:391
+#, python-format
+msgid "runoconfig not found at %s"
+msgstr ""
+
+#: ../src/runomatic.py:409
+msgid "The next categories will be added"
+msgstr ""
+
+#: ../src/runomatic.py:415
+msgid ""
+"On apply Run-O-Matic will be launched with the apps from choosed categories."
+"<br>For fine tuning it's recommended to launch Run-O-Config."
+msgstr ""
+
+#: ../src/runomatic.py:418
+msgid "Apply"
+msgstr ""
+
+#: ../src/runomatic.py:421
+msgid "Cancel"
+msgstr ""
+
+#: ../src/runomatic.py:424
+msgid "Launch Run-O-Config"
+msgstr ""
+
+#: ../src/runomatic.py:439
 msgid "Insert the password"
 msgstr ""
 
-#: ../src/runomatic.py:326
+#: ../src/runomatic.py:441
 msgid "Insert the password. Current session will also be closed."
 msgstr ""
 
-#: ../src/runomatic.py:327
+#: ../src/runomatic.py:442
 msgid "Confirm close"
+msgstr ""
+
+#: ../src/runomatic.py:495
+msgid "runoconfig not found"
 msgstr ""
