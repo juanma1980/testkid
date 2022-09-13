@@ -54,9 +54,13 @@ class behaviour(confStack):
 		box.addWidget(wdg_level,1,Qt.AlignLeft)
 		box.addWidget(QLabel(_("Session settings")),1,Qt.AlignTop)
 		self.chk_startup=QCheckBox(_("Launch at startup"))
-		box.addWidget(self.chk_startup,1,Qt.AlignTop)
+		box.addWidget(self.chk_startup,1)
 		self.chk_close=QCheckBox(_("Close session when application exits"))
-		box.addWidget(self.chk_close,2,Qt.AlignTop)
+		box.addWidget(self.chk_close,2)
+		self.lbl_warning=QLabel(_("For session closing it's mandatory a keybind for launch configuration within run-o-matic"))
+		box.addWidget(self.lbl_warning,3,Qt.AlignTop)
+		self.lbl_warning.setVisible(False)
+		self.lbl_warning.setEnabled(False)
 		lbl_img=QLabel(_("Choose the background image"))
 		box.addWidget(lbl_img,Qt.AlignTop)
 		icn=QtGui.QIcon(self.bg)
@@ -68,7 +72,7 @@ class behaviour(confStack):
 		box.addWidget(self.btn_img,Qt.AlignTop)
 		self.setLayout(box)
 		_change_osh()
-		self.updateScreen()
+		#self.updateScreen()
 		return(self)
 	#def _load_screen
 
@@ -82,6 +86,15 @@ class behaviour(confStack):
 		elif idx==2:
 			level='n4d'
 		config=self.getConfig(level)
+		#Block close session if there's no keybind for config
+		keybind=config[level].get('keybinds',{}).get('conf','')
+		if keybind.strip()=="":
+			self.chk_close.setEnabled(False)
+			self.lbl_warning.setVisible(True)
+		else:
+			self.chk_close.setEnabled(True)
+			self.lbl_warning.setVisible(False)
+		#Set state
 		close=False
 		if level in config.keys():
 			close=config[level].get('close',False)
@@ -112,9 +125,9 @@ class behaviour(confStack):
 	#def fakeUpdate
 
 	def updateScreen(self):
-			#		config=self.getConfig(exclude=['background64'])
+		self.refresh=True
+		self.changes=True
 		config=self.getConfig()
-		self.force_change=False
 		if self.level:
 			idx=0
 			if self.level.lower()=='system':
@@ -123,6 +136,15 @@ class behaviour(confStack):
 				idx=2
 			self.cmb_level.setCurrentIndex(idx)
 			self.cmb_level.activated.emit(idx)
+		#Block close session if there's no keybind for config
+		keybind=config[self.level].get('keybinds',{}).get('conf','')
+		if keybind.strip()=="":
+			self.chk_close.setEnabled(False)
+			self.lbl_warning.setVisible(True)
+		else:
+			self.chk_close.setEnabled(True)
+			self.lbl_warning.setVisible(False)
+		#Set state
 		close=config[self.level].get('close',False)
 		if close:
 			if str(close).lower()=='true':
@@ -173,8 +195,6 @@ class behaviour(confStack):
 
 	def _setBg(self):
 		if self._setBgDlg()!='':
-			print("Enabling controls...")
-			self.force_change=True
 			self.setChanged(True)
 	#def _setBg(self)
 
