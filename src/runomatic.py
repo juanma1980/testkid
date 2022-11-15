@@ -266,8 +266,6 @@ class runomatic(QWidget):
 		self.sigmap_tabRemove=QSignalMapper(self)
 		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
 		#Shortcut for super_keys
-
-
 	#def _set_keymapping
 
 	def _read_config(self):
@@ -460,6 +458,7 @@ class runomatic(QWidget):
 					xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
 					if os.path.isfile(xlockFile):
 						os.remove(xlockFile)
+		os.environ['DISPLAY']=":0"
 		if str(self.close_on_exit).lower()=='true':
 			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
@@ -742,7 +741,10 @@ class runomatic(QWidget):
 		dsp=self.tab_id[index].get('display',None)
 		self.focusWidgets[self.appsWidgets.index(self.tab_id[index]['app'])].statusBar.hide()
 		if dsp:
-			self.runner.stop_display(self.tab_id[index].get('wid',''),dsp)
+			wid=self.tab_id[index].get('wid','')
+			if isinstance(wid,appZone):
+				wid=wid.wid.strip()
+			self.runner.stop_display(wid,dsp)
 			xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
 			if os.path.isfile(xlockFile):
 				os.remove(xlockFile)
@@ -841,7 +843,7 @@ class runomatic(QWidget):
 			self.currentBtn=btn
 
 		os.environ["HOME"]="/home/%s"%self.username
-		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+		#os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
 		if self._launchZone(app):
 			self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)
