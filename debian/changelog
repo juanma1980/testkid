@@ -1,5 +1,6 @@
-runomatic (1.3.2) lliurex22; urgency=medium
+runomatic (1.3.3) lliurex22; urgency=medium
 
+  * Disconnect from dbus session
   * Always use primary screen
   * Fix columns for resolutions>=1360
   * Minor fixes
