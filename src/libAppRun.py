@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import getpass
 import sys
-import os
+import os,stat
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
 import subprocess
 import base64
@@ -84,7 +84,7 @@ class th_runApp(QThread):
 		p_pid=''
 		tmp_file=""
 		self._debug("Launching thread...")
-		env=os.environ.copy()
+		env=os.environ
 		env['DISPLAY']=self.display
 		if not os.path.isdir(NOLAUNCH):
 			try:
@@ -120,7 +120,7 @@ class th_runApp(QThread):
 				if '%f' in app.lower():
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
-			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=False,env=env)
+			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=True,env=env)
 			#If process launch a child, get the child's pid
 			if 'firefox' not in self.app:
 				parent=psutil.Process(self.pid.pid)
@@ -234,13 +234,19 @@ class appRun():
 				"-fullscreen",
 				"%s"%display]
 
+				#Create fake xstartup for tigervnc so dbus don't interfere with real session
+				runovncstartup="/tmp/.runovncstartup"
+				with open(runovncstartup,"w") as f:
+					f.write("#!/bin/sh\n")
+					f.write("unset DBUS_SESSION_BUS_ADDRESS\n")
+				os.chmod(runovncstartup, stat.S_IXUSR | stat.S_IRUSR| stat.S_IWUSR | stat.S_IRGRP |stat.S_IROTH | stat.S_IROTH)
 				
 				#vnc_cmd=["Xtightvnc",
 				vnc_cmd=["tigervncserver",
-				"%s"%display,
+				"{}".format(display),
 				"-localhost",
 				"-name",
-				"\"Xephyr on %s\""%display,
+				"\"Xephyr on {}\"".format(display),
 				"-geometry",
 				"800x600",
 				#"%sx%s"%(qwidget.width()-10,qwidget.height()-(self.topBarHeight+30)),
@@ -249,7 +255,8 @@ class appRun():
 				"yes",
 				"-SecurityTypes",
 				"None",
-				"-autokill"]
+				"-xstartup",
+				"{}".format(runovncstartup)]
 				#print("Launch %s"%vnc_cmd)
 				#Set environment to prevent autostart
 				if not os.path.isdir(NOLAUNCH):
@@ -257,7 +264,7 @@ class appRun():
 						os.makedirs(NOLAUNCH)
 					except:
 						pass
-				fakeEnv=os.environ.copy()
+				fakeEnv=os.environ
 				fakeEnv['XDG_CONFIG_DIRS']=NOLAUNCH
 				subprocess.run(vnc_cmd,env=fakeEnv)
 
@@ -297,9 +304,9 @@ class appRun():
 	#def init_Xephyr
 
 	def _run_cmd_on_display(self,cmd=[],display=":13"):
-		env=os.environ.copy()
+		env=os.environ
 		env["HOME"]="/home/%s"%self.username
-		env["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+		#env["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		env['DISPLAY']=display
 		self._debug("Running cmd on %s"%display)
 		self._debug("CMD %s"%cmd)
@@ -311,19 +318,44 @@ class appRun():
 	def stop_display(self,wid,display):
 		#if not wid:
 		windoWid=subprocess.run(["xdotool","getwindowfocus"],stdout=subprocess.PIPE)
+		env=os.environ
+		env["HOME"]="/home/%s"%self.username
+		#env["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+		env['DISPLAY']=":0"
 		if (windoWid.stdout):
 			widTree=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
 			hexWid=""
 			for widWindow in widTree.stdout.decode().split("\n"):
+				print(widWindow)
 				if "Xephyr on %s"%display in widWindow:
 					wid=widWindow.split()[0]
 					break
 		if wid:
-			self._debug("CLOSING WINDOW %s"%wid)
-			a=subprocess.run(["xdotool", "windowclose" ,"%s"%wid])
+			self._debug("CLOSING WINDOW {}".format(wid))
+			try:
+				subprocess.run(["xdotool", "windowclose" ,"{}".format(wid)])
+			except:
+				pass
 		if display:
-			self._debug("KILLING DISPLAY %s"%display)
-			subprocess.run(["vncserver","--kill","%s"%display])
+			self._debug("KILLING DISPLAY {}".format(display))
+			try:
+				subprocess.run(["vncserver","--kill","{}".format(display)])
+			except:
+				print("ERROR KILLING VNC")
+				pass
+		self._killPidXephyr(display)
+	#def stop_display
+
+	def _killPidXephyr(self,display):
+		ps=list(psutil.process_iter())
+		count=0
+		for p in ps:
+			name=" ".join(p.cmdline())
+			if "Xephyr on {}".format(display) in name:
+				pid=p.pid
+				self._debug("Killing Xephyr {}".format(pid))
+				p.kill()
+
 
 	def send_signal_to_thread(self,s_signal,thread):
 		self._debug("Send signal: %s to %s"%(s_signal,thread))
