@@ -36,7 +36,7 @@ class launchers(confStack):
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
-		self.description=(_("Add custom launcher"))
+		self.description=(_("Add launcher (expert mode)"))
 		self.icon=('org.kde.plasma.quicklaunch')
 		self.tooltip=(_("From here you can add a custom launcher"))
 		self.defaultName=""
