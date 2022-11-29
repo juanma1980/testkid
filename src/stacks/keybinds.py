@@ -30,6 +30,7 @@ class keybinds(confStack):
 		box=QGridLayout()
 		inp_conf=QLabel(_("Launch configuration"))
 		self.cmb_keys=QComboBox()
+		self.cmb_keys.addItem(" ")
 		for key in range(1,13):
 			self.cmb_keys.addItem("F{}".format(key))
 		self.cmb_keys.adjustSize()
