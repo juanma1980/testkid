@@ -30,10 +30,12 @@ class keybinds(confStack):
 		box=QGridLayout()
 		inp_conf=QLabel(_("Launch configuration"))
 		self.cmb_keys=QComboBox()
+		self.cmb_keys.addItem(" ")
 		for key in range(1,13):
 			self.cmb_keys.addItem("F{}".format(key))
 		self.cmb_keys.adjustSize()
 		self.lbl_info=QLabel(_("Select a F key for launch runoconfig from runomatic"))
+		self.lbl_info.setWordWrap(True)
 		box.addWidget(self.lbl_info,1,0,1,1,Qt.Alignment(-1))
 		box.addWidget(self.cmb_keys,1,1,1,1,Qt.Alignment(1))
 		self.setLayout(box)

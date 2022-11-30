@@ -52,8 +52,9 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		newProfile=tempfile.mkdtemp()
-		self.app=["firefox","--kiosk","-profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		#newProfile=tempfile.mkdtemp()
+		#self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		self.app=["firefox","--kiosk","--private-window","--no-remote",self.app[-1]]
 		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
 		#css_content=[
@@ -104,6 +105,7 @@ class th_runApp(QThread):
 #				self.app.append("--fullscreen")
 			elif 'firefox' in self.app:
 				self._run_firefox()
+				print("FIREFOX: {}".format(self.app))
 			elif (('chromium' in self.app) or ('chrome' in self.app)):
 				self._run_chromium()
 			elif 'loffice' in self.app:
@@ -120,7 +122,11 @@ class th_runApp(QThread):
 				if '%f' in app.lower():
 					app=app.replace("%f","")
 					self.app=app.replace("%F","").split(" ")
-			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=True,env=env)
+			shellExe=True
+			#Firefox breaks if shell=True
+			if "firefox" in self.app:
+				shellExe=False
+			self.pid=subprocess.Popen(self.app,stdin=None,stdout=None,stderr=None,shell=shellExe,env=env)
 			#If process launch a child, get the child's pid
 			if 'firefox' not in self.app:
 				parent=psutil.Process(self.pid.pid)

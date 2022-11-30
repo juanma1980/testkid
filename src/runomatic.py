@@ -376,15 +376,13 @@ class runomatic(QWidget):
 	def _launchConf(self):
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
-				self.hide()
-				cmd=["{}/runoconfig.py".format(self.baseDir),"1","2"]
+				cmd=["{}/runoconfig.py".format(self.baseDir)]
 				try:
 					subprocess.run(cmd)
 				except Exception as e:
 					msgErr=_("Error launching config")
 					print(_("{0}: {1}".format(msgErr,e)))
-				#os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
-				self.show()
+				os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
 		else:
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 	#def launchConf
@@ -420,7 +418,7 @@ class runomatic(QWidget):
 		btnCancel.clicked.connect(dlg.close)
 		lay.addWidget(btnCancel,3,1,1,1)
 		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._setTemplatesAndLaunch(categories))
+		btnConfig.clicked.connect(self._launchConf())
 		lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
@@ -428,9 +426,10 @@ class runomatic(QWidget):
 		self.runner.write_config(categories,key='categories')
 		os.execv("%s/runomatic.py"%self.baseDir,["1","2"])
 
-	def _setTemplatesAndLaunch(self,categories):
-		self.runner.write_config(categories,key='categories')
-		os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+#	def _setTemplatesAndLaunch(self,categories):
+#		self.runner.write_config(categories,key='categories')
+#		print("PASO")
+#		os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
 
 	def closeEvent(self,event):
 		if self.password:
@@ -487,7 +486,9 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
-						os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+						print("LANZO")
+						self._launchConf()
+						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
 				else:
 					event.ignore()

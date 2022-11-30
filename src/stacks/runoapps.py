@@ -349,7 +349,7 @@ class runoapps(confStack):
 		scrollArea.setWidget(self.tbl_app)
 		scrollArea.alignment()
 		scrollArea.setGeometry(QRect(0,0,self.width,self.height))
-		self.tbl_app.setFixedWidth((self.columns+int(self.columns*0.5)+1)*BTN_SIZE)
+		#self.tbl_app.setFixedWidth((self.columns+int(self.columns*0.5)+1)*BTN_SIZE)
 		box.addWidget(self.tbl_app)
 		self.setLayout(box)
 	#def load_screen
@@ -422,7 +422,6 @@ class runoapps(confStack):
 					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
 					btn_desktop.drop.connect(self._btn_dragDropEvent)
 					self._debug("Adding %s at %s %s"%(appName,row,col))
-					print(btn_desktop.menu())
 					self.tbl_app.setCellWidget(row,col,btn_desktop)
 					col+=1
 					if col>=self.columns:

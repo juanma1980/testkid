@@ -23,7 +23,7 @@ config.Show()
 #config.setFixedSize(config.width(),config.height())
 
 app.exec_()
-if len(sys.argv)>1:
-	if os.path.isfile("/usr/bin/runomatic"):
-		os.execv("/usr/bin/runomatic",["1"])
+#if len(sys.argv)>1:
+#	if os.path.isfile("/usr/bin/runomatic"):
+#		os.execv("/usr/bin/runomatic",["1"])
 
