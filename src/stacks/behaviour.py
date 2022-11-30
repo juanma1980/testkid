@@ -57,7 +57,7 @@ class behaviour(confStack):
 		box.addWidget(self.chk_startup,1)
 		self.chk_close=QCheckBox(_("Close session when application exits"))
 		box.addWidget(self.chk_close,2)
-		self.lbl_warning=QLabel(_("For session closing it's mandatory a keybind for launch configuration within run-o-matic"))
+		self.lbl_warning=QLabel(_("For session closing it's mandatory a keybind\nfor launch configuration within run-o-matic"))
 		box.addWidget(self.lbl_warning,3,Qt.AlignTop)
 		self.lbl_warning.setVisible(False)
 		self.lbl_warning.setEnabled(False)
