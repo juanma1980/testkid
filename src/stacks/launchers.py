@@ -10,6 +10,7 @@ from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLa
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QSignalMapper,QProcess,QEvent,QSize
 from app2menu import App2Menu
+from libAppRun import appRun
 from appconfig.appConfigStack import appConfigStack as confStack
 from urllib.request import Request,urlopen,urlretrieve
 from bs4 import BeautifulSoup
@@ -21,6 +22,7 @@ class launchers(confStack):
 	def __init_stack__(self):
 		self.dbg=False
 		self._debug("confDesktops Load")
+		self.runner=appRun()
 		self.menu=App2Menu.app2menu()
 		home=os.environ['HOME']
 #		self.menu.desktoppath="%s/.local/share/applications/"%home
@@ -36,7 +38,7 @@ class launchers(confStack):
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
-		self.description=(_("Add launcher (expert mode)"))
+		self.description=(_("Add url/path (expert mode)"))
 		self.icon=('org.kde.plasma.quicklaunch')
 		self.tooltip=(_("From here you can add a custom launcher"))
 		self.defaultName=""
@@ -244,6 +246,12 @@ class launchers(confStack):
 		retval=True
 		if self.editBtn:
 			self._reset_screen(filename)
+
+		apps=self.runner.get_apps(exclude=['background64'])
+		categories=apps['categories']
+		if "run-o-matic"  not in categories:
+			categories.insert(0,'run-o-matic')
+			self.saveChanges('categories',categories)
 	#def writeConfig
 
 	def _tar_runodesktops(self):
