@@ -1,4 +1,4 @@
-runomatic (1.3.6) lliurex22; urgency=medium
+runomatic (1.4) lliurex22; urgency=medium
 
   * Disconnect from dbus session
   * Always use primary screen
@@ -6,6 +6,7 @@ runomatic (1.3.6) lliurex22; urgency=medium
   * Minor fixes
   * Block close session if there's no keybind
   * Keybindings only for Fx keys
+  * Rework custom launchers stack
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Aug 2022 11:10:27 +0200
 
