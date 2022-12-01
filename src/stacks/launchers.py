@@ -18,9 +18,18 @@ import re
 import gettext
 _ = gettext.gettext
 
+
+i18n={"EXECUTABLE":_("Add executable"),
+	"EXEHOLDER":_("Executable path"),
+	"EXETOOLTIP":_("Insert the executable path"),
+	"URL":_("Add link"),
+	"URLTOOLTIP":_("Insert the url for the site"),
+	"URLHOLDER":_("https://example.com")
+}
+
 class launchers(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confDesktops Load")
 		self.runner=appRun()
 		self.menu=App2Menu.app2menu()
@@ -38,7 +47,7 @@ class launchers(confStack):
 		self.default_icon='shell'
 		self.app_icon='shell'
 		self.menu_description=(_("Add new launchers"))
-		self.description=(_("Add url/path (expert mode)"))
+		self.description=(_("Add url/executable"))
 		self.icon=('org.kde.plasma.quicklaunch')
 		self.tooltip=(_("From here you can add a custom launcher"))
 		self.defaultName=""
@@ -64,7 +73,6 @@ class launchers(confStack):
 		self.filename=""
 	#def initScreen
 
-
 	def _load_screen(self):
 		box=QGridLayout()
 		lbl_txt=QLabel(_("From here you can add Launchers"))
@@ -85,23 +93,31 @@ class launchers(confStack):
 		self.inp_name.setPlaceholderText(_("Desktop name"))
 		self.inp_name.setToolTip(_("Insert desktop name"))
 		box.addWidget(self.inp_name,2,0,1,2,Qt.AlignTop)
-		lbl_exec=QLabel(_("Executable: "))
-		box.addWidget(lbl_exec,3,0,1,2,Qt.AlignTop)
+		self.cmb_exec=QComboBox()
+		self.cmb_exec.addItem(i18n["URL"])
+		self.cmb_exec.addItem(i18n["EXECUTABLE"])
+		self.cmb_exec.currentIndexChanged.connect(self._setUrlExe)
+		box.addWidget(self.cmb_exec,3,0,1,2,Qt.AlignTop)
 		wdg=QWidget()
 		hbox=QHBoxLayout()
 		wdg.setLayout(hbox)
 		self.inp_exec=QLineEdit()
 		self.inp_exec.editingFinished.connect(self._get_icon)
-		self.inp_exec.setPlaceholderText(_("Executable path"))
-		self.inp_exec.setToolTip(_("Insert path to the executable"))
+		self.inp_exec.setPlaceholderText(i18n["URLHOLDER"])
+		self.inp_exec.setToolTip(i18n["URLTOOLTIP"])
 		self.inp_exec.setStyleSheet("margin:0px")
 		hbox.addWidget(self.inp_exec,Qt.Alignment(0))
-		btn_exec=QPushButton("...")
-		btn_exec.setObjectName("btnFile")
-		btn_exec.setToolTip(_("Press button to select an executable"))
-		btn_exec.clicked.connect(lambda:self._file_chooser(widget=self.inp_exec,path="/usr/bin"))
-		btn_exec.setStyleSheet("margin:0px")
-		hbox.addWidget(btn_exec)
+		self.cmb_browsers=QComboBox()
+		browsers=self._get_browsers()
+		self.cmb_browsers.addItems(browsers)
+		hbox.addWidget(self.cmb_browsers)
+		self.btn_exec=QPushButton("...")
+		self.btn_exec.setObjectName("btnFile")
+		self.btn_exec.setToolTip(_("Press button to select an executable"))
+		self.btn_exec.clicked.connect(lambda:self._file_chooser(widget=self.inp_exec,path="/usr/bin"))
+		self.btn_exec.setStyleSheet("margin:0px")
+		hbox.addWidget(self.btn_exec)
+		self.btn_exec.hide()
 		box.addWidget(wdg,4,0,2,1,Qt.AlignTop)
 		lbl_desc=QLabel(_("Description: "))
 		box.addWidget(lbl_desc,5,0,1,2,Qt.AlignBottom)
@@ -110,7 +126,37 @@ class launchers(confStack):
 		self.inp_desc.setToolTip(_("Insert a description for the app"))
 		box.addWidget(self.inp_desc,6,0,1,Qt.AlignTop)
 		self.setLayout(box)
+	#def _load_screen
+
+	def _setUrlExe(self):
+		if self.cmb_exec.currentText()==i18n["URL"]:
+			self.btn_exec.hide()
+			self.cmb_browsers.show()
+			self.inp_exec.setText("")
+			self.inp_exec.setPlaceholderText(i18n["URLHOLDER"])
+			self.inp_exec.setToolTip(i18n["URLTOOLTIP"])
+		else:
+			self.cmb_browsers.hide()
+			self.btn_exec.show()
+			self.inp_exec.setText("")
+			self.inp_exec.setPlaceholderText(i18n["EXEHOLDER"])
+			self.inp_exec.setToolTip(i18n["EXETOOLTIP"])
+		self.app_icon="shell"
+		icn_desktop=QtGui.QIcon.fromTheme("shell")
+		self.btn_icon.setIcon(icn_desktop)
+	#def _setUrlExe
 	
+	def _get_browsers(self):
+		browsers=[]
+		proc=subprocess.run(["update-alternatives","--list","x-www-browser"],text=True,capture_output=True)
+		browsers.append('firefox')
+		for browser in proc.stdout.split("\n"):
+			browser_name=os.path.basename(browser)
+			if browser_name and (browser_name not in browsers):
+				browsers.append(browser_name)
+		return(browsers)
+	#def _get_browsers
+
 	def _file_chooser(self,widget=None,path=None,imgDialog=None):
 		fdia=QFileDialog()
 		fchoosed=''
@@ -137,12 +183,16 @@ class launchers(confStack):
 	#def _file_chooser
 
 	def _get_icon(self):
+		if self.cmb_exec.currentText()!=i18n["URL"]:
+			return
 		txt=self.inp_exec.text()
-		if txt.startswith("http"):
-			txt="firefox %s"%txt
+		if txt.startswith("http")==False:
+			txt="https://{}".format(txt)
+
+		txt="{} {}".format(self.cmb_browsers.currentText(),txt)
 		exeLine=txt.split(' ')
 		self._debug("Analize {}".format(exeLine))
-		if 'firefox' not in exeLine and 'chromium' not in exeLine and 'chrome' not in exeLine :
+		if exeLine[0] not in self._get_browsers():
 			return
 		path=exeLine[-1]
 		path=path.split(" ")[0]
@@ -162,6 +212,7 @@ class launchers(confStack):
 			content=urlopen(req,timeout=2).read()
 			soup=BeautifulSoup(content,'html.parser')
 			favicon=soup.head
+			outputIco=""
 			for link in favicon.find_all(href=re.compile("favicon")):
 				fname=link
 				if "favicon" in str(fname):
@@ -175,17 +226,25 @@ class launchers(confStack):
 							try:
 								urlretrieve(ico,outputIco)
 							except:
-								return
+								outputIco=""
+								continue
+
 							self.app_icon=ico
 							icn=QtGui.QIcon(outputIco)
 							self.btn_icon.setIcon(icn)
 							break
+			if ico=="":
+				self.app_icon="shell"
+				icn_desktop=QtGui.QIcon.fromTheme("shell")
+				self.btn_icon.setIcon(icn_desktop)
 		except Exception as e:
+			self.app_icon="shell"
+			icn_desktop=QtGui.QIcon.fromTheme("shell")
+			self.btn_icon.setIcon(icn_desktop)
 			self._debug("Couldn't open %s: %s"%(req,e))
 		finally:
 			self._debug("Selected icon: {}".format(self.app_icon))
 	#def _get_icon
-
 
 	def updateScreen(self):
 		self.inp_name.setText(self.defaultName)
@@ -203,8 +262,10 @@ class launchers(confStack):
 		desktop['NoDisplay']='True'
 		desktop['Name']=self.inp_name.text()
 		txt=self.inp_exec.text()
-		if txt.startswith("http"):
-			txt="firefox %s"%txt
+		if self.cmb_exec.currentText()==i18n["URL"]:
+			if txt.startswith("http")==False:
+				txt="https://{}".format(txt)
+			txt="{} {}".format(self.cmb_browsers.currentText(),txt)
 		desktop['Exec']=txt
 		desktop['Icon']=self.app_icon
 		desktop['Comment']=self.inp_desc.text()
