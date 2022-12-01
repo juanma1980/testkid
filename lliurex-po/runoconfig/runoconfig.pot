@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 11:56+0100\n"
+"POT-Creation-Date: 2022-12-01 12:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,11 +75,11 @@ msgid ""
 "run-o-matic"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:64
+#: ../src/stacks/behaviour.py:65
 msgid "Choose the background image"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:187
+#: ../src/stacks/behaviour.py:188
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr ""
 
@@ -99,79 +99,91 @@ msgstr ""
 msgid "Launch configuration"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:35
+#: ../src/stacks/keybinds.py:37
 msgid "Select a F key for launch runoconfig from runomatic"
 msgstr ""
 
-#: ../src/stacks/launchers.py:38
-msgid "Add new launchers"
+#: ../src/stacks/launchers.py:22
+msgid "Add executable"
 msgstr ""
 
-#: ../src/stacks/launchers.py:39
-msgid "Add launcher (expert mode)"
-msgstr ""
-
-#: ../src/stacks/launchers.py:41
-msgid "From here you can add a custom launcher"
-msgstr ""
-
-#: ../src/stacks/launchers.py:68
-msgid "From here you can add Launchers"
-msgstr ""
-
-#: ../src/stacks/launchers.py:70
-msgid "Icon: "
-msgstr ""
-
-#: ../src/stacks/launchers.py:77
-msgid "Push to change icon"
-msgstr ""
-
-#: ../src/stacks/launchers.py:80
-msgid "Name: "
-msgstr ""
-
-#: ../src/stacks/launchers.py:83
-msgid "Desktop name"
-msgstr ""
-
-#: ../src/stacks/launchers.py:84
-msgid "Insert desktop name"
-msgstr ""
-
-#: ../src/stacks/launchers.py:86
-msgid "Executable: "
-msgstr ""
-
-#: ../src/stacks/launchers.py:93
+#: ../src/stacks/launchers.py:23
 msgid "Executable path"
 msgstr ""
 
-#: ../src/stacks/launchers.py:94
-msgid "Insert path to the executable"
+#: ../src/stacks/launchers.py:24
+msgid "Insert the executable path"
 msgstr ""
 
-#: ../src/stacks/launchers.py:99
+#: ../src/stacks/launchers.py:25
+msgid "Add link"
+msgstr ""
+
+#: ../src/stacks/launchers.py:26
+msgid "Insert the url for the site"
+msgstr ""
+
+#: ../src/stacks/launchers.py:27
+msgid "https://example.com"
+msgstr ""
+
+#: ../src/stacks/launchers.py:49
+msgid "Add new launchers"
+msgstr ""
+
+#: ../src/stacks/launchers.py:50
+msgid "Add url/executable"
+msgstr ""
+
+#: ../src/stacks/launchers.py:52
+msgid "From here you can add a custom launcher"
+msgstr ""
+
+#: ../src/stacks/launchers.py:78
+msgid "From here you can add Launchers"
+msgstr ""
+
+#: ../src/stacks/launchers.py:80
+msgid "Icon: "
+msgstr ""
+
+#: ../src/stacks/launchers.py:87
+msgid "Push to change icon"
+msgstr ""
+
+#: ../src/stacks/launchers.py:90
+msgid "Name: "
+msgstr ""
+
+#: ../src/stacks/launchers.py:93
+msgid "Desktop name"
+msgstr ""
+
+#: ../src/stacks/launchers.py:94
+msgid "Insert desktop name"
+msgstr ""
+
+#: ../src/stacks/launchers.py:116
 msgid "Press button to select an executable"
 msgstr ""
 
-#: ../src/stacks/launchers.py:104
+#: ../src/stacks/launchers.py:122
 msgid "Description: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:107
+#: ../src/stacks/launchers.py:125
 msgid "Description"
 msgstr ""
 
-#: ../src/stacks/launchers.py:108
+#: ../src/stacks/launchers.py:126
 msgid "Insert a description for the app"
 msgstr ""
 
-#: ../src/stacks/launchers.py:117
+#: ../src/stacks/launchers.py:165
 msgid "images(*.png *.xpm *jpg)"
 msgstr ""
 
-#: ../src/stacks/launchers.py:119
+#: ../src/stacks/launchers.py:167
 msgid "All files(*.*)"
 msgstr ""
 

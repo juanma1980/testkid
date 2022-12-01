@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 11:56+0100\n"
+"POT-Creation-Date: 2022-12-01 12:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,54 +45,54 @@ msgid ""
 "o-matic is with Alt+F4"
 msgstr ""
 
-#: ../src/runomatic.py:384
+#: ../src/runomatic.py:383
 msgid "Error launching config"
 msgstr ""
 
-#: ../src/runomatic.py:385
+#: ../src/runomatic.py:384
 #, python-brace-format
 msgid "{0}: {1}"
 msgstr ""
 
-#: ../src/runomatic.py:389
+#: ../src/runomatic.py:387
 #, python-format
 msgid "runoconfig not found at %s"
 msgstr ""
 
-#: ../src/runomatic.py:407
+#: ../src/runomatic.py:405
 msgid "The next categories will be added"
 msgstr ""
 
-#: ../src/runomatic.py:413
+#: ../src/runomatic.py:411
 msgid ""
 "On apply Run-O-Matic will be launched with the apps from choosed categories."
 "<br>For fine tuning it's recommended to launch Run-O-Config."
 msgstr ""
 
-#: ../src/runomatic.py:416
+#: ../src/runomatic.py:414
 msgid "Apply"
 msgstr ""
 
-#: ../src/runomatic.py:419
+#: ../src/runomatic.py:417
 msgid "Cancel"
 msgstr ""
 
-#: ../src/runomatic.py:422
+#: ../src/runomatic.py:420
 msgid "Launch Run-O-Config"
 msgstr ""
 
-#: ../src/runomatic.py:437
+#: ../src/runomatic.py:436
 msgid "Insert the password"
 msgstr ""
 
-#: ../src/runomatic.py:439
+#: ../src/runomatic.py:438
 msgid "Insert the password. Current session will also be closed."
 msgstr ""
 
-#: ../src/runomatic.py:440
+#: ../src/runomatic.py:439
 msgid "Confirm close"
 msgstr ""
 
-#: ../src/runomatic.py:494
+#: ../src/runomatic.py:495
 msgid "runoconfig not found"
 msgstr ""
