@@ -373,7 +373,9 @@ class runomatic(QWidget):
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
 
-	def _launchConf(self):
+	def _launchConf(self,launch=True):
+		if launch==False:
+			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
 				cmd=["{}/runoconfig.py".format(self.baseDir)]
@@ -394,8 +396,10 @@ class runomatic(QWidget):
 		if os.path.isdir(userRunoapps)==False:
 			os.makedirs(userRunoapps)
 		for item in items:
+			print(item)
 			if isinstance(item,QWidget):
 				for chk in item.findChildren(QCheckBoxWithDescriptions):
+					print(chk)
 					if chk.isChecked():
 						self._debug("Loading apps from {}".format(chk.text()))
 						categories.append(chk.text())
@@ -418,7 +422,7 @@ class runomatic(QWidget):
 		btnCancel.clicked.connect(dlg.close)
 		lay.addWidget(btnCancel,3,1,1,1)
 		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(self._launchConf())
+		btnConfig.clicked.connect(lambda:self._launchConf(False))
 		lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 

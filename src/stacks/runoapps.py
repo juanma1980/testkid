@@ -152,6 +152,8 @@ class dropButton(QPushButton):
 	def __init__(self,title,parent):
 		super (dropButton,self).__init__("",parent)
 		self.title=title
+		a=QMenu()
+		self.setMenu(a)
 		self.parent=parent
 		self.img=None
 		self.icon=None
@@ -222,6 +224,9 @@ class dropButton(QPushButton):
 		return True
 	#def setImage
 
+	def setPopup(self,menu):
+		self.setMenu(menu)
+
 	def clone(self):
 		btn=dropButton(self.title,self.parent)
 		btn.setImage(self.img)
@@ -235,6 +240,7 @@ class runoapps(confStack):
 	def __init_stack__(self,app=None):
 		self.dbg=False
 		self._debug("confLaunchers Load")
+		self.appMenus=[]
 		self.parm="app"
 		self.app=None
 		self.hidden=[]
@@ -418,6 +424,7 @@ class runoapps(confStack):
 				#	remove.triggered.connect(lambda:self._removeBtn(apps))
 					btn_desktop.setToolTip(desktop)
 					btn_desktop.setMenu(btnMenu)
+					self.appMenus.append(btnMenu)
 					btn_desktop.setObjectName("confBtn")
 					self.btn_grid[btn_desktop]={"row":row,"col":col,"state":state}
 					btn_desktop.drop.connect(self._btn_dragDropEvent)
