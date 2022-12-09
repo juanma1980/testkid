@@ -1,4 +1,4 @@
-runomatic (1.4.2) lliurex22; urgency=medium
+runomatic (1.4.3) lliurex22; urgency=medium
 
   * Disconnect from dbus session
   * Always use primary screen
