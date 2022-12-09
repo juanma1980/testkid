@@ -28,19 +28,21 @@ class behaviour(confStack):
 	def _load_screen(self):
 		def _change_osh():
 			idx=self.cmb_level.currentIndex()
-			if idx==0:
-				lbl_help.setText(_("The config will be applied per user"))
-			elif idx==1:
-				lbl_help.setText(_("The config will be applied to all users"))
-			elif idx==2:
-				lbl_help.setText(_("The config will be applied to all users and clients"))
+			#if idx==0:
+			#	lbl_help.setText(_("The config will be applied per user"))
+			#elif idx==1:
+			#	lbl_help.setText(_("The config will be applied to all users"))
+			#elif idx==2:
+			#	lbl_help.setText(_("The config will be applied to all users and clients"))
 			self.fakeUpdate()
 		box=QVBoxLayout()
 		lbl_txt=QLabel(_("Choose the config level that should use the app"))
 		lbl_txt.setAlignment(Qt.AlignTop)
-		box.addWidget(lbl_txt,0)
+		#box.addWidget(lbl_txt,0)
 		wdg_level=QWidget()
 		hbox=QHBoxLayout()
+		lbl_help=QLabel(_("The config will be applied per"))
+		hbox.addWidget(lbl_help,0,Qt.AlignTop)
 		self.cmb_level=QComboBox()
 		self.cmb_level.addItem(_("User"))
 		self.cmb_level.addItem(_("System"))
@@ -48,11 +50,9 @@ class behaviour(confStack):
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		hbox.addWidget(self.cmb_level,1,Qt.AlignLeft)
-		lbl_help=QLabel("")
-		hbox.addWidget(lbl_help,1,Qt.AlignTop)
 		wdg_level.setLayout(hbox)
 		box.addWidget(wdg_level,1,Qt.AlignLeft)
-		box.addWidget(QLabel(_("Session settings")),1,Qt.AlignTop)
+		#box.addWidget(QLabel(_("Session settings")),1,Qt.AlignTop)
 		self.chk_startup=QCheckBox(_("Launch at startup"))
 		box.addWidget(self.chk_startup,1)
 		self.chk_close=QCheckBox(_("Close session when application exits"))
