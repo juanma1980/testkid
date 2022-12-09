@@ -40,6 +40,7 @@ class QCheckBoxWithDescriptions(QCheckBox):
 			text=self.text()
 		if text=='':
 			self.setToolTip(_("Empty"))
+			self.setEnabled(False)
 			return
 		applist=self.app2menu.get_apps_from_category(text)
 		addedApp=[]
@@ -50,6 +51,7 @@ class QCheckBoxWithDescriptions(QCheckBox):
 				addedApp.append(item.get('name'))
 		if tooltext=='':
 			tooltext=_('Empty')
+			self.setEnabled(False)
 		self.setToolTip(tooltext)
 #class QCheckBoxWithDescriptions
 
