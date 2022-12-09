@@ -422,10 +422,10 @@ class runomatic(QWidget):
 		lay.addWidget(btnOk,3,0,1,1)
 		btnCancel=QPushButton(_("Cancel"))
 		btnCancel.clicked.connect(dlg.close)
-		lay.addWidget(btnCancel,3,1,1,1)
-		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._launchConf(True))
-		lay.addWidget(btnConfig,3,2,1,1)
+		lay.addWidget(btnCancel,3,1,1,2,Qt.AlignRight)
+		#btnConfig=QPushButton(_("Launch Run-O-Config"))
+		#btnConfig.clicked.connect(lambda:self._launchConf(True))
+		#lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
 	def _setTemplates(self,categories):
