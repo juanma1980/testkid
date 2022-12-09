@@ -358,6 +358,7 @@ class runomatic(QWidget):
 			for cat in catList:
 				if cat and cat not in blacklist:
 					chk=QCheckBoxWithDescriptions(text=cat)
+					chk.stateChanged.connect(lambda:btnTemplates.setEnabled(True))
 					lyt.addWidget(chk,row,col,1,1)
 					col+=1
 					if col==4:
@@ -365,6 +366,7 @@ class runomatic(QWidget):
 						col=0
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
 			btnTemplates.clicked.connect(self._applyTemplates)
+			btnTemplates.setEnabled(False)
 			lyt.addWidget(btnTemplates,row,0,1,4)
 
 			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic is with Alt+F4"))
