@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
-from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout
+from PySide2.QtWidgets import QApplication, QLabel, QWidget, QPushButton,QVBoxLayout,QLineEdit,QHBoxLayout,QGridLayout,QComboBox
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QSignalMapper,QProcess,QEvent,QSize
 from appconfig.appConfigStack import appConfigStack as confStack
@@ -28,29 +28,20 @@ class keybinds(confStack):
 	
 	def _load_screen(self):
 		box=QGridLayout()
-		lbl_txt=QLabel(_("From here you can define the keybindings"))
-		box.addWidget(lbl_txt,0,0,1,2,Qt.AlignTop)
 		inp_conf=QLabel(_("Launch configuration"))
-		self.lbl_info=QLabel(_("Press a key"))
-		box.addWidget(self.lbl_info,1,0,1,2,Qt.AlignTop)
-		self.lbl_info.hide()
-		self.btn_conf=QHotkeyButton("")
-		self.btn_conf.hotkeyAssigned.connect(self._set_config_key)
-		box.addWidget(inp_conf,2,0,1,1,Qt.AlignTop)
-		box.addWidget(self.btn_conf,2,1,1,1,Qt.AlignTop)
-		box.setRowStretch(1,2)
-		box.setRowStretch(2,4)
-		box.setColumnStretch(2,3)
+		self.cmb_keys=QComboBox()
+		self.cmb_keys.addItem(" ")
+		for key in range(1,13):
+			self.cmb_keys.addItem("F{}".format(key))
+		self.cmb_keys.adjustSize()
+		self.lbl_info=QLabel(_("Select a F key for launch runoconfig from runomatic"))
+		self.lbl_info.setWordWrap(True)
+		box.addWidget(self.lbl_info,1,0,1,1,Qt.Alignment(-1))
+		box.addWidget(self.cmb_keys,1,1,1,1,Qt.Alignment(1))
 		self.setLayout(box)
 		self.updateScreen()
 		return(self)
 	#def _load_screen
-
-	def _set_config_key(self,*args):
-		self.lbl_info.hide()
-		self.changes=True
-		self.setChanged(True)
-	#def _set_config_key(keypress):
 
 	def updateScreen(self):
 		self.force_change=False
@@ -60,17 +51,11 @@ class keybinds(confStack):
 			keybinds=config[self.level].get('keybinds',None)
 			if keybinds:
 				self.keytext=keybinds.get('conf',None)
-		self.btn_conf.setText(self.keytext)
+		self.cmb_keys.setCurrentText(self.keytext)
 	#def updateScreen
-
-	def getData(self):
-		key='keybinds'
-		data={'conf':self.btn_conf.text()}
-		return({key:data})
-	#def getData
 
 	def writeConfig(self):
 		key='keybinds'
-		data={'conf':self.btn_conf.text()}
+		data={'conf':self.cmb_keys.currentText()}
 		self.saveChanges(key,data)
 	#def writeConfig

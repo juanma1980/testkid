@@ -266,8 +266,6 @@ class runomatic(QWidget):
 		self.sigmap_tabRemove=QSignalMapper(self)
 		self.sigmap_tabRemove.mapped[QInt].connect(self._on_tabRemove)
 		#Shortcut for super_keys
-
-
 	#def _set_keymapping
 
 	def _read_config(self):
@@ -375,18 +373,18 @@ class runomatic(QWidget):
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
 
-	def _launchConf(self):
+	def _launchConf(self,nolaunch=False):
+		if nolaunch==True:
+			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
-				self.hide()
-				cmd=["{}/runoconfig.py".format(self.baseDir),"1","2"]
+				cmd=["{}/runoconfig.py".format(self.baseDir)]
 				try:
 					subprocess.run(cmd)
 				except Exception as e:
 					msgErr=_("Error launching config")
 					print(_("{0}: {1}".format(msgErr,e)))
-				#os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
-				self.show()
+				os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
 		else:
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 	#def launchConf
@@ -398,8 +396,10 @@ class runomatic(QWidget):
 		if os.path.isdir(userRunoapps)==False:
 			os.makedirs(userRunoapps)
 		for item in items:
+			print(item)
 			if isinstance(item,QWidget):
 				for chk in item.findChildren(QCheckBoxWithDescriptions):
+					print(chk)
 					if chk.isChecked():
 						self._debug("Loading apps from {}".format(chk.text()))
 						categories.append(chk.text())
@@ -422,7 +422,7 @@ class runomatic(QWidget):
 		btnCancel.clicked.connect(dlg.close)
 		lay.addWidget(btnCancel,3,1,1,1)
 		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._setTemplatesAndLaunch(categories))
+		btnConfig.clicked.connect(lambda:self._launchConf(True))
 		lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
@@ -430,9 +430,10 @@ class runomatic(QWidget):
 		self.runner.write_config(categories,key='categories')
 		os.execv("%s/runomatic.py"%self.baseDir,["1","2"])
 
-	def _setTemplatesAndLaunch(self,categories):
-		self.runner.write_config(categories,key='categories')
-		os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+#	def _setTemplatesAndLaunch(self,categories):
+#		self.runner.write_config(categories,key='categories')
+#		print("PASO")
+#		os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
 
 	def closeEvent(self,event):
 		if self.password:
@@ -460,6 +461,7 @@ class runomatic(QWidget):
 					xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
 					if os.path.isfile(xlockFile):
 						os.remove(xlockFile)
+		os.environ['DISPLAY']=":0"
 		if str(self.close_on_exit).lower()=='true':
 			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
@@ -488,7 +490,8 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
-						os.execv("%s/runoconfig.py"%self.baseDir,["1","2"])
+						self._launchConf()
+						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
 				else:
 					event.ignore()
@@ -742,7 +745,10 @@ class runomatic(QWidget):
 		dsp=self.tab_id[index].get('display',None)
 		self.focusWidgets[self.appsWidgets.index(self.tab_id[index]['app'])].statusBar.hide()
 		if dsp:
-			self.runner.stop_display(self.tab_id[index].get('wid',''),dsp)
+			wid=self.tab_id[index].get('wid','')
+			if isinstance(wid,appZone):
+				wid=wid.wid.strip()
+			self.runner.stop_display(wid,dsp)
 			xlockFile=os.path.join("/tmp",".X%s-lock"%dsp.replace(":",""))
 			if os.path.isfile(xlockFile):
 				os.remove(xlockFile)
@@ -841,7 +847,7 @@ class runomatic(QWidget):
 			self.currentBtn=btn
 
 		os.environ["HOME"]="/home/%s"%self.username
-		os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
+		#os.environ["XAUTHORITY"]="/home/%s/.Xauthority"%self.username
 		self.display,self.pid,x_pid=self.runner.new_Xephyr(self.tabBar)
 		if self._launchZone(app):
 			self.tab_id[self.id]['thread']=self.runner.launch(app,self.display)

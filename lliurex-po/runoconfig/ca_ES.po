@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-13 15:24+0200\n"
-"PO-Revision-Date: 2022-09-13 15:26+0200\n"
+"POT-Creation-Date: 2022-12-01 12:44+0100\n"
+"PO-Revision-Date: 2022-12-01 12:47+0100\n"
 "Last-Translator: empar <montoro_mde@gva.es>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -81,11 +81,11 @@ msgstr ""
 "Per a tancar la sessió es obligatori configurar una drecera per a executar "
 "el configurador desde el propi run-o-matic"
 
-#: ../src/stacks/behaviour.py:64
+#: ../src/stacks/behaviour.py:65
 msgid "Choose the background image"
 msgstr "Seleccioneu la imatge de fons"
 
-#: ../src/stacks/behaviour.py:187
+#: ../src/stacks/behaviour.py:188
 msgid "images(*.png *.svg *jpg *bmp)"
 msgstr "imatges(*.png *.svg *jpg *bmp)"
 
@@ -102,86 +102,94 @@ msgid "From here you can modify the keybinding"
 msgstr "Des d'ací podeu modificar les vinculacions de tecles"
 
 #: ../src/stacks/keybinds.py:31
-msgid "From here you can define the keybindings"
-msgstr "Des d'ací podeu definir les vinculacions de tecles"
-
-#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr "Tecla per a llançar la configuració de run-o-matic"
 
-#: ../src/stacks/keybinds.py:34
-msgid "Press a key"
-msgstr "Premeu una tecla"
+#: ../src/stacks/keybinds.py:37
+msgid "Select a F key for launch runoconfig from runomatic"
+msgstr "Triar una tecla F per a executar run-o-config desde el run-o-matic"
 
-#: ../src/stacks/launchers.py:38
-msgid "Add new launchers"
-msgstr "Afig llançadors nous"
-
-#: ../src/stacks/launchers.py:39
-msgid "Add custom launcher"
-msgstr "Afig un llançador personalitzat"
-
-#: ../src/stacks/launchers.py:41
-msgid "From here you can add a custom launcher"
-msgstr "Des d'ací podeu afegir un llançador personalitzat"
-
-#: ../src/stacks/launchers.py:68
-msgid "From here you can add Launchers"
-msgstr "Des d'ací podeu afegir llançadors"
-
-#: ../src/stacks/launchers.py:70
-msgid "Icon: "
-msgstr "Icona:"
-
-#: ../src/stacks/launchers.py:77
-msgid "Push to change icon"
-msgstr "Premeu per a canviar la icona"
-
-#: ../src/stacks/launchers.py:80
-msgid "Name: "
-msgstr "Nom: "
-
-#: ../src/stacks/launchers.py:83
-msgid "Desktop name"
-msgstr "Nom de l'escriptori"
-
-#: ../src/stacks/launchers.py:84
-msgid "Insert desktop name"
-msgstr "Inseriu el nom de l'escriptori"
-
-#: ../src/stacks/launchers.py:86
-msgid "Executable: "
+#: ../src/stacks/launchers.py:22
+msgid "Add executable"
 msgstr "Executable:"
 
-#: ../src/stacks/launchers.py:93
+#: ../src/stacks/launchers.py:23
 msgid "Executable path"
 msgstr "Camí a l'executable"
 
-#: ../src/stacks/launchers.py:94
-msgid "Insert path to the executable"
+#: ../src/stacks/launchers.py:24
+msgid "Insert the executable path"
 msgstr "Inseriu el camí a l'executable"
 
-#: ../src/stacks/launchers.py:99
+#: ../src/stacks/launchers.py:25
+msgid "Add link"
+msgstr "Afig un web"
+
+#: ../src/stacks/launchers.py:26
+msgid "Insert the url for the site"
+msgstr "Inseriu la direcció web"
+
+#: ../src/stacks/launchers.py:27
+msgid "https://example.com"
+msgstr "https://exemple.es"
+
+#: ../src/stacks/launchers.py:49
+msgid "Add new launchers"
+msgstr "Afig llançadors nous"
+
+#: ../src/stacks/launchers.py:50
+msgid "Add url/executable"
+msgstr "Afegir web/executable"
+
+#: ../src/stacks/launchers.py:52
+msgid "From here you can add a custom launcher"
+msgstr "Des d'ací podeu afegir un llançador personalitzat"
+
+#: ../src/stacks/launchers.py:78
+msgid "From here you can add Launchers"
+msgstr "Des d'ací podeu afegir llançadors"
+
+#: ../src/stacks/launchers.py:80
+msgid "Icon: "
+msgstr "Icona:"
+
+#: ../src/stacks/launchers.py:87
+msgid "Push to change icon"
+msgstr "Premeu per a canviar la icona"
+
+#: ../src/stacks/launchers.py:90
+msgid "Name: "
+msgstr "Nom: "
+
+#: ../src/stacks/launchers.py:93
+msgid "Desktop name"
+msgstr "Nom de l'escriptori"
+
+#: ../src/stacks/launchers.py:94
+msgid "Insert desktop name"
+msgstr "Inseriu el nom de l'escriptori"
+
+#: ../src/stacks/launchers.py:116
 msgid "Press button to select an executable"
 msgstr "Premeu per a seleccionar l'executable"
 
-#: ../src/stacks/launchers.py:104
+#: ../src/stacks/launchers.py:122
 msgid "Description: "
 msgstr "Descripció: "
 
-#: ../src/stacks/launchers.py:107
+#: ../src/stacks/launchers.py:125
 msgid "Description"
 msgstr "Descripció"
 
-#: ../src/stacks/launchers.py:108
+#: ../src/stacks/launchers.py:126
 msgid "Insert a description for the app"
 msgstr "Inseriu una descripció de l'aplicació"
 
-#: ../src/stacks/launchers.py:117
+#: ../src/stacks/launchers.py:165
 msgid "images(*.png *.xpm *jpg)"
 msgstr "imatges(*.png *.xpm *jpg)"
 
-#: ../src/stacks/launchers.py:119
+#: ../src/stacks/launchers.py:167
 msgid "All files(*.*)"
 msgstr "Tots els fitxers(*.*)"
 
@@ -259,6 +267,18 @@ msgstr "Elimina"
 #: ../src/stacks/runoapps.py:409
 msgid "Edit button"
 msgstr "Edita el botó"
+
+#~ msgid "Add launcher (expert mode)"
+#~ msgstr "Afig un llançador (mode expert)"
+
+#~ msgid "From here you can define the keybindings"
+#~ msgstr "Des d'ací podeu definir les vinculacions de tecles"
+
+#~ msgid "Press a key"
+#~ msgstr "Premeu una tecla"
+
+#~ msgid "Add custom launcher"
+#~ msgstr "Afig un llançador personalitzat"
 
 #~ msgid "Show button"
 #~ msgstr "Mostra el botó"
