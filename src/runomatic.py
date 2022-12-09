@@ -373,8 +373,8 @@ class runomatic(QWidget):
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
 
-	def _launchConf(self,launch=True):
-		if launch==False:
+	def _launchConf(self,nolaunch=False):
+		if nolaunch==True:
 			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
@@ -422,7 +422,7 @@ class runomatic(QWidget):
 		btnCancel.clicked.connect(dlg.close)
 		lay.addWidget(btnCancel,3,1,1,1)
 		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._launchConf(False))
+		btnConfig.clicked.connect(lambda:self._launchConf(True))
 		lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
@@ -490,7 +490,6 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
-						print("LANZO")
 						self._launchConf()
 						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
