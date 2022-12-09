@@ -52,9 +52,9 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		#newProfile=tempfile.mkdtemp()
-		#self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
-		self.app=["firefox","--kiosk","--private-window","--no-remote",self.app[-1]]
+		newProfile=tempfile.mkdtemp()
+		self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		#self.app=["firefox","--new-window","--kiosk","--private-window",self.app[-1]]
 		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
 		#css_content=[
