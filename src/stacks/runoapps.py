@@ -362,7 +362,8 @@ class runoapps(confStack):
 	
 	def _get_all_categories(self):
 		categories=[]
-		categories=self.menu.get_categories()
+		categories_tree=self.menu.get_categories_tree()
+		categories=list(categories_tree.keys())
 		categories.insert(0,'run-o-matic')
 		return categories
 	#def _get_all_categories(self):
