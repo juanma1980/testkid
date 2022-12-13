@@ -366,8 +366,8 @@ class runomatic(QWidget):
 			for cat,desktops in catList.items():
 				if cat and cat.lower() not in blacklist:
 					chk=QCheckBoxWithDescriptions(text=cat,desktops=desktops)
-					chk.stateChanged.connect(lambda:btnTemplates.setEnabled(True))
 					lyt.addWidget(chk,row,col,1,1)
+					chk.stateChanged.connect(lambda:btnTemplates.setEnabled(True))
 					col+=1
 					if col==4:
 						row+=1
@@ -375,10 +375,10 @@ class runomatic(QWidget):
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
 			btnTemplates.clicked.connect(self._applyTemplates)
 			btnTemplates.setEnabled(False)
-			lyt.addWidget(btnTemplates,row,0,1,4)
+			lyt.addWidget(btnTemplates,row+1,0,1,4)
 
 			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic is with Alt+F4"))
-			lyt.addWidget(lbl3,row+1,0,1,4)
+			lyt.addWidget(lbl3,row+2,0,1,4)
 
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
@@ -392,8 +392,8 @@ class runomatic(QWidget):
 				try:
 					subprocess.run(cmd)
 				except Exception as e:
-					msgErr=_("Error launching config")
 					print(_("{0}: {1}".format(msgErr,e)))
+					msgErr=_("Error launching config")
 				os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
 		else:
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
