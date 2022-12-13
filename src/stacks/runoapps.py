@@ -39,9 +39,9 @@ class desktopChooser(QDialog):
 		self.desktopList.itemPressed.connect(self._loadMime)
 		self.data={}
 		self._renderGui()
+	#def __init__
 	
 	def _renderGui(self):
-
 		def searchList():
 			items=self.desktopList.findItems(inp_search.text(),Qt.MatchFlag.MatchContains)
 			if items:
@@ -56,9 +56,24 @@ class desktopChooser(QDialog):
 		completer.setCaseSensitivity(Qt.CaseInsensitive)
 		model=QtGui.QStandardItemModel()
 		#Load available desktops
-		categories=self.menu.get_categories()
-		desktops={}
+		desktopDict=self._getDesktops(model)
+		cont=0
+		for desktop in sorted(desktopDict.keys(),key=str.lower):
+			self.data[cont]={'path':os.path.join(self.menu.desktoppath,desktopDict[desktop].get('desktop')),'icon':desktopDict[desktop].get('icon','')}
+			cont+=1
+		completer.setModel(model)
+		inp_search.setCompleter(completer)
+		box.addWidget(inp_search)
+		box.addWidget(self.desktopList)
+		btnClose=QPushButton(_("Close"))
+		btnClose.clicked.connect(self.close)
+		box.addWidget(btnClose)
+		self.setLayout(box)
+	#def _renderGui
+
+	def _getDesktops(self,model):
 		desktopDict={}
+		categories=self.menu.get_categories()
 		for category in categories:
 			desktops=self.menu.get_apps_from_category(category)
 			for desktop in desktops.keys():
@@ -79,20 +94,15 @@ class desktopChooser(QDialog):
 				if name not in desktopDict.keys():
 					self.desktopList.addItem(listWidget)
 				desktopDict[name]={'icon':icon,'desktop':desktop}
-		cont=0
-		for desktop in sorted(desktopDict.keys(),key=str.lower):
-			self.data[cont]={'path':os.path.join(self.menu.desktoppath,desktopDict[desktop].get('desktop')),'icon':desktopDict[desktop].get('icon','')}
-			cont+=1
-		completer.setModel(model)
-		inp_search.setCompleter(completer)
-		box.addWidget(inp_search)
-		box.addWidget(self.desktopList)
-		self.setLayout(box)
+		return(desktopDict)
+	#def _getDesktops
 
 	def _dblClick(self):
 		listWidget=self.desktopList.currentRow()
 		path=self.data[listWidget]
 		self.dblClicked.emit(path)
+		self.close()
+	#def _dblClick
 	
 	def _loadMime(self):
 		listWidget=self.desktopList.currentRow()
@@ -103,7 +113,7 @@ class desktopChooser(QDialog):
 		pixmap=self.data[listWidget]['icon'].pixmap(QSize(BTN_SIZE,BTN_SIZE))
 		drag.setPixmap(pixmap)
 		dropAction=drag.exec_(Qt.MoveAction)
-	#def mousePressEvent
+	#def _loadMime
 	
 	def dragMoveEvent(self,e):
 		e.accept()
@@ -385,6 +395,7 @@ class runoapps(confStack):
 					apps=self._get_table_apps()
 					apps['desktops'].append(deskPath)
 					self.update_apps(apps)
+		self.btn_ok.setEnabled(True)
 	#def _tbl_DropEvent
 
 	def _update_apps_data(self):
@@ -492,10 +503,13 @@ class runoapps(confStack):
 	#def _changeBtnState
 
 	def _editBtn(self,apps):
+		if self.btn_ok.isEnabled():
+			self.writeConfig()
 		row=self.tbl_app.currentRow()
 		col=self.tbl_app.currentColumn()
 		btn=self.tbl_app.cellWidget(row,col)
 		self.stack.gotoStack(idx=3,parms=btn.title)
+	#def _editBtn
 
 	def _btn_dragDropEvent(self,btnEv):
 		if 'drag' in btnEv.keys():
