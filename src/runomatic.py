@@ -28,11 +28,12 @@ gettext.textdomain('runomatic')
 _ = gettext.gettext
 
 class QCheckBoxWithDescriptions(QCheckBox):
-	def __init__(self,text="",parent=None):
+	def __init__(self,text="",desktops=[],parent=None):
 		super (QCheckBoxWithDescriptions,self).__init__("",parent)
 		self.app2menu=app2menu.app2menu()
 		if text:
 			self.setText(text)
+		self.desktops=desktops
 		self._generateApplist(text)
 
 	def _generateApplist(self,text=''):
@@ -40,16 +41,22 @@ class QCheckBoxWithDescriptions(QCheckBox):
 			text=self.text()
 		if text=='':
 			self.setToolTip(_("Empty"))
+			self.setEnabled(False)
 			return
-		applist=self.app2menu.get_apps_from_category(text)
 		addedApp=[]
 		tooltext=''
-		for key,item in applist.items():
-			if item.get('name','') not in addedApp:
-				tooltext="{0}{1}\n".format(tooltext,item.get('name'),key)
-				addedApp.append(item.get('name'))
+		#applist=self.app2menu.get_apps_from_category(text)
+		#for key,item in applist.items():
+		#	if item.get('name','') not in addedApp:
+		#		tooltext="{0}{1}\n".format(tooltext,item.get('name'),key)
+		#		addedApp.append(item.get('name'))
+		for desk in self.desktops:
+			if desk not in addedApp:
+				tooltext="{0}{1}\n".format(tooltext,desk)
+				addedApp.append(desk)
 		if tooltext=='':
 			tooltext=_('Empty')
+			self.setEnabled(False)
 		self.setToolTip(tooltext)
 #class QCheckBoxWithDescriptions
 
@@ -351,30 +358,33 @@ class runomatic(QWidget):
 			lyt.addWidget(btn,1,0,1,4)
 			lbl2=QLabel(_("Or you can set directly a template from the menu"))
 			lyt.addWidget(lbl2,2,1,1,2)
-			catList=self.app2menu.get_categories()
+			catList=self.app2menu.get_categories_tree()
 			row=3
 			col=0
 			blacklist=['information','translation','internet','settingsmenu','system','utilities','lliurex preferences','lliurex administration']
-			for cat in catList:
-				if cat and cat not in blacklist:
-					chk=QCheckBoxWithDescriptions(text=cat)
+			blacklist=[]
+			for cat,desktops in catList.items():
+				if cat and cat.lower() not in blacklist:
+					chk=QCheckBoxWithDescriptions(text=cat,desktops=desktops)
 					lyt.addWidget(chk,row,col,1,1)
+					chk.stateChanged.connect(lambda:btnTemplates.setEnabled(True))
 					col+=1
 					if col==4:
 						row+=1
 						col=0
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
 			btnTemplates.clicked.connect(self._applyTemplates)
-			lyt.addWidget(btnTemplates,row,0,1,4)
+			btnTemplates.setEnabled(False)
+			lyt.addWidget(btnTemplates,row+1,0,1,4)
 
 			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic is with Alt+F4"))
-			lyt.addWidget(lbl3,row+1,0,1,4)
+			lyt.addWidget(lbl3,row+2,0,1,4)
 
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
 
-	def _launchConf(self,launch=True):
-		if launch==False:
+	def _launchConf(self,nolaunch=False):
+		if nolaunch==True:
 			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
@@ -382,8 +392,8 @@ class runomatic(QWidget):
 				try:
 					subprocess.run(cmd)
 				except Exception as e:
-					msgErr=_("Error launching config")
 					print(_("{0}: {1}".format(msgErr,e)))
+					msgErr=_("Error launching config")
 				os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
 		else:
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
@@ -396,10 +406,8 @@ class runomatic(QWidget):
 		if os.path.isdir(userRunoapps)==False:
 			os.makedirs(userRunoapps)
 		for item in items:
-			print(item)
 			if isinstance(item,QWidget):
 				for chk in item.findChildren(QCheckBoxWithDescriptions):
-					print(chk)
 					if chk.isChecked():
 						self._debug("Loading apps from {}".format(chk.text()))
 						categories.append(chk.text())
@@ -420,10 +428,10 @@ class runomatic(QWidget):
 		lay.addWidget(btnOk,3,0,1,1)
 		btnCancel=QPushButton(_("Cancel"))
 		btnCancel.clicked.connect(dlg.close)
-		lay.addWidget(btnCancel,3,1,1,1)
-		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._launchConf(False))
-		lay.addWidget(btnConfig,3,2,1,1)
+		lay.addWidget(btnCancel,3,1,1,2,Qt.AlignRight)
+		#btnConfig=QPushButton(_("Launch Run-O-Config"))
+		#btnConfig.clicked.connect(lambda:self._launchConf(True))
+		#lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
 	def _setTemplates(self,categories):
@@ -490,7 +498,6 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
-						print("LANZO")
 						self._launchConf()
 						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw

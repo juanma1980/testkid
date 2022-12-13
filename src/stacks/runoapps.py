@@ -333,10 +333,14 @@ class runoapps(confStack):
 			if not cat:
 				continue
 			act=QAction(cat,self.menu_cat)
+			self.menu_cat.addAction(act)
+			if cat!="run-o-matic":
+				if len(self.menu.get_apps_from_menuentry(cat))<1:
+					act.setEnabled(False)
+					continue
 			act.setCheckable(True)
 			if cat in self.visible_categories:
 				act.setChecked(True)
-			self.menu_cat.addAction(act)
 			sigmap_catSelect.setMapping(act,cat)
 			act.triggered.connect(sigmap_catSelect.map)
 		btn_cat.setMenu(self.menu_cat)
@@ -362,7 +366,8 @@ class runoapps(confStack):
 	
 	def _get_all_categories(self):
 		categories=[]
-		categories=self.menu.get_categories()
+		categories_tree=self.menu.get_categories_tree()
+		categories=list(categories_tree.keys())
 		categories.insert(0,'run-o-matic')
 		return categories
 	#def _get_all_categories(self):

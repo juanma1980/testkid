@@ -347,6 +347,8 @@ class launchers(confStack):
 		self.filename=os.path.basename(parms)
 		self.defaultName=desktop['Name']
 		self.defaultExec=desktop['Exec']
+		if "http" not in self.defaultExec:
+			self.cmb_exec.setCurrentText(i18n["EXECUTABLE"])
 		self.defaultDesc=desktop['Comment']
 		self.default_icon=desktop['Icon']
 

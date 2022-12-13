@@ -52,9 +52,9 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		#newProfile=tempfile.mkdtemp()
-		#self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
-		self.app=["firefox","--kiosk","--private-window","--no-remote",self.app[-1]]
+		newProfile=tempfile.mkdtemp()
+		self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		#self.app=["firefox","--new-window","--kiosk","--private-window",self.app[-1]]
 		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
 		#css_content=[
@@ -571,7 +571,7 @@ class appRun():
 	def _filter_category_apps(self,categories,desktops,banned,hidden,runoapps):
 		result={}
 		for category in categories:
-			cat_apps=self.get_category_desktops(category.lower())
+			cat_apps=self.get_category_desktops(category)
 			for app in cat_apps:
 				if ((app not in desktops) and (app not in banned)):
 					desktops.append(app)
@@ -609,7 +609,8 @@ class appRun():
 	def get_category_desktops(self,category):
 		apps=[]
 		tmp_apps=[]
-		if category=="run-o-matic":
+		if category.lower()=="run-o-matic":
+			category="run-o-matic"
 			if os.path.isdir(self.runoapps):
 				for f in os.listdir(self.runoapps):
 					if f not in apps and os.path.isfile("%s"%os.path.join(self.runoapps,f)):
@@ -621,7 +622,7 @@ class appRun():
 							apps.append("%s"%os.path.join(self.userRunoapps,f))
 		else:
 			self.menu.set_desktop_system()
-			applist=self.menu.get_apps_from_category(category)
+			applist=self.menu.get_apps_from_menuentry(category)
 			for app,data in applist.items():
 				if data['exe'] not in tmp_apps and app not in tmp_apps:
 					apps.append("%s/%s"%(self.menu.desktoppath,app))
