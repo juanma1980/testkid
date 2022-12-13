@@ -41,7 +41,7 @@ class QCheckBoxWithDescriptions(QCheckBox):
 			text=self.text()
 		if text=='':
 			self.setToolTip(_("Empty"))
-			self.setVisible(False)
+			self.setEnabled(False)
 			return
 		addedApp=[]
 		tooltext=''
@@ -56,6 +56,7 @@ class QCheckBoxWithDescriptions(QCheckBox):
 				addedApp.append(desk)
 		if tooltext=='':
 			tooltext=_('Empty')
+			self.setEnabled(False)
 		self.setToolTip(tooltext)
 #class QCheckBoxWithDescriptions
 
@@ -365,6 +366,7 @@ class runomatic(QWidget):
 			for cat,desktops in catList.items():
 				if cat and cat.lower() not in blacklist:
 					chk=QCheckBoxWithDescriptions(text=cat,desktops=desktops)
+					chk.stateChanged.connect(lambda:btnTemplates.setEnabled(True))
 					lyt.addWidget(chk,row,col,1,1)
 					col+=1
 					if col==4:
@@ -372,6 +374,7 @@ class runomatic(QWidget):
 						col=0
 			btnTemplates=QPushButton(_("Set apps from selected templates"))
 			btnTemplates.clicked.connect(self._applyTemplates)
+			btnTemplates.setEnabled(False)
 			lyt.addWidget(btnTemplates,row,0,1,4)
 
 			lbl3=QLabel(_("Remember that run-o-matic will block the desktop. The only way for close run-o-matic is with Alt+F4"))
@@ -380,8 +383,8 @@ class runomatic(QWidget):
 			self.box.addWidget(wdg,0,0,1,1,Qt.AlignCenter)
 	#def _render_gui
 
-	def _launchConf(self,launch=True):
-		if launch==False:
+	def _launchConf(self,nolaunch=False):
+		if nolaunch==True:
 			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
 			if self.close():
@@ -425,10 +428,10 @@ class runomatic(QWidget):
 		lay.addWidget(btnOk,3,0,1,1)
 		btnCancel=QPushButton(_("Cancel"))
 		btnCancel.clicked.connect(dlg.close)
-		lay.addWidget(btnCancel,3,1,1,1)
-		btnConfig=QPushButton(_("Launch Run-O-Config"))
-		btnConfig.clicked.connect(lambda:self._launchConf(False))
-		lay.addWidget(btnConfig,3,2,1,1)
+		lay.addWidget(btnCancel,3,1,1,2,Qt.AlignRight)
+		#btnConfig=QPushButton(_("Launch Run-O-Config"))
+		#btnConfig.clicked.connect(lambda:self._launchConf(True))
+		#lay.addWidget(btnConfig,3,2,1,1)
 		dlg.exec_()
 
 	def _setTemplates(self,categories):
@@ -495,7 +498,6 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
-						print("LANZO")
 						self._launchConf()
 						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
