@@ -52,8 +52,15 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		newProfile=tempfile.mkdtemp()
-		self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
+		timehash=str(time.time())
+		time64=base64.encodebytes(timehash.encode())
+		newProfile="{}".format(time64.decode().strip())
+		newProfile=newProfile[-8:]
+		#Create tmp profile
+		cmd=["firefox", "--no-remote","-CreateProfile", "{0} /tmp/{0}".format(newProfile)]
+		subprocess.run(cmd)
+		self.app=["firefox","--kiosk","-P",newProfile,"--private-window","--no-remote",self.app[-1]]
+		#self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
 		#self.app=["firefox","--new-window","--kiosk","--private-window",self.app[-1]]
 		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
