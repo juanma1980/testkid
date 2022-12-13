@@ -335,7 +335,7 @@ class runoapps(confStack):
 			act=QAction(cat,self.menu_cat)
 			self.menu_cat.addAction(act)
 			if cat!="run-o-matic":
-				if len(self.menu.get_apps_from_category(cat))<1:
+				if len(self.menu.get_apps_from_menuentry(cat))<1:
 					act.setEnabled(False)
 					continue
 			act.setCheckable(True)
