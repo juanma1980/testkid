@@ -4,6 +4,7 @@ import sys
 import os,stat
 from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
 import subprocess
+import multiprocessing as mp
 import base64
 import signal
 import time
@@ -52,10 +53,7 @@ class th_runApp(QThread):
 	#def __del__
 
 	def _run_firefox(self):
-		timehash=str(time.time())
-		time64=base64.encodebytes(timehash.encode())
-		newProfile="{}".format(time64.decode().strip())
-		newProfile=newProfile[-8:]
+		newProfile=self.setFirefoxProfile()
 		#Create tmp profile
 		cmd=["firefox", "--no-remote","-CreateProfile", "{0} /tmp/{0}".format(newProfile)]
 		subprocess.run(cmd)
@@ -74,6 +72,15 @@ class th_runApp(QThread):
 		#	f.writelines(css_content)
 		self._debug("Firefox Launch: %s"%self.app)
 	#def _run_firefox
+
+	def setFirefoxProfile(self):
+		profile=''
+		timehash=str(time.time())
+		time64=base64.encodebytes(timehash.encode())
+		profile="{}".format(time64.decode().strip())
+		profile=profile[-8:]
+		return(profile)
+	#def setFirefoxProfile
 
 	def _run_chromium(self):
 		self.app=[self.app[0],"--temp-profile","--start-fullscreen","--app=%s"%self.app[-1]]
@@ -112,7 +119,6 @@ class th_runApp(QThread):
 #				self.app.append("--fullscreen")
 			elif 'firefox' in self.app:
 				self._run_firefox()
-				print("FIREFOX: {}".format(self.app))
 			elif (('chromium' in self.app) or ('chrome' in self.app)):
 				self._run_chromium()
 			elif 'loffice' in self.app:
@@ -152,7 +158,7 @@ class th_runApp(QThread):
 
 class appRun():
 	def __init__(self):
-		self.dbg=False
+		self.dbg=True
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])
@@ -307,7 +313,11 @@ class appRun():
 				#	self.main_wid=wid[1]
 ####!ADD TAB IF VINAGRE
 				#self._debug("UNMAP: %s"%self.main_wid)
-				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.DEVNULL)
+				fakeEnv=os.environ
+				fakeEnv['DISPLAY']=":0"
+				p_pid=subprocess.Popen(xephyr_cmd,stderr=subprocess.PIPE,stdout=subprocess.PIPE,env=fakeEnv)
+				th_comm=mp.Process(target=self._helper_th_communicate,args=(p_pid,))
+				th_comm.start()
 #				subprocess.run(["xdotool","windowmap","--sync",self.main_wid],stderr=subprocess.PIPE)
 #				subprocess.run(["xdotool","windowunmap","--sync",self.main_wid],stderr=subprocess.DEVNULL)
 				self.xephyr_servers[display]=p_pid.pid
@@ -315,6 +325,13 @@ class appRun():
 
 		return (display,self.xephyr_servers[display],p_pid.pid)
 	#def init_Xephyr
+
+	def _helper_th_communicate(self,process):
+		try:
+			a=process.communicate()
+		except Exception as e:
+			print(e)
+	#def _helper_th_communicate
 
 	def _run_cmd_on_display(self,cmd=[],display=":13"):
 		env=os.environ
@@ -339,7 +356,6 @@ class appRun():
 			widTree=subprocess.run(["xwininfo -tree -root"],shell=True,stdout=subprocess.PIPE)
 			hexWid=""
 			for widWindow in widTree.stdout.decode().split("\n"):
-				print(widWindow)
 				if "Xephyr on %s"%display in widWindow:
 					wid=widWindow.split()[0]
 					break
