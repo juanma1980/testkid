@@ -54,13 +54,14 @@ class th_runApp(QThread):
 
 	def _run_firefox(self):
 		newProfile=self.setFirefoxProfile()
+		#os.makedirs("/tmp/{}".format(newProfile))
 		#Create tmp profile
 		cmd=["firefox", "--no-remote","-CreateProfile", "{0} /tmp/{0}".format(newProfile)]
 		subprocess.run(cmd)
 		self.app=["firefox","--kiosk","-P",newProfile,"--private-window","--no-remote",self.app[-1]]
 		#self.app=["firefox","--kiosk","--profile",newProfile,"--private-window","--no-remote",self.app[-1]]
 		#self.app=["firefox","--new-window","--kiosk","--private-window",self.app[-1]]
-		#self.app=["firefox","-profile",newProfile,"--no-remote",self.app[-1]]
+		#self.app=["firefox","--kiosk","-profile",newProfile,"--no-remote",self.app[-1]]
 		#os.makedirs("%s/chrome"%newProfile)
 		#css_content=[
 		#			"@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");",
