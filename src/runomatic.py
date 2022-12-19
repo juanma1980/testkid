@@ -35,28 +35,35 @@ class firefoxProfiles():
 		self.destIniProfile=os.path.join(self.tmpDir,os.environ.get('USER'),'firefox')
 	#def __init__
 
+	def _debug(self,msg):
+		print("{}".format(str(msg)))
+
 	def iniProfilesCopy(self):
 		ffProfile=os.path.join(self.destIniProfile,"firefox")
 		snapProfile=os.path.join(self.destIniProfile,"snap")
-		if os.path.isdir(self.iniProfile):
-			if os.path.isdir(self.destIniProfile)==False:
-				os.makedirs(self.destIniProfile)
-				shutil.copytree(self.iniProfile,ffProfile,ignore_dangling_symlinks=True)
-			if os.path.isdir(self.iniProfileSnap)==False:
-				shutil.copytree(self.iniProfileSnap,snapProfile,ignore_dangling_symlinks=True)
+		if os.path.isdir(self.destIniProfile)==False:
+			os.makedirs(self.destIniProfile)
+		if (os.path.isdir(ffProfile)==False) and (os.path.isdir(self.iniProfile)==True):
+			shutil.copytree(self.iniProfile,ffProfile,ignore_dangling_symlinks=True)
+		if (os.path.isdir(snapProfile)==False) and (os.path.isdir(self.iniProfileSnap)==True):
+			shutil.copytree(self.iniProfileSnap,snapProfile,ignore_dangling_symlinks=True)
 	#def iniProfilesCopy
 
 	def restoreProfiles(self):
 		ffProfile=os.path.join(self.destIniProfile,"firefox")
 		snapProfile=os.path.join(self.destIniProfile,"snap")
+		self._debug("Restore ff profile")
+		self._debug("From {} -> {}".format(ffProfile,self.iniProfile))
 		if os.path.isdir(ffProfile):
 			if os.path.isdir(self.iniProfile):
 				shutil.rmtree(self.iniProfile)
-				shutil.copytree(ffProfile,self.iniProfile)
+			shutil.copytree(ffProfile,self.iniProfile)
+		self._debug("Restore ff snap profile")
+		self._debug("From {} -> {}".format(snapProfile,self.iniProfileSnap))
 		if os.path.isdir(snapProfile):
 			if os.path.isdir(self.iniProfileSnap):
 				shutil.rmtree(self.iniProfileSnap)
-				shutil.copytree(snapProfile,self.iniProfileSnap)
+			shutil.copytree(snapProfile,self.iniProfileSnap)
 	#def restoreProfiles
 #class firefoxProfiles
 
