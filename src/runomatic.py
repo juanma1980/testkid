@@ -27,6 +27,46 @@ BTN_SIZE=128
 gettext.textdomain('runomatic')
 _ = gettext.gettext
 
+class firefoxProfiles():
+	def __init__(self):
+		self.tmpDir="/tmp/.runomatic/firefox"
+		self.iniProfile=os.path.join(os.environ.get('HOME'),".mozilla/firefox/")
+		self.iniProfileSnap=os.path.join(os.environ.get('HOME'),"snap/firefox/common/.mozilla/firefox/")
+		self.destIniProfile=os.path.join(self.tmpDir,os.environ.get('USER'),'firefox')
+	#def __init__
+
+	def _debug(self,msg):
+		print("{}".format(str(msg)))
+
+	def iniProfilesCopy(self):
+		ffProfile=os.path.join(self.destIniProfile,"firefox")
+		snapProfile=os.path.join(self.destIniProfile,"snap")
+		if os.path.isdir(self.destIniProfile)==False:
+			os.makedirs(self.destIniProfile)
+		if (os.path.isdir(ffProfile)==False) and (os.path.isdir(self.iniProfile)==True):
+			shutil.copytree(self.iniProfile,ffProfile,ignore_dangling_symlinks=True)
+		if (os.path.isdir(snapProfile)==False) and (os.path.isdir(self.iniProfileSnap)==True):
+			shutil.copytree(self.iniProfileSnap,snapProfile,ignore_dangling_symlinks=True)
+	#def iniProfilesCopy
+
+	def restoreProfiles(self):
+		ffProfile=os.path.join(self.destIniProfile,"firefox")
+		snapProfile=os.path.join(self.destIniProfile,"snap")
+		self._debug("Restore ff profile")
+		self._debug("From {} -> {}".format(ffProfile,self.iniProfile))
+		if os.path.isdir(ffProfile):
+			if os.path.isdir(self.iniProfile):
+				shutil.rmtree(self.iniProfile)
+			shutil.copytree(ffProfile,self.iniProfile)
+		self._debug("Restore ff snap profile")
+		self._debug("From {} -> {}".format(snapProfile,self.iniProfileSnap))
+		if os.path.isdir(snapProfile):
+			if os.path.isdir(self.iniProfileSnap):
+				shutil.rmtree(self.iniProfileSnap)
+			shutil.copytree(snapProfile,self.iniProfileSnap)
+	#def restoreProfiles
+#class firefoxProfiles
+
 class QCheckBoxWithDescriptions(QCheckBox):
 	def __init__(self,text="",desktops=[],parent=None):
 		super (QCheckBoxWithDescriptions,self).__init__("",parent)
@@ -59,7 +99,6 @@ class QCheckBoxWithDescriptions(QCheckBox):
 			self.setEnabled(False)
 		self.setToolTip(tooltext)
 #class QCheckBoxWithDescriptions
-
 
 class appZone(QWidget):
 	def __init__(self,parent):
@@ -205,6 +244,8 @@ class runomatic(QWidget):
 		self._render_gui()
 		self.oldKey=""
 		self.currentKey=""
+		self.firefoxProfiles=firefoxProfiles()
+		self.firefoxProfiles.iniProfilesCopy()
 	#def init
 
 	def _plasmaMetaHotkey(self,enable=None,reconfigure=True):
@@ -387,7 +428,7 @@ class runomatic(QWidget):
 		if nolaunch==True:
 			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-			if self.close():
+		#	if self.close():
 				cmd=["{}/runoconfig.py".format(self.baseDir)]
 				try:
 					subprocess.run(cmd)
@@ -470,6 +511,7 @@ class runomatic(QWidget):
 					if os.path.isfile(xlockFile):
 						os.remove(xlockFile)
 		os.environ['DISPLAY']=":0"
+		self.firefoxProfiles.restoreProfiles()
 		if str(self.close_on_exit).lower()=='true':
 			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
@@ -498,6 +540,7 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
+						print("Launch conf")
 						self._launchConf()
 						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
@@ -795,6 +838,7 @@ class runomatic(QWidget):
 	def _launchZone(self,app):
 		tabContent=QWidget()
 		box=QVBoxLayout()
+		self._debug("Xephyr on {}".format(self.display))
 		wid=self.runner.get_wid("Xephyr on",self.display)
 		self._debug("Window Wid: %s"%wid)
 		zone=None
@@ -804,6 +848,8 @@ class runomatic(QWidget):
 
 		if not zone or not wid:
 			self._debug("Xephyr failed to launch")
+			self._debug("Zone: {}".format(zone))
+			self._debug("Wid: {}".format(wid))
 			tabContent.destroy()
 			wid=None
 		else:

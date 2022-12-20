@@ -184,7 +184,7 @@ class behaviour(confStack):
 		if os.path.isdir("/usr/share/lliurex/pixmaps/lliurex_art/stamps"):
 			fdia.setDirectory("/usr/share/lliurex/pixmaps/lliurex_art/stamps")
 		else:
-			fdia.setDirectory("/usr/share/backgrounds")
+			fdia.setDirectory("/usr/share/wallpapers")
 		fdia.setNameFilter(_("images(*.png *.svg *jpg *bmp)"))
 		if (fdia.exec_()):
 			fchoosed=fdia.selectedFiles()[0]
@@ -196,6 +196,7 @@ class behaviour(confStack):
 
 	def _setBg(self):
 		if self._setBgDlg()!='':
+			self.force_change=True
 			self.setChanged(True)
 	#def _setBg(self)
 
