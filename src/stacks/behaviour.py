@@ -46,7 +46,7 @@ class behaviour(confStack):
 		self.cmb_level=QComboBox()
 		self.cmb_level.addItem(_("User"))
 		self.cmb_level.addItem(_("System"))
-		self.cmb_level.addItem(_("N4d"))
+		#self.cmb_level.addItem(_("N4d"))
 		self.cmb_level.activated.connect(_change_osh)
 		self.cmb_level.setFixedWidth(100)
 		hbox.addWidget(self.cmb_level,1,Qt.AlignLeft)
