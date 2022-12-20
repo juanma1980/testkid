@@ -177,8 +177,8 @@ class launchers(confStack):
 					widget.setIcon(icn)
 				else:
 					widget.setText(fchoosed)
-			self.btn_ok.setEnabled(True)
-			self.btn_cancel.setEnabled(True)
+			self.force_change=True
+			self.setChanged(True)
 			return(fchoosed)
 	#def _file_chooser
 
