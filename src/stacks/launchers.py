@@ -324,16 +324,16 @@ class launchers(confStack):
 			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
 
 	def _reset_screen(self,filename):
-		if "runomatic" not in self.editBtn:
-			hidden=self.config[self.level].get("hidden",[])
-			hidden.append(self.editBtn)
-			self.saveChanges('hidden',hidden)
-			desktops=self.config[self.level].get("desktops",[])
-			if self.editBtn in desktops:
-				idx=desktops.index(self.editBtn)
-				desktops.remove(self.editBtn)
-				desktops.insert(idx,filename)
-				self.saveChanges('desktops',desktops)
+		#if "runomatic" not in self.editBtn:
+		hidden=self.config[self.level].get("hidden",[])
+		hidden.append(self.editBtn)
+		self.saveChanges('hidden',hidden)
+		desktops=self.config[self.level].get("desktops",[])
+		if self.editBtn in desktops:
+			idx=desktops.index(self.editBtn)
+			desktops.remove(self.editBtn)
+			desktops.insert(idx,filename)
+			self.saveChanges('desktops',desktops)
 		self.default_icon='shell'
 		self.defaultName=""
 		self.defaultExec=""
