@@ -395,7 +395,7 @@ class runomatic(QWidget):
 			lyt.addWidget(lbl,0,0,1,4)
 			btn=QPushButton(_("Launch configuration app"))
 			btn.setStyleSheet("")
-			btn.clicked.connect(self._launchConf)
+			btn.clicked.connect(lambda:self._launchConf(None))
 			lyt.addWidget(btn,1,0,1,4)
 			lbl2=QLabel(_("Or you can set directly a template from the menu"))
 			lyt.addWidget(lbl2,2,1,1,2)
@@ -425,17 +425,19 @@ class runomatic(QWidget):
 	#def _render_gui
 
 	def _launchConf(self,nolaunch=False):
-		if nolaunch==True:
-			return
+		if isinstance(nolaunch,bool):
+			if nolaunch==True:
+				return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-		#	if self.close():
-				cmd=["{}/runoconfig.py".format(self.baseDir)]
-				try:
-					subprocess.run(cmd)
-				except Exception as e:
-					print(_("{0}: {1}".format(msgErr,e)))
-					msgErr=_("Error launching config")
-				os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
+			if nolaunch==None:
+				self.close()
+			cmd=["{}/runoconfig.py".format(self.baseDir)]
+			try:
+				subprocess.run(cmd)
+			except Exception as e:
+				print(_("{0}: {1}".format(msgErr,e)))
+				msgErr=_("Error launching config")
+			os.execv("%s/runomatic.py"%self.baseDir,("1","1"))
 		else:
 			self.showMessage(_("runoconfig not found at %s"%self.baseDir),"error2",20)
 	#def launchConf
