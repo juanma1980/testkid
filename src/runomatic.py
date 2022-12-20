@@ -428,7 +428,7 @@ class runomatic(QWidget):
 		if nolaunch==True:
 			return
 		if os.path.isfile("%s/runoconfig.py"%self.baseDir):
-			if self.close():
+		#	if self.close():
 				cmd=["{}/runoconfig.py".format(self.baseDir)]
 				try:
 					subprocess.run(cmd)
@@ -540,6 +540,7 @@ class runomatic(QWidget):
 					sw=self.close_on_exit
 					self.close_on_exit=False
 					if self.close():
+						print("Launch conf")
 						self._launchConf()
 						#os.execv("%s/runoconfig.py"%self.baseDir)
 					self.close_on_exit=sw
