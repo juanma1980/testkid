@@ -604,7 +604,7 @@ class appRun():
 						idx=desktops.index(app)
 						self._debug("Banned app: %s"%app)
 						banned.append(app)
-						if (runapps[os.path.basename(app)] not in desktops):
+						if (runoapps[os.path.basename(app)] not in desktops):
 							desktops.insert(idx,runoapps[os.path.basename(app)])
 					desktops.remove(app)
 		result={'desktops':desktops,'banned':banned,'hidden':hidden}
