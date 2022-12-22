@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-01 12:44+0100\n"
+"POT-Creation-Date: 2022-12-22 11:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,36 +29,20 @@ msgstr ""
 msgid "From here you can change background, start and exit options..."
 msgstr ""
 
-#: ../src/stacks/behaviour.py:32
-msgid "The config will be applied per user"
-msgstr ""
-
-#: ../src/stacks/behaviour.py:34
-msgid "The config will be applied to all users"
-msgstr ""
-
-#: ../src/stacks/behaviour.py:36
-msgid "The config will be applied to all users and clients"
-msgstr ""
-
 #: ../src/stacks/behaviour.py:39
 msgid "Choose the config level that should use the app"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:45
-msgid "User"
-msgstr ""
-
-#: ../src/stacks/behaviour.py:46
-msgid "System"
+#: ../src/stacks/behaviour.py:44
+msgid "The config will be applied per"
 msgstr ""
 
 #: ../src/stacks/behaviour.py:47
-msgid "N4d"
+msgid "User"
 msgstr ""
 
-#: ../src/stacks/behaviour.py:55
-msgid "Session settings"
+#: ../src/stacks/behaviour.py:48
+msgid "System"
 msgstr ""
 
 #: ../src/stacks/behaviour.py:56
@@ -227,34 +211,38 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:252
+#: ../src/stacks/runoapps.py:68
+msgid "Close"
+msgstr ""
+
+#: ../src/stacks/runoapps.py:268
 msgid "Configure visible launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:253
+#: ../src/stacks/runoapps.py:269
 msgid "Modify launchers"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:255
+#: ../src/stacks/runoapps.py:271
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:324
+#: ../src/stacks/runoapps.py:340
 msgid "Categories"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:337
+#: ../src/stacks/runoapps.py:357
 msgid "Add launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:338
+#: ../src/stacks/runoapps.py:358
 msgid "Add Launcher"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:408 ../src/stacks/runoapps.py:412
+#: ../src/stacks/runoapps.py:430 ../src/stacks/runoapps.py:434
 msgid "Remove button"
 msgstr ""
 
-#: ../src/stacks/runoapps.py:409
+#: ../src/stacks/runoapps.py:431
 msgid "Edit button"
 msgstr ""
