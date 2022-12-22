@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-01 12:44+0100\n"
-"PO-Revision-Date: 2022-12-01 12:47+0100\n"
+"POT-Creation-Date: 2022-12-22 11:42+0100\n"
+"PO-Revision-Date: 2022-12-22 11:44+0100\n"
 "Last-Translator: empar <montoro_mde@gva.es>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -33,37 +33,21 @@ msgstr ""
 "Des d'ací podeu canviar les opcions d'inici i d'eixida, de fons de "
 "pantalla..."
 
-#: ../src/stacks/behaviour.py:32
-msgid "The config will be applied per user"
-msgstr "La configuració s'aplica per usuari"
-
-#: ../src/stacks/behaviour.py:34
-msgid "The config will be applied to all users"
-msgstr "La configuració s'aplicara tots els usuaris"
-
-#: ../src/stacks/behaviour.py:36
-msgid "The config will be applied to all users and clients"
-msgstr "La configuració s'aplica a tots els usuaris i clients"
-
 #: ../src/stacks/behaviour.py:39
 msgid "Choose the config level that should use the app"
 msgstr "Seleccioneu el nivell de configuració que s'ha d'aplicar"
 
-#: ../src/stacks/behaviour.py:45
+#: ../src/stacks/behaviour.py:44
+msgid "The config will be applied per"
+msgstr "La configuració s'aplica per"
+
+#: ../src/stacks/behaviour.py:47
 msgid "User"
 msgstr "Usuari"
 
-#: ../src/stacks/behaviour.py:46
+#: ../src/stacks/behaviour.py:48
 msgid "System"
 msgstr "Sistema"
-
-#: ../src/stacks/behaviour.py:47
-msgid "N4d"
-msgstr "N4d"
-
-#: ../src/stacks/behaviour.py:55
-msgid "Session settings"
-msgstr "Configuració de la sessió"
 
 #: ../src/stacks/behaviour.py:56
 msgid "Launch at startup"
@@ -111,7 +95,7 @@ msgstr "Triar una tecla F per a executar run-o-config desde el run-o-matic"
 
 #: ../src/stacks/launchers.py:22
 msgid "Add executable"
-msgstr "Executable:"
+msgstr "Executable"
 
 #: ../src/stacks/launchers.py:23
 msgid "Executable path"
@@ -151,7 +135,7 @@ msgstr "Des d'ací podeu afegir llançadors"
 
 #: ../src/stacks/launchers.py:80
 msgid "Icon: "
-msgstr "Icona:"
+msgstr "Icona"
 
 #: ../src/stacks/launchers.py:87
 msgid "Push to change icon"
@@ -235,38 +219,54 @@ msgstr "Selecció del llançador"
 msgid "Search"
 msgstr "Cerca"
 
-#: ../src/stacks/runoapps.py:252
+#: ../src/stacks/runoapps.py:68
+msgid "Close"
+msgstr "Tancar"
+
+#: ../src/stacks/runoapps.py:268
 msgid "Configure visible launchers"
 msgstr "Configura els llançadors visibles"
 
-#: ../src/stacks/runoapps.py:253
+#: ../src/stacks/runoapps.py:269
 msgid "Modify launchers"
 msgstr "Modifica els llançadors"
 
-#: ../src/stacks/runoapps.py:255
+#: ../src/stacks/runoapps.py:271
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr ""
 "Afig un llançador personalitzat que es mostrarà en la categoria run-o-matic"
 
-#: ../src/stacks/runoapps.py:324
+#: ../src/stacks/runoapps.py:340
 msgid "Categories"
 msgstr "Categories"
 
-#: ../src/stacks/runoapps.py:337
+#: ../src/stacks/runoapps.py:357
 msgid "Add launcher"
 msgstr "Afig un llançador"
 
-#: ../src/stacks/runoapps.py:338
+#: ../src/stacks/runoapps.py:358
 msgid "Add Launcher"
 msgstr "Afig un llançador"
 
-#: ../src/stacks/runoapps.py:408 ../src/stacks/runoapps.py:412
+#: ../src/stacks/runoapps.py:430 ../src/stacks/runoapps.py:434
 msgid "Remove button"
 msgstr "Elimina"
 
-#: ../src/stacks/runoapps.py:409
+#: ../src/stacks/runoapps.py:431
 msgid "Edit button"
 msgstr "Edita el botó"
+
+#~ msgid "The config will be applied to all users"
+#~ msgstr "La configuració s'aplicara tots els usuaris"
+
+#~ msgid "The config will be applied to all users and clients"
+#~ msgstr "La configuració s'aplica a tots els usuaris i clients"
+
+#~ msgid "N4d"
+#~ msgstr "N4d"
+
+#~ msgid "Session settings"
+#~ msgstr "Configuració de la sessió"
 
 #~ msgid "Add launcher (expert mode)"
 #~ msgstr "Afig un llançador (mode expert)"

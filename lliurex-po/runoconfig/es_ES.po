@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-01 12:44+0100\n"
-"PO-Revision-Date: 2022-12-01 12:45+0100\n"
+"POT-Creation-Date: 2022-12-22 11:42+0100\n"
+"PO-Revision-Date: 2022-12-22 11:43+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -30,37 +30,21 @@ msgstr "Comportamiento de la aplicación"
 msgid "From here you can change background, start and exit options..."
 msgstr "Opciones de inicio y apagado, fondo de pantalla..."
 
-#: ../src/stacks/behaviour.py:32
-msgid "The config will be applied per user"
-msgstr "La configuración se aplicará por usuario"
-
-#: ../src/stacks/behaviour.py:34
-msgid "The config will be applied to all users"
-msgstr "La configuración se aplicará a todos los usuarios"
-
-#: ../src/stacks/behaviour.py:36
-msgid "The config will be applied to all users and clients"
-msgstr "La configuración se aplicará a todos los usuarios y clientes"
-
 #: ../src/stacks/behaviour.py:39
 msgid "Choose the config level that should use the app"
 msgstr "Selecciona el nivel de configuración a usar"
 
-#: ../src/stacks/behaviour.py:45
+#: ../src/stacks/behaviour.py:44
+msgid "The config will be applied per"
+msgstr "La configuración se aplicará por"
+
+#: ../src/stacks/behaviour.py:47
 msgid "User"
 msgstr "Usuario"
 
-#: ../src/stacks/behaviour.py:46
+#: ../src/stacks/behaviour.py:48
 msgid "System"
 msgstr "Sistema"
-
-#: ../src/stacks/behaviour.py:47
-msgid "N4d"
-msgstr "N4d"
-
-#: ../src/stacks/behaviour.py:55
-msgid "Session settings"
-msgstr "Ajustes de sesión"
 
 #: ../src/stacks/behaviour.py:56
 msgid "Launch at startup"
@@ -108,7 +92,7 @@ msgstr "Seleccionar una tecla F para ejecutar runoconfig desde runomatic"
 
 #: ../src/stacks/launchers.py:22
 msgid "Add executable"
-msgstr "Ejecutable:"
+msgstr "Ejecutable"
 
 #: ../src/stacks/launchers.py:23
 msgid "Executable path"
@@ -148,7 +132,7 @@ msgstr "Desde aquí se pueden añadir lanzadores"
 
 #: ../src/stacks/launchers.py:80
 msgid "Icon: "
-msgstr "Icono:"
+msgstr "Icono"
 
 #: ../src/stacks/launchers.py:87
 msgid "Push to change icon"
@@ -156,7 +140,7 @@ msgstr "Pulsa para cambiar el icono"
 
 #: ../src/stacks/launchers.py:90
 msgid "Name: "
-msgstr "Nombre:"
+msgstr "Nombre"
 
 #: ../src/stacks/launchers.py:93
 msgid "Desktop name"
@@ -172,7 +156,7 @@ msgstr "Pulsa para seleccionar un ejecutable"
 
 #: ../src/stacks/launchers.py:122
 msgid "Description: "
-msgstr "Descripción:"
+msgstr "Descripción"
 
 #: ../src/stacks/launchers.py:125
 msgid "Description"
@@ -232,37 +216,53 @@ msgstr "Selección de lanzador"
 msgid "Search"
 msgstr "Búsqueda"
 
-#: ../src/stacks/runoapps.py:252
-msgid "Configure visible launchers"
-msgstr "Configurar los lanzadores "
+#: ../src/stacks/runoapps.py:68
+msgid "Close"
+msgstr "Cerrar"
 
-#: ../src/stacks/runoapps.py:253
+#: ../src/stacks/runoapps.py:268
+msgid "Configure visible launchers"
+msgstr "Configurar los lanzadores"
+
+#: ../src/stacks/runoapps.py:269
 msgid "Modify launchers"
 msgstr "Modificar lanzadores"
 
-#: ../src/stacks/runoapps.py:255
+#: ../src/stacks/runoapps.py:271
 msgid "Add custom launcher that will be shown in run-o-matic category"
 msgstr "Añadir un lanzador personalizado (en la categoría run-o-matic)"
 
-#: ../src/stacks/runoapps.py:324
+#: ../src/stacks/runoapps.py:340
 msgid "Categories"
 msgstr "Categorías"
 
-#: ../src/stacks/runoapps.py:337
+#: ../src/stacks/runoapps.py:357
 msgid "Add launcher"
-msgstr "Añadir lanzador\t"
+msgstr "Añadir lanzador"
 
-#: ../src/stacks/runoapps.py:338
+#: ../src/stacks/runoapps.py:358
 msgid "Add Launcher"
-msgstr "Añadir lanzador\t"
+msgstr "Añadir lanzador"
 
-#: ../src/stacks/runoapps.py:408 ../src/stacks/runoapps.py:412
+#: ../src/stacks/runoapps.py:430 ../src/stacks/runoapps.py:434
 msgid "Remove button"
 msgstr "Eliminar"
 
-#: ../src/stacks/runoapps.py:409
+#: ../src/stacks/runoapps.py:431
 msgid "Edit button"
 msgstr "Editar"
+
+#~ msgid "The config will be applied to all users"
+#~ msgstr "La configuración se aplicará a todos los usuarios"
+
+#~ msgid "The config will be applied to all users and clients"
+#~ msgstr "La configuración se aplicará a todos los usuarios y clientes"
+
+#~ msgid "N4d"
+#~ msgstr "N4d"
+
+#~ msgid "Session settings"
+#~ msgstr "Ajustes de sesión"
 
 #~ msgid "Add launcher (expert mode)"
 #~ msgstr "Añadir lanzador (modo experto)"
