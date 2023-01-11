@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-22 11:42+0100\n"
+"POT-Creation-Date: 2023-01-11 16:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,11 +79,11 @@ msgstr ""
 msgid "From here you can modify the keybinding"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:31
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr ""
 
-#: ../src/stacks/keybinds.py:37
+#: ../src/stacks/keybinds.py:39
 msgid "Select a F key for launch runoconfig from runomatic"
 msgstr ""
 
@@ -124,50 +124,46 @@ msgid "From here you can add a custom launcher"
 msgstr ""
 
 #: ../src/stacks/launchers.py:78
-msgid "From here you can add Launchers"
-msgstr ""
-
-#: ../src/stacks/launchers.py:80
-msgid "Icon: "
-msgstr ""
-
-#: ../src/stacks/launchers.py:87
-msgid "Push to change icon"
-msgstr ""
-
-#: ../src/stacks/launchers.py:90
 msgid "Name: "
 msgstr ""
 
-#: ../src/stacks/launchers.py:93
+#: ../src/stacks/launchers.py:81
 msgid "Desktop name"
 msgstr ""
 
-#: ../src/stacks/launchers.py:94
+#: ../src/stacks/launchers.py:82
 msgid "Insert desktop name"
 msgstr ""
 
-#: ../src/stacks/launchers.py:116
+#: ../src/stacks/launchers.py:84
+msgid "Icon: "
+msgstr ""
+
+#: ../src/stacks/launchers.py:91
+msgid "Push to change icon"
+msgstr ""
+
+#: ../src/stacks/launchers.py:114
 msgid "Press button to select an executable"
 msgstr ""
 
-#: ../src/stacks/launchers.py:122
-msgid "Description: "
+#: ../src/stacks/launchers.py:120
+msgid "Description (optional): "
 msgstr ""
 
-#: ../src/stacks/launchers.py:125
+#: ../src/stacks/launchers.py:123
 msgid "Description"
 msgstr ""
 
-#: ../src/stacks/launchers.py:126
+#: ../src/stacks/launchers.py:124
 msgid "Insert a description for the app"
 msgstr ""
 
-#: ../src/stacks/launchers.py:165
+#: ../src/stacks/launchers.py:169
 msgid "images(*.png *.xpm *jpg)"
 msgstr ""
 
-#: ../src/stacks/launchers.py:167
+#: ../src/stacks/launchers.py:171
 msgid "All files(*.*)"
 msgstr ""
 

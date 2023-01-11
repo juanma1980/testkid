@@ -27,7 +27,9 @@ class keybinds(confStack):
 	#def __init__
 	
 	def _load_screen(self):
-		box=QGridLayout()
+		vbox=QVBoxLayout()
+		wdg=QWidget()
+		hbox=QGridLayout()
 		inp_conf=QLabel(_("Launch configuration"))
 		self.cmb_keys=QComboBox()
 		self.cmb_keys.addItem(" ")
@@ -36,10 +38,12 @@ class keybinds(confStack):
 		self.cmb_keys.adjustSize()
 		self.lbl_info=QLabel(_("Select a F key for launch runoconfig from runomatic"))
 		self.lbl_info.setWordWrap(True)
-		box.addWidget(self.lbl_info,1,0,1,1,Qt.Alignment(-1))
-		box.addWidget(self.cmb_keys,1,1,1,1,Qt.Alignment(1))
-		self.setLayout(box)
-		self.updateScreen()
+		hbox.addWidget(self.lbl_info,1,0,1,1,Qt.AlignRight)
+		hbox.addWidget(self.cmb_keys,1,1,1,1,Qt.AlignLeft)
+		wdg.setLayout(hbox)
+		vbox.addWidget(wdg)
+		self.setLayout(vbox)
+#		self.updateScreen()
 		return(self)
 	#def _load_screen
 

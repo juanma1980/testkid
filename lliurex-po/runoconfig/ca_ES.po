@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-22 11:42+0100\n"
-"PO-Revision-Date: 2022-12-22 11:44+0100\n"
+"POT-Creation-Date: 2023-01-11 16:05+0100\n"
+"PO-Revision-Date: 2023-01-11 16:07+0100\n"
 "Last-Translator: empar <montoro_mde@gva.es>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -85,11 +85,11 @@ msgstr "Modifica les vinculacions de tecles"
 msgid "From here you can modify the keybinding"
 msgstr "Des d'ací podeu modificar les vinculacions de tecles"
 
-#: ../src/stacks/keybinds.py:31
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr "Tecla per a llançar la configuració de run-o-matic"
 
-#: ../src/stacks/keybinds.py:37
+#: ../src/stacks/keybinds.py:39
 msgid "Select a F key for launch runoconfig from runomatic"
 msgstr "Triar una tecla F per a executar run-o-config desde el run-o-matic"
 
@@ -130,50 +130,46 @@ msgid "From here you can add a custom launcher"
 msgstr "Des d'ací podeu afegir un llançador personalitzat"
 
 #: ../src/stacks/launchers.py:78
-msgid "From here you can add Launchers"
-msgstr "Des d'ací podeu afegir llançadors"
-
-#: ../src/stacks/launchers.py:80
-msgid "Icon: "
-msgstr "Icona"
-
-#: ../src/stacks/launchers.py:87
-msgid "Push to change icon"
-msgstr "Premeu per a canviar la icona"
-
-#: ../src/stacks/launchers.py:90
 msgid "Name: "
 msgstr "Nom: "
 
-#: ../src/stacks/launchers.py:93
+#: ../src/stacks/launchers.py:81
 msgid "Desktop name"
-msgstr "Nom de l'escriptori"
+msgstr "Nom del llançador"
 
-#: ../src/stacks/launchers.py:94
+#: ../src/stacks/launchers.py:82
 msgid "Insert desktop name"
-msgstr "Inseriu el nom de l'escriptori"
+msgstr "Inseriu el nom del llançador"
 
-#: ../src/stacks/launchers.py:116
+#: ../src/stacks/launchers.py:84
+msgid "Icon: "
+msgstr "Icona "
+
+#: ../src/stacks/launchers.py:91
+msgid "Push to change icon"
+msgstr "Premeu per a canviar la icona"
+
+#: ../src/stacks/launchers.py:114
 msgid "Press button to select an executable"
 msgstr "Premeu per a seleccionar l'executable"
 
-#: ../src/stacks/launchers.py:122
-msgid "Description: "
-msgstr "Descripció: "
+#: ../src/stacks/launchers.py:120
+msgid "Description (optional): "
+msgstr "Descripció (opcional): "
 
-#: ../src/stacks/launchers.py:125
+#: ../src/stacks/launchers.py:123
 msgid "Description"
 msgstr "Descripció"
 
-#: ../src/stacks/launchers.py:126
+#: ../src/stacks/launchers.py:124
 msgid "Insert a description for the app"
 msgstr "Inseriu una descripció de l'aplicació"
 
-#: ../src/stacks/launchers.py:165
+#: ../src/stacks/launchers.py:169
 msgid "images(*.png *.xpm *jpg)"
 msgstr "imatges(*.png *.xpm *jpg)"
 
-#: ../src/stacks/launchers.py:167
+#: ../src/stacks/launchers.py:171
 msgid "All files(*.*)"
 msgstr "Tots els fitxers(*.*)"
 
@@ -255,6 +251,9 @@ msgstr "Elimina"
 #: ../src/stacks/runoapps.py:431
 msgid "Edit button"
 msgstr "Edita el botó"
+
+#~ msgid "From here you can add Launchers"
+#~ msgstr "Des d'ací podeu afegir llançadors"
 
 #~ msgid "The config will be applied to all users"
 #~ msgstr "La configuració s'aplicara tots els usuaris"
