@@ -198,7 +198,7 @@ class runomatic(QWidget):
 	def __init__(self):
 		super().__init__()
 		self._plasmaMetaHotkey(enable=False,reconfigure=True)
-		self.dbg=True
+		self.dbg=False
 		exePath=sys.argv[0]
 		if os.path.islink(sys.argv[0]):
 			exePath=os.path.realpath(sys.argv[0])

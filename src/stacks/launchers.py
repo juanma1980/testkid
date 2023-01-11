@@ -29,7 +29,7 @@ i18n={"EXECUTABLE":_("Add executable"),
 
 class launchers(confStack):
 	def __init_stack__(self):
-		self.dbg=True
+		self.dbg=False
 		self._debug("confDesktops Load")
 		self.runner=appRun()
 		self.menu=App2Menu.app2menu()
