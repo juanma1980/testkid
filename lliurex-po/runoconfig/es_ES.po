@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-22 11:42+0100\n"
-"PO-Revision-Date: 2022-12-22 11:43+0100\n"
+"POT-Creation-Date: 2023-01-11 16:05+0100\n"
+"PO-Revision-Date: 2023-01-11 16:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -82,11 +82,11 @@ msgstr "Modificar atajos"
 msgid "From here you can modify the keybinding"
 msgstr "Desde aquí se pueden modificar los atajos de teclado"
 
-#: ../src/stacks/keybinds.py:31
+#: ../src/stacks/keybinds.py:33
 msgid "Launch configuration"
 msgstr "Tecla para acceder a la configuración de runomatic"
 
-#: ../src/stacks/keybinds.py:37
+#: ../src/stacks/keybinds.py:39
 msgid "Select a F key for launch runoconfig from runomatic"
 msgstr "Seleccionar una tecla F para ejecutar runoconfig desde runomatic"
 
@@ -127,50 +127,46 @@ msgid "From here you can add a custom launcher"
 msgstr "Desde aquí se pueden añadir lanzadores personalizados"
 
 #: ../src/stacks/launchers.py:78
-msgid "From here you can add Launchers"
-msgstr "Desde aquí se pueden añadir lanzadores"
-
-#: ../src/stacks/launchers.py:80
-msgid "Icon: "
-msgstr "Icono"
-
-#: ../src/stacks/launchers.py:87
-msgid "Push to change icon"
-msgstr "Pulsa para cambiar el icono"
-
-#: ../src/stacks/launchers.py:90
 msgid "Name: "
 msgstr "Nombre"
 
-#: ../src/stacks/launchers.py:93
+#: ../src/stacks/launchers.py:81
 msgid "Desktop name"
 msgstr "Nombre del lanzador"
 
-#: ../src/stacks/launchers.py:94
+#: ../src/stacks/launchers.py:82
 msgid "Insert desktop name"
 msgstr "Inserta el nombre del lanzador"
 
-#: ../src/stacks/launchers.py:116
+#: ../src/stacks/launchers.py:84
+msgid "Icon: "
+msgstr "Icono"
+
+#: ../src/stacks/launchers.py:91
+msgid "Push to change icon"
+msgstr "Pulsa para cambiar el icono"
+
+#: ../src/stacks/launchers.py:114
 msgid "Press button to select an executable"
 msgstr "Pulsa para seleccionar un ejecutable"
 
-#: ../src/stacks/launchers.py:122
-msgid "Description: "
-msgstr "Descripción"
+#: ../src/stacks/launchers.py:120
+msgid "Description (optional): "
+msgstr "Descripción (opcional): "
 
-#: ../src/stacks/launchers.py:125
+#: ../src/stacks/launchers.py:123
 msgid "Description"
 msgstr "Descripción"
 
-#: ../src/stacks/launchers.py:126
+#: ../src/stacks/launchers.py:124
 msgid "Insert a description for the app"
 msgstr "Inserta la descripción del lanzador"
 
-#: ../src/stacks/launchers.py:165
+#: ../src/stacks/launchers.py:169
 msgid "images(*.png *.xpm *jpg)"
 msgstr "imagenes(*.png *.xpm *jpg)"
 
-#: ../src/stacks/launchers.py:167
+#: ../src/stacks/launchers.py:171
 msgid "All files(*.*)"
 msgstr "Todos los ficheros(*.*)"
 
@@ -251,6 +247,9 @@ msgstr "Eliminar"
 #: ../src/stacks/runoapps.py:431
 msgid "Edit button"
 msgstr "Editar"
+
+#~ msgid "From here you can add Launchers"
+#~ msgstr "Desde aquí se pueden añadir lanzadores"
 
 #~ msgid "The config will be applied to all users"
 #~ msgstr "La configuración se aplicará a todos los usuarios"
