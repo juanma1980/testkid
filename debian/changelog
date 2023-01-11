@@ -1,4 +1,4 @@
-runomatic (1.5.2) lliurex22; urgency=medium
+runomatic (1.5.3) focal; urgency=medium
 
   * Disconnect from dbus session
   * Always use primary screen
@@ -11,7 +11,7 @@ runomatic (1.5.2) lliurex22; urgency=medium
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Aug 2022 11:10:27 +0200
 
-runomatic (1.2.2) lliurex22; urgency=medium
+runomatic (1.2.2) focal; urgency=medium
 
   * Always load system runoapps
 
