@@ -576,7 +576,8 @@ class runoapps(confStack):
 						apps['desktops'].append(btn.title)
 					else:
 						apps['hidden'].append(btn.title)
-		apps['hidden']=self.hidden
+		config=self.getConfig(self.level)
+		apps['hidden']=list(set(config.get(self.level,{}).get("hidden",[])+self.hidden))
 		return apps
 	#def _get_table_apps
 
