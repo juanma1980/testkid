@@ -528,6 +528,7 @@ class appRun():
 		if self.level=='system':
 			data=sysconfig.copy()
 		else:
+			self.config.changes=True
 			data=self.config.getConfig(self.level,exclude=['background64'])
 
 		self._debug("Read Data: %s"%data)
