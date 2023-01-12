@@ -1,4 +1,4 @@
-runomatic (1.5.3.2) focal; urgency=medium
+runomatic (1.5.3.3) focal; urgency=medium
 
   * Disconnect from dbus session
   * Always use primary screen
@@ -10,6 +10,7 @@ runomatic (1.5.3.2) focal; urgency=medium
   * Only show launchable apps
   * Fix tmp not being cleaned
   * Fix duplicated items after editing
+  * Only close session if both closeOnExit and launchConfKey are set
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Aug 2022 11:10:27 +0200
 
