@@ -29,7 +29,7 @@ i18n={"EXECUTABLE":_("Add executable"),
 
 class launchers(confStack):
 	def __init_stack__(self):
-		self.dbg=False
+		self.dbg=True
 		self._debug("confDesktops Load")
 		self.runner=appRun()
 		self.menu=App2Menu.app2menu()
@@ -58,6 +58,7 @@ class launchers(confStack):
 		self.filename=""
 		self.level='user'
 		self.editBtn=False
+		self.reset=True
 	#def __init__
 		
 	def _debug(self,msg):
@@ -251,6 +252,8 @@ class launchers(confStack):
 	#def _get_icon
 
 	def updateScreen(self):
+		if self.reset==True:
+			self._reset_screen()
 		self.inp_name.setText(self.defaultName)
 		self.inp_exec.setText(self.defaultExec)
 		self.inp_desc.setText(self.defaultDesc)
@@ -309,8 +312,7 @@ class launchers(confStack):
 		self.btn_cancel.setEnabled(False)
 		self.refresh=True
 		retval=True
-		if self.editBtn:
-			self._reset_screen(filename)
+		self._end_edit(filename)
 
 		apps=self.runner.get_apps(exclude=['background64'])
 		categories=apps['categories']
@@ -327,26 +329,40 @@ class launchers(confStack):
 		with open(tarFile,"rb") as tar:
 			self.saveChanges('runotar',base64.b64encode(tar.read()).decode("utf-8"))
 
-	def _reset_screen(self,filename):
+	def _reset_screen(self):
+		self.reset=False
+		self.default_icon='shell'
+		self.defaultName=""
+		self.defaultExec=""
+		self.defaultDesc=""
+		self.editBtn=False
+		self.filename=""
+
+	def _end_edit(self,filename):
 		#if "runomatic" not in self.editBtn:
-		hidden=self.config[self.level].get("hidden",[])
-		hidden.append(self.editBtn)
-		self.saveChanges('hidden',hidden)
+		if isinstance(self.editBtn,str):
+			if not ".config/runomatic/applications" in self.editBtn:
+				hidden=self.config[self.level].get("hidden",[])
+				hidden.append(self.editBtn)
+				self.saveChanges('hidden',hidden)
+
+	#	desktops=self.config[self.level].get("desktops",[])
+		self.changes=True
+		self.config=self.getConfig(self.level)
 		desktops=self.config[self.level].get("desktops",[])
 		if self.editBtn in desktops:
 			idx=desktops.index(self.editBtn)
 			desktops.remove(self.editBtn)
 			desktops.insert(idx,filename)
 			self.saveChanges('desktops',desktops)
-		self.default_icon='shell'
-		self.defaultName=""
-		self.defaultExec=""
-		self.defaultDesc=""
-		self.editBtn=False
+		self._reset_screen()
 		self.stack.gotoStack(idx=2,parms=self.editBtn)
+		self.stack.lst_options.setCurrentRow(1)
 
 	def setParms(self,parms):
 		self._debug("Loading %s"%parms)
+		self.reset=False
+		self.stack.lst_options.setCurrentRow(2)
 		desktop=self.menu.get_desktop_info(parms)
 		self.filename=os.path.basename(parms)
 		self.defaultName=desktop['Name']
