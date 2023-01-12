@@ -514,6 +514,18 @@ class runomatic(QWidget):
 						os.remove(xlockFile)
 		os.environ['DISPLAY']=":0"
 		self.firefoxProfiles.restoreProfiles()
+		#Clean files
+		if os.path.isdir("/tmp/.runomatic"):
+			try:
+				shutil.rmtree("/tmp/.runomatic")
+			except:
+				pass
+		if os.path.isfile("/tmp/.runovncstartup"):
+			try:
+				os.remove("/tmp/.runovncstartup")
+			except Exception as e:
+				print(e)
+				pass
 		if str(self.close_on_exit).lower()=='true':
 			print("Closing session...")
 			subprocess.run(["loginctl","terminate-user","%s"%self.username])
