@@ -586,6 +586,7 @@ class runoapps(confStack):
 			apps['banned'].append(parms)
 		for key,data in apps.items():
 			self.saveChanges(key,data)
+		self.stack.lst_options.setCurrentRow(1)
 		self.updateScreen()
 
 	def _define_css(self):
