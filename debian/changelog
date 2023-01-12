@@ -1,4 +1,4 @@
-runomatic (1.5.3.3) focal; urgency=medium
+runomatic (1.5.3.4) focal; urgency=medium
 
   * Disconnect from dbus session
   * Always use primary screen
