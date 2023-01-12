@@ -255,6 +255,9 @@ class launchers(confStack):
 		if self.reset==True:
 			self._reset_screen()
 		self.inp_name.setText(self.defaultName)
+		if "https" in self.defaultExec:
+			exe=self.defaultExec.split(" ")
+			self.defaultExec=" ".join(exe[1:])
 		self.inp_exec.setText(self.defaultExec)
 		self.inp_desc.setText(self.defaultDesc)
 		self.app_icon=self.default_icon
