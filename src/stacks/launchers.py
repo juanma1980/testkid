@@ -301,7 +301,7 @@ class launchers(confStack):
 			print("Error saving desktop %s"%filename)
 			self._debug("Error  saving %s: %s"%(filename,e))
 		#Copy newd desktop to userRunoapps
-		runoName="%s/%s"%(self.userRunoapps,os.path.basename(filename))
+		runoName=os.path.join(self.userRunoapps,os.path.basename(filename))
 		if filename!=runoName:
 			shutil.copy(filename,runoName)
 
@@ -340,14 +340,16 @@ class launchers(confStack):
 
 	def _end_edit(self,filename):
 		#if "runomatic" not in self.editBtn:
-		if isinstance(self.editBtn,str):
-			if not ".config/runomatic/applications" in self.editBtn:
-				hidden=self.config[self.level].get("hidden",[])
-				hidden.append(self.editBtn)
-				self.saveChanges('hidden',hidden)
-
-	#	desktops=self.config[self.level].get("desktops",[])
 		self.changes=True
+		hidden=self.config[self.level].get("hidden",[])
+		if len(hidden)==0:
+			self.config=self.getConfig(self.level)
+			hidden=self.config[self.level].get("hidden",[])
+		if isinstance(self.editBtn,bool):
+			self.editBtn=""
+		if not ".config/runomatic/applications" in self.editBtn:
+			hidden.append(self.editBtn)
+		self.saveChanges('hidden',hidden)
 		self.config=self.getConfig(self.level)
 		desktops=self.config[self.level].get("desktops",[])
 		if self.editBtn in desktops:
