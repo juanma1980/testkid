@@ -527,8 +527,12 @@ class runomatic(QWidget):
 				print(e)
 				pass
 		if str(self.close_on_exit).lower()=='true':
-			print("Closing session...")
-			subprocess.run(["loginctl","terminate-user","%s"%self.username])
+			confKey=''
+			if self.keybinds:
+				confKey=self.keybinds.get('conf','')
+			if len(confKey.strip())>0:
+				print("Closing session...")
+				subprocess.run(["loginctl","terminate-user","%s"%self.username])
 	#def closeEvent
 
 	def keyPressEvent(self,event):
