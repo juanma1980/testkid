@@ -249,6 +249,5 @@ class behaviour(confStack):
 		with open(self.bg,"rb") as img:
 			if self.saveChanges('background64',base64.b64encode(img.read()).decode("utf-8"))==False:
 				self.showMsg("Failed to write config")
-				break
 	#def writeConfig
 
