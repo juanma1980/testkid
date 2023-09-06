@@ -2,7 +2,8 @@
 import getpass
 import sys
 import os,stat
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
+#from PyQt5.QtCore import QSize,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
+from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess
 import subprocess
 import multiprocessing as mp
 import base64
@@ -33,7 +34,7 @@ class th_procMon(QThread):
 #class th_procMon
 
 class th_runApp(QThread):
-	processRun=pyqtSignal("PyQt_PyObject")
+	processRun=Signal(object)
 	def __init__(self,app,display,parent=None):
 		QThread.__init__(self,parent)
 		self.display=display
