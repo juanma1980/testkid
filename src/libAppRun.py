@@ -258,8 +258,9 @@ class appRun():
 				#Create fake xstartup for tigervnc so dbus don't interfere with real session
 				runovncstartup="/tmp/.runovncstartup"
 				with open(runovncstartup,"w") as f:
-					f.write("#!/bin/sh\n")
+					f.write("#!/bin/bash\n")
 					f.write("unset DBUS_SESSION_BUS_ADDRESS\n")
+					f.write("xeyes\n")
 				os.chmod(runovncstartup, stat.S_IXUSR | stat.S_IRUSR| stat.S_IWUSR | stat.S_IRGRP |stat.S_IROTH | stat.S_IROTH)
 				
 				#vnc_cmd=["Xtightvnc",
@@ -287,6 +288,7 @@ class appRun():
 						pass
 				fakeEnv=os.environ
 				fakeEnv['XDG_CONFIG_DIRS']=NOLAUNCH
+				self._debug("VNC: {}".format(" ".join(vnc_cmd)))
 				subprocess.run(vnc_cmd,env=fakeEnv)
 
 #				xephyr_cmd=["vinagre",
