@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-<id>runomatic</id>
+<id>net.lliurex.runomatic</id>
 <metadata_license>CC0-1.0</metadata_license>
 <name>Run-o-Matic</name>
 <summary>Application environment targeting childs</summary>
@@ -12,8 +12,8 @@
 <p xml:lang="ca">Run-o-Matic es un sentzill llançador d'aplicacions predefinides que bloqueja l'accès a la resta de l'escriptori. Està pensat per a ser utilitzat mitjançat teclat o ratolí, tractant de reproduir l'experiència d'ús d'una tàbleta a una pantalla no tàctil per tal de facilitar l'ús de l'ordinador per part dels menuts. Cada apliació s'executa dins d'una pestanya independient i pot ser tancada prement l'aspa roja que apareix a cadascuna amb el ratolí. Desde la finestra principal podem accedir a qualsevol de les aplicacions executades be prement la pestranya corresponent o be el nombre corresponent de cadascuna d'elles, sobreimprès a les respectives aplicacions que estàn en execució</p>
 </description>
 <categories>
-<category>System</category>
-<category>Utilities</category>
+<category>Education</category>
+<category>LliureX-Infantil</category>
 </categories>
 <icon type="stock">runomatic</icon>
 <provides><binary>/usr/bin/runomatic</binary></provides>
