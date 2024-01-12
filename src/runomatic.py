@@ -42,11 +42,20 @@ class firefoxProfiles():
 		ffProfile=os.path.join(self.destIniProfile,"firefox")
 		snapProfile=os.path.join(self.destIniProfile,"snap")
 		if os.path.isdir(self.destIniProfile)==False:
-			os.makedirs(self.destIniProfile)
+			try:
+				os.makedirs(self.destIniProfile)
+			except Exeption as e:
+				print("makedirs: {}".format(e))
 		if (os.path.isdir(ffProfile)==False) and (os.path.isdir(self.iniProfile)==True):
-			shutil.copytree(self.iniProfile,ffProfile,ignore_dangling_symlinks=True)
+			try:
+				shutil.copytree(self.iniProfile,ffProfile,ignore_dangling_symlinks=True)
+			except Exeption as e:
+				print("copy: {}".format(e))
 		if (os.path.isdir(snapProfile)==False) and (os.path.isdir(self.iniProfileSnap)==True):
-			shutil.copytree(self.iniProfileSnap,snapProfile,ignore_dangling_symlinks=True)
+			try:
+				shutil.copytree(self.iniProfileSnap,snapProfile,ignore_dangling_symlinks=True)
+			except Exeption as e:
+				print("copy: {}".format(e))
 	#def iniProfilesCopy
 
 	def restoreProfiles(self):

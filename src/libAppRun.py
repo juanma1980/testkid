@@ -2,7 +2,8 @@
 import getpass
 import sys
 import os,stat
-from PyQt5.QtCore import QSize,pyqtSlot,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
+#from PyQt5.QtCore import QSize,Qt, QPropertyAnimation,QThread,QRect,QTimer,pyqtSignal,QSignalMapper,QProcess
+from PySide2.QtCore import QSize,Slot,Qt, QPropertyAnimation,QThread,QRect,QTimer,Signal,QSignalMapper,QProcess
 import subprocess
 import multiprocessing as mp
 import base64
@@ -33,7 +34,7 @@ class th_procMon(QThread):
 #class th_procMon
 
 class th_runApp(QThread):
-	processRun=pyqtSignal("PyQt_PyObject")
+	processRun=Signal(object)
 	def __init__(self,app,display,parent=None):
 		QThread.__init__(self,parent)
 		self.display=display
@@ -257,8 +258,9 @@ class appRun():
 				#Create fake xstartup for tigervnc so dbus don't interfere with real session
 				runovncstartup="/tmp/.runovncstartup"
 				with open(runovncstartup,"w") as f:
-					f.write("#!/bin/sh\n")
+					f.write("#!/bin/bash\n")
 					f.write("unset DBUS_SESSION_BUS_ADDRESS\n")
+					f.write("xeyes\n")
 				os.chmod(runovncstartup, stat.S_IXUSR | stat.S_IRUSR| stat.S_IWUSR | stat.S_IRGRP |stat.S_IROTH | stat.S_IROTH)
 				
 				#vnc_cmd=["Xtightvnc",
@@ -286,6 +288,7 @@ class appRun():
 						pass
 				fakeEnv=os.environ
 				fakeEnv['XDG_CONFIG_DIRS']=NOLAUNCH
+				self._debug("VNC: {}".format(" ".join(vnc_cmd)))
 				subprocess.run(vnc_cmd,env=fakeEnv)
 
 #				xephyr_cmd=["vinagre",
